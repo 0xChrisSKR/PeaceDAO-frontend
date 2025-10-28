@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { useAccount, usePublicClient, useWalletClient, useChainId } from "wagmi";
 import type { Address } from "viem";
@@ -23,10 +23,16 @@ export default function DonatePage() {
   const [isSubmitting, setSubmitting] = useState(false);
   const [resolvedMethod, setResolvedMethod] = useState<string | null>(null);
 
-  const donateAddress = env.peaceFund as Address;
+  const donateAddress = useMemo(() => {
+    if (!env.peaceFund) return undefined;
+    return isAddress(env.peaceFund) ? (env.peaceFund as Address) : undefined;
+  }, []);
+
+  const isPeaceFundConfigured = Boolean(donateAddress);
 
   const resolveMethod = async (value: bigint, account: Address, beneficiaryAddress: Address) => {
     if (!publicClient) throw new Error("Public client unavailable");
+    if (!donateAddress) throw new Error("PeaceFund contract is not configured");
     const methods = Array.from(new Set([env.donateMethod, ...FALLBACK_METHODS]));
     for (const method of methods) {
       if (!method) continue;
@@ -58,7 +64,7 @@ export default function DonatePage() {
       toast.error(`Switch to ${DEFAULT_CHAIN.name} to donate`);
       return;
     }
-    if (!donateAddress || donateAddress === "0x0000000000000000000000000000000000000000") {
+    if (!donateAddress) {
       toast.error("PeaceFund contract address is not configured");
       return;
     }
@@ -98,7 +104,9 @@ export default function DonatePage() {
       setBeneficiary("");
     } catch (error: any) {
       console.error(error);
-      toast.error(error?.shortMessage ?? error?.message ?? "Donation failed", { id: "donate" });
+      const message =
+        error?.shortMessage ?? error?.message ?? error?.cause?.shortMessage ?? "Donation failed";
+      toast.error(message, { id: "donate" });
     } finally {
       setSubmitting(false);
     }
@@ -116,52 +124,64 @@ export default function DonatePage() {
           90% of every donation is streamed directly to the beneficiary while 10% sustains PeaceDAO operations.
         </p>
       </div>
+      {!isPeaceFundConfigured && (
+        <div className="rounded-lg border border-amber-500 bg-amber-500/20 p-4 text-sm text-amber-100">
+          PeaceFund is not configured. Set <span className="font-semibold">NEXT_PUBLIC_PEACE_FUND</span> in your
+          <code className="mx-1 rounded bg-amber-500/20 px-1 py-0.5 text-xs text-amber-200">.env.local</code> to enable donations.
+        </div>
+      )}
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 shadow-lg">
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-200">Beneficiary Address</label>
-            <input
-              type="text"
-              required
-              value={beneficiary}
-              onChange={(event) => setBeneficiary(event.target.value)}
-              placeholder="0x..."
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-brand focus:outline-none"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-200">Amount (BNB)</label>
-            <input
-              type="number"
-              min="0"
-              step="0.0001"
-              value={amount}
-              onChange={(event) => setAmount(event.target.value)}
-              placeholder="0.5"
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-brand focus:outline-none"
-            />
-          </div>
-          {resolvedMethod && (
-            <p className="text-xs text-emerald-400">
-              Using PeaceFund method <span className="font-semibold">{resolvedMethod}</span>
-            </p>
-          )}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full rounded-lg bg-brand px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-light"
-          >
-            {isSubmitting ? "Processing..." : "Donate Now"}
-          </button>
+          <fieldset className="space-y-4" disabled={!isPeaceFundConfigured || isSubmitting}>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-200">Beneficiary Address</label>
+              <input
+                type="text"
+                required
+                value={beneficiary}
+                onChange={(event) => setBeneficiary(event.target.value)}
+                placeholder="0x..."
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-brand focus:outline-none"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-200">Amount (BNB)</label>
+              <input
+                type="number"
+                min="0"
+                step="0.0001"
+                value={amount}
+                onChange={(event) => setAmount(event.target.value)}
+                placeholder="0.5"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-brand focus:outline-none"
+              />
+            </div>
+            {resolvedMethod && (
+              <p className="text-xs text-emerald-400">
+                Using PeaceFund method <span className="font-semibold">{resolvedMethod}</span>
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={isSubmitting || !isPeaceFundConfigured}
+              className="w-full rounded-lg bg-brand px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-light disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSubmitting ? "Processing..." : "Donate Now"}
+            </button>
+          </fieldset>
         </form>
       </div>
       <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 text-sm text-slate-300">
-        <p>
-          PeaceFund Contract: <span className="font-mono text-slate-100">{env.peaceFund}</span>
-        </p>
-        <p className="mt-2">
-          Keep at least 0.01 BNB for gas fees. Donations are executed on {DEFAULT_CHAIN.name}.
-        </p>
+        {isPeaceFundConfigured ? (
+          <>
+            <p>
+              PeaceFund Contract: <span className="font-mono text-slate-100">{env.peaceFund}</span>
+            </p>
+            <p className="mt-2">Keep at least 0.01 BNB for gas fees. Donations are executed on {DEFAULT_CHAIN.name}.</p>
+          </>
+        ) : (
+          <p className="text-amber-200">Configure your PeaceFund address to enable donations on {DEFAULT_CHAIN.name}.</p>
+        )}
       </div>
     </div>
   );

@@ -6,6 +6,8 @@ import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { fromWei, formatNumber } from "@/lib/format";
 import toast from "react-hot-toast";
 import type { Address } from "viem";
+import { isAddress } from "viem";
+import { useMemo } from "react";
 
 interface Props {
   requiredBalance: number;
@@ -13,7 +15,12 @@ interface Props {
 
 export function VerifiedTGButton({ requiredBalance }: Props) {
   const { isConnected } = useAccount();
-  const { data: balance } = useTokenBalance(env.peaceToken as Address | undefined, { watch: true });
+  const peaceTokenAddress = useMemo(() => {
+    if (!env.peaceToken) return undefined;
+    return isAddress(env.peaceToken) ? (env.peaceToken as Address) : undefined;
+  }, []);
+
+  const { data: balance } = useTokenBalance(peaceTokenAddress, { watch: true });
 
   const numericBalance = balance ? Number(fromWei(balance)) : 0;
   const hasAccess = numericBalance >= requiredBalance;
