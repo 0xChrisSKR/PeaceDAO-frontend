@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAccount, useChainId, usePublicClient, useWalletClient } from "wagmi";
 import type { Address } from "viem";
-import { isAddress, decodeEventLog, maxUint256 } from "viem";
+import { isAddress, decodeEventLog, maxUint256, formatUnits } from "viem";
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
@@ -53,39 +53,58 @@ export default function SwapPage() {
     }
   }, [chainId]);
 
+  const normalizedTokenIn = tokenIn.trim();
+  const normalizedTokenOut = tokenOut.trim();
+
   const { data: tokenInMeta } = useQuery<TokenMeta>({
-    queryKey: ["token-meta", chainId, tokenIn, "in"],
-    enabled: Boolean(publicClient && isAddress(tokenIn)),
+    queryKey: ["token-meta", chainId, normalizedTokenIn, "in"],
+    enabled: Boolean(publicClient && isAddress(normalizedTokenIn)),
     queryFn: async () => {
       if (!publicClient) throw new Error("public client unavailable");
       const [decimals, symbol] = await Promise.all([
-        publicClient.readContract({ address: tokenIn as Address, abi: erc20Abi, functionName: "decimals" }) as Promise<number>,
-        publicClient.readContract({ address: tokenIn as Address, abi: erc20Abi, functionName: "symbol" }) as Promise<string>
+        publicClient.readContract({
+          address: normalizedTokenIn as Address,
+          abi: erc20Abi,
+          functionName: "decimals"
+        }) as Promise<number>,
+        publicClient.readContract({
+          address: normalizedTokenIn as Address,
+          abi: erc20Abi,
+          functionName: "symbol"
+        }) as Promise<string>
       ]);
       return { decimals, symbol };
     }
   });
 
   const { data: tokenOutMeta } = useQuery<TokenMeta>({
-    queryKey: ["token-meta", chainId, tokenOut, "out"],
-    enabled: Boolean(publicClient && isAddress(tokenOut)),
+    queryKey: ["token-meta", chainId, normalizedTokenOut, "out"],
+    enabled: Boolean(publicClient && isAddress(normalizedTokenOut)),
     queryFn: async () => {
       if (!publicClient) throw new Error("public client unavailable");
       const [decimals, symbol] = await Promise.all([
-        publicClient.readContract({ address: tokenOut as Address, abi: erc20Abi, functionName: "decimals" }) as Promise<number>,
-        publicClient.readContract({ address: tokenOut as Address, abi: erc20Abi, functionName: "symbol" }) as Promise<string>
+        publicClient.readContract({
+          address: normalizedTokenOut as Address,
+          abi: erc20Abi,
+          functionName: "decimals"
+        }) as Promise<number>,
+        publicClient.readContract({
+          address: normalizedTokenOut as Address,
+          abi: erc20Abi,
+          functionName: "symbol"
+        }) as Promise<string>
       ]);
       return { decimals, symbol };
     }
   });
 
   const { data: allowance, refetch: refetchAllowance } = useQuery<bigint>({
-    queryKey: ["allowance", chainId, tokenIn, address, routerAddress],
-    enabled: Boolean(publicClient && isConnected && isAddress(tokenIn) && routerAddress),
+    queryKey: ["allowance", chainId, normalizedTokenIn, address, routerAddress],
+    enabled: Boolean(publicClient && isConnected && isAddress(normalizedTokenIn) && routerAddress),
     queryFn: async () => {
       if (!publicClient || !address || !routerAddress) return 0n;
       return (await publicClient.readContract({
-        address: tokenIn as Address,
+        address: normalizedTokenIn as Address,
         abi: erc20Abi,
         functionName: "allowance",
         args: [address as Address, routerAddress]
@@ -94,7 +113,10 @@ export default function SwapPage() {
     refetchInterval: 20_000
   });
 
-  const { data: balance } = useTokenBalance(isAddress(tokenIn) ? (tokenIn as Address) : undefined, { watch: true });
+  const { data: balance } = useTokenBalance(
+    isAddress(normalizedTokenIn) ? (normalizedTokenIn as Address) : undefined,
+    { watch: true }
+  );
 
   const amountInBigInt = useMemo(() => {
     if (!tokenInMeta || !amountIn) return 0n;
@@ -121,9 +143,10 @@ export default function SwapPage() {
   }, [minOutBigInt, slippageBps]);
 
   const needsApproval = useMemo(() => {
-    if (!allowance) return true;
+    if (!isAddress(normalizedTokenIn) || amountInBigInt === 0n) return false;
+    if (allowance === undefined) return true;
     return allowance < amountInBigInt;
-  }, [allowance, amountInBigInt]);
+  }, [allowance, amountInBigInt, normalizedTokenIn]);
 
   const executeApprove = async () => {
     if (!isConnected || !address) {
@@ -138,7 +161,7 @@ export default function SwapPage() {
       toast.error("Wallet client unavailable");
       return;
     }
-    if (!isAddress(tokenIn)) {
+    if (!isAddress(normalizedTokenIn)) {
       toast.error("Enter a valid Token In address");
       return;
     }
@@ -150,7 +173,7 @@ export default function SwapPage() {
       setApproving(true);
       toast.loading("Approving token...", { id: "approve" });
       const txHash = await walletClient.writeContract({
-        address: tokenIn as Address,
+        address: normalizedTokenIn as Address,
         abi: erc20Abi,
         functionName: "approve",
         args: [routerAddress, maxUint256],
@@ -185,7 +208,7 @@ export default function SwapPage() {
       toast.error("Unable to load token metadata");
       return;
     }
-    if (!isAddress(tokenIn) || !isAddress(tokenOut)) {
+    if (!isAddress(normalizedTokenIn) || !isAddress(normalizedTokenOut)) {
       toast.error("Enter valid token addresses");
       return;
     }
@@ -214,12 +237,19 @@ export default function SwapPage() {
 
     try {
       setSwapping(true);
+      setSwapLogs([]);
       toast.loading("Submitting swap...", { id: "swap" });
       const txHash = await walletClient.writeContract({
         address: routerAddress,
         abi: routerAbi,
         functionName: "swapExactTokensForTokensWithFee",
-        args: [amountInBigInt, slippageAdjustedMinOut, [tokenIn as Address, tokenOut as Address], address as Address, deadline],
+        args: [
+          amountInBigInt,
+          slippageAdjustedMinOut,
+          [normalizedTokenIn as Address, normalizedTokenOut as Address],
+          address as Address,
+          deadline
+        ],
         account: address as Address
       });
       toast.success(`Swap tx: ${txHash.slice(0, 10)}…`, { id: "swap" });
@@ -231,9 +261,17 @@ export default function SwapPage() {
           try {
             const decoded = decodeEventLog({ abi: routerAbi, data: log.data, topics: log.topics });
             if (decoded.eventName === "SwapWithFee") {
-              const { amountIn: loggedIn, amountOut, fee } = decoded.args as any;
+              const { amountIn: loggedIn, amountOut, fee } = decoded.args as {
+                amountIn?: bigint;
+                amountOut?: bigint;
+                fee?: bigint;
+              };
+              if (typeof loggedIn !== "bigint" || typeof amountOut !== "bigint" || typeof fee !== "bigint") continue;
+              const formattedIn = formatNumber(Number(formatUnits(loggedIn, tokenInMeta.decimals)), 4);
+              const formattedOut = formatNumber(Number(formatUnits(amountOut, tokenOutMeta.decimals)), 4);
+              const formattedFee = formatNumber(Number(formatUnits(fee, tokenInMeta.decimals)), 4);
               logMessages.push(
-                `SwapWithFee: in ${formatNumber(Number(loggedIn) / 10 ** tokenInMeta.decimals, 4)} ${tokenInMeta.symbol}, out ${formatNumber(Number(amountOut) / 10 ** tokenOutMeta.decimals, 4)} ${tokenOutMeta.symbol}, fee ${formatNumber(Number(fee) / 10 ** tokenInMeta.decimals, 4)}`
+                `SwapWithFee: in ${formattedIn} ${tokenInMeta.symbol}, out ${formattedOut} ${tokenOutMeta.symbol}, fee ${formattedFee}`
               );
             }
           } catch (error) {
