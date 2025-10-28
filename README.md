@@ -32,3 +32,11 @@ Set these environment variables in `.env.local` (or your hosting provider):
 - The donate page auto-detects the PeaceFund payable method. It attempts the value provided in `NEXT_PUBLIC_DONATE_METHOD` and falls back through `donate`, `donateBNB`, `donateTo`, and `executeDonation`.
 - Swapping requires a functioning PeaceSwap router address. If the configured address is a placeholder the swap form will surface a warning and transactions will fail fast.
 - The UI uses Tailwind CSS's default system font stack so builds succeed in fully offline environments (no Google font downloads required).
+
+## Connect Wallet Support
+
+- Supported wallets:
+  - Binance Web3 Wallet (via WalletConnect)
+  - MetaMask (via WalletConnect QR)
+- Removed the direct MetaMask SDK dependency to support Vercel builds.
+- Wallet connections work across desktop and mobile platforms.
