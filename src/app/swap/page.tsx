@@ -35,23 +35,34 @@ export default function SwapPage() {
   const [isApproving, setApproving] = useState(false);
   const [isSwapping, setSwapping] = useState(false);
 
-  const routerAddress = (env.peaceSwapRouter && isAddress(env.peaceSwapRouter) ? (env.peaceSwapRouter as Address) : undefined);
+  const routerAddress = useMemo(() => {
+    if (!env.peaceSwapRouter) return undefined;
+    return isAddress(env.peaceSwapRouter) ? (env.peaceSwapRouter as Address) : undefined;
+  }, []);
+
+  const isRouterConfigured = Boolean(routerAddress);
+
+  const defaultPair = useMemo(() => {
+    const tokenInAddress = env.peaceToken ?? "";
+    const wbnbMain = env.wbnbMainnet ?? "";
+    const wbnbTest = env.wbnbTestnet ?? "";
+
+    if (chainId === bsc.id) {
+      return { tokenIn: tokenInAddress, tokenOut: wbnbMain };
+    }
+    if (chainId === bscTestnet.id) {
+      return { tokenIn: tokenInAddress, tokenOut: wbnbTest || wbnbMain };
+    }
+    if (DEFAULT_CHAIN.id === bsc.id) {
+      return { tokenIn: tokenInAddress, tokenOut: wbnbMain };
+    }
+    return { tokenIn: tokenInAddress, tokenOut: wbnbTest || wbnbMain };
+  }, [chainId]);
 
   useEffect(() => {
-    if (chainId === bsc.id) {
-      setTokenIn(env.tokenInMainnet);
-      setTokenOut(env.tokenOutMainnet);
-    } else if (chainId === bscTestnet.id) {
-      setTokenIn(env.tokenInTestnet);
-      setTokenOut(env.tokenOutTestnet);
-    } else if (DEFAULT_CHAIN.id === bscTestnet.id) {
-      setTokenIn(env.tokenInTestnet);
-      setTokenOut(env.tokenOutTestnet);
-    } else {
-      setTokenIn(env.tokenInMainnet);
-      setTokenOut(env.tokenOutMainnet);
-    }
-  }, [chainId]);
+    setTokenIn(defaultPair.tokenIn ?? "");
+    setTokenOut(defaultPair.tokenOut ?? "");
+  }, [defaultPair.tokenIn, defaultPair.tokenOut]);
 
   const normalizedTokenIn = tokenIn.trim();
   const normalizedTokenOut = tokenOut.trim();
@@ -143,10 +154,11 @@ export default function SwapPage() {
   }, [minOutBigInt, slippageBps]);
 
   const needsApproval = useMemo(() => {
+    if (!isRouterConfigured) return false;
     if (!isAddress(normalizedTokenIn) || amountInBigInt === 0n) return false;
     if (allowance === undefined) return true;
     return allowance < amountInBigInt;
-  }, [allowance, amountInBigInt, normalizedTokenIn]);
+  }, [allowance, amountInBigInt, isRouterConfigured, normalizedTokenIn]);
 
   const executeApprove = async () => {
     if (!isConnected || !address) {
@@ -159,6 +171,10 @@ export default function SwapPage() {
     }
     if (!walletClient) {
       toast.error("Wallet client unavailable");
+      return;
+    }
+    if (!publicClient) {
+      toast.error("Public client unavailable");
       return;
     }
     if (!isAddress(normalizedTokenIn)) {
@@ -238,6 +254,37 @@ export default function SwapPage() {
     try {
       setSwapping(true);
       setSwapLogs([]);
+      toast.loading("Simulating swap...", { id: "swap" });
+      try {
+        await publicClient.simulateContract({
+          address: routerAddress,
+          abi: routerAbi,
+          functionName: "swapExactTokensForTokensWithFee",
+          args: [
+            amountInBigInt,
+            slippageAdjustedMinOut,
+            [normalizedTokenIn as Address, normalizedTokenOut as Address],
+            address as Address,
+            deadline
+          ],
+          account: address as Address
+        });
+      } catch (error: any) {
+        console.error(error);
+        const rawMessage =
+          error?.shortMessage ?? error?.message ?? error?.cause?.shortMessage ?? "Swap simulation failed";
+        const normalizedMessage = String(rawMessage).toLowerCase();
+        if (normalizedMessage.includes("liquidity")) {
+          toast.error(
+            "Liquidity not found for this pair (WORLDPEACE/WBNB). Please add LP on PancakeSwap.",
+            { id: "swap" }
+          );
+        } else {
+          toast.error(rawMessage, { id: "swap" });
+        }
+        return;
+      }
+
       toast.loading("Submitting swap...", { id: "swap" });
       const txHash = await walletClient.writeContract({
         address: routerAddress,
@@ -253,7 +300,7 @@ export default function SwapPage() {
         account: address as Address
       });
       toast.success(`Swap tx: ${txHash.slice(0, 10)}…`, { id: "swap" });
-      const receipt = await publicClient?.waitForTransactionReceipt({ hash: txHash });
+      const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
       toast.success("Swap confirmed", { id: "swap" });
       if (receipt?.logs?.length) {
         const logMessages: string[] = [];
@@ -284,7 +331,8 @@ export default function SwapPage() {
       setMinOut("");
     } catch (error: any) {
       console.error(error);
-      toast.error(error?.shortMessage ?? error?.message ?? "Swap failed", { id: "swap" });
+      const message = error?.shortMessage ?? error?.message ?? error?.cause?.shortMessage ?? "Swap failed";
+      toast.error(message, { id: "swap" });
     } finally {
       setSwapping(false);
     }
@@ -295,13 +343,22 @@ export default function SwapPage() {
       <div>
         <h1 className="text-3xl font-bold text-white">PeaceSwap Router</h1>
         <p className="mt-2 text-sm text-slate-300">
-          Swap tokens while contributing a {env.swapFeeBps / 100}% fee to PeaceDAO (80% DAO, 20% founder).
+          Swap WORLDPEACE ↔ WBNB through PeaceSwap Router. When no wallet is connected we fall back to the BSC Testnet pair so
+          you can explore safely before deploying capital on mainnet.
         </p>
       </div>
 
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 shadow-lg">
+        {!isRouterConfigured && (
+          <div className="mb-4 rounded-lg border border-amber-500 bg-amber-500/20 p-3 text-xs text-amber-100">
+            PeaceSwap router is not configured. Set <span className="font-semibold">NEXT_PUBLIC_PEACE_SWAP_ROUTER</span> in your
+            <code className="mx-1 rounded bg-amber-500/20 px-1 py-0.5 text-[10px] text-amber-100">.env.local</code> to enable
+            swaps.
+          </div>
+        )}
         <div className="mb-4 rounded-lg border border-brand/30 bg-brand/10 p-3 text-xs text-brand-light">
-          This router charges a {env.swapFeeBps / 100}% fee; plan for slippage and keep BNB for gas.
+          Router may charge {env.swapFeeBps / 100}% fee (DAO 80% / Founder 20%) if using PeaceSwapRouter. Plan for slippage and
+          keep BNB for gas.
         </div>
         <div className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -385,16 +442,16 @@ export default function SwapPage() {
             {needsApproval ? (
               <button
                 onClick={executeApprove}
-                disabled={isApproving || !amountInBigInt}
-                className="flex-1 rounded-lg bg-slate-800 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
+                disabled={isApproving || !amountInBigInt || !isRouterConfigured}
+                className="flex-1 rounded-lg bg-slate-800 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isApproving ? "Approving..." : "Approve TokenIn"}
               </button>
             ) : null}
             <button
               onClick={executeSwap}
-              disabled={isSwapping || !amountInBigInt || needsApproval}
-              className="flex-1 rounded-lg bg-brand px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-light"
+              disabled={isSwapping || !amountInBigInt || needsApproval || !isRouterConfigured}
+              className="flex-1 rounded-lg bg-brand px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-light disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSwapping ? "Swapping..." : "Swap"}
             </button>
@@ -403,12 +460,20 @@ export default function SwapPage() {
       </div>
 
       <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 text-sm text-slate-300">
-        <p>
-          Router Address: <span className="font-mono text-slate-100">{routerAddress}</span>
-        </p>
-        <p className="mt-2">
-          Keep a small BNB balance to cover gas. Without a valid PeaceSwap router deployment, this interface will not execute.
-        </p>
+        {isRouterConfigured ? (
+          <>
+            <p>
+              Router Address: <span className="font-mono text-slate-100">{routerAddress}</span>
+            </p>
+            <p className="mt-2">
+              Keep a small BNB balance to cover gas. Without a valid PeaceSwap router deployment, this interface will not execute.
+            </p>
+          </>
+        ) : (
+          <p className="text-amber-200">
+            Router is disabled until <span className="font-semibold">NEXT_PUBLIC_PEACE_SWAP_ROUTER</span> is set for {DEFAULT_CHAIN.name}.
+          </p>
+        )}
         {swapLogs.length > 0 && (
           <div className="mt-4 space-y-2">
             {swapLogs.map((log, index) => (
