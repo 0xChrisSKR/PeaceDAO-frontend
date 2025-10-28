@@ -32,3 +32,7 @@ Set these environment variables in `.env.local` (or your hosting provider):
 - The donate page auto-detects the PeaceFund payable method. It attempts the value provided in `NEXT_PUBLIC_DONATE_METHOD` and falls back through `donate`, `donateBNB`, `donateTo`, and `executeDonation`.
 - Swapping requires a functioning PeaceSwap router address. If the configured address is a placeholder the swap form will surface a warning and transactions will fail fast.
 - The UI uses Tailwind CSS's default system font stack so builds succeed in fully offline environments (no Google font downloads required).
+
+## Troubleshooting (Build errors on Vercel)
+
+If you see `Can't resolve 'pino-pretty'`, it’s safe to ignore — this module is used only for Node.js logs and has been disabled for browser builds.
