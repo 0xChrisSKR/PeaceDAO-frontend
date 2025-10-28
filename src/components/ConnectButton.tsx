@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import clsx from "clsx";
 import toast from "react-hot-toast";
@@ -15,6 +15,11 @@ export function ConnectButton() {
   const { connectAsync, connectors, isPending, variables } = useConnect();
   const { disconnectAsync } = useDisconnect();
   const [open, setOpen] = useState(false);
+
+  const hasInjectedProvider = useMemo(() => {
+    if (typeof window === "undefined") return false;
+    return Boolean((window as typeof window & { ethereum?: unknown }).ethereum);
+  }, []);
 
   type ConnectorOption = (typeof connectors)[number];
   type ConnectorWithId = Extract<ConnectorOption, { id: string }>;
@@ -63,7 +68,7 @@ export function ConnectButton() {
         {isConnecting ? "Connecting..." : "Connect Wallet"}
       </button>
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-48 rounded-lg border border-slate-700 bg-slate-900 shadow-lg">
+        <div className="absolute right-0 z-50 mt-2 w-64 rounded-lg border border-slate-700 bg-slate-900 shadow-lg p-2 space-y-2">
           {availableConnectors.map((connector) => {
             const pendingId = (variables?.connector as { id?: string } | undefined)?.id;
             const isConnectorPending = isPending && pendingId === connector.id;
@@ -74,7 +79,7 @@ export function ConnectButton() {
                 disabled={!connector.ready}
                 onClick={() => handleConnect(connector.id)}
                 className={clsx(
-                  "block w-full px-4 py-2 text-left text-sm hover:bg-slate-800",
+                  "block w-full rounded-md px-4 py-2 text-left text-sm hover:bg-slate-800",
                   !connector.ready && "cursor-not-allowed opacity-50"
                 )}
               >
@@ -83,6 +88,27 @@ export function ConnectButton() {
               </button>
             );
           })}
+          {!hasInjectedProvider && (
+            <div className="space-y-1 rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-100">
+              <p className="font-medium">
+                Use Binance Web3 Wallet or WalletConnect QR to connect.
+              </p>
+              <p>
+                No browser wallet detected. You can
+                {" "}
+                <a
+                  href="https://metamask.io/download/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline"
+                >
+                  install MetaMask
+                </a>
+                {" "}
+                for direct browser support.
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>
