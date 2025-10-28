@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { injected, walletConnect } from "wagmi/connectors";
 import env from "@/config/env";
-import { CHAINS, DEFAULT_CHAIN, transports } from "@/config/chains";
+import { CHAINS, transports } from "@/config/chains";
 
 export const wagmiConfig = createConfig({
   chains: CHAINS,
@@ -42,7 +42,7 @@ export function WagmiProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <BaseWagmiProvider config={wagmiConfig} initialState={{ chainId: DEFAULT_CHAIN.id }}>
+    <BaseWagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </BaseWagmiProvider>
   );

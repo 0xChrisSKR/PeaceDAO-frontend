@@ -12,12 +12,18 @@ function truncateAddress(address?: string) {
 
 export function ConnectButton() {
   const { address, isConnecting, isConnected } = useAccount();
-  const { connectAsync, connectors, pendingConnector } = useConnect();
+  const { connectAsync, connectors, isPending, variables } = useConnect();
   const { disconnectAsync } = useDisconnect();
   const [open, setOpen] = useState(false);
 
+  type ConnectorOption = (typeof connectors)[number];
+  type ConnectorWithId = Extract<ConnectorOption, { id: string }>;
+  const availableConnectors = connectors.filter(
+    (connector): connector is ConnectorWithId => typeof connector !== "function"
+  );
+
   const handleConnect = async (id: string) => {
-    const connector = connectors.find((c) => c.id === id);
+    const connector = availableConnectors.find((c) => c.id === id);
     if (!connector) return;
     try {
       await connectAsync({ connector });
@@ -58,20 +64,25 @@ export function ConnectButton() {
       </button>
       {open && (
         <div className="absolute right-0 z-50 mt-2 w-48 rounded-lg border border-slate-700 bg-slate-900 shadow-lg">
-          {connectors.map((connector) => (
-            <button
-              key={connector.id}
-              disabled={!connector.ready}
-              onClick={() => handleConnect(connector.id)}
-              className={clsx(
-                "block w-full px-4 py-2 text-left text-sm hover:bg-slate-800",
-                !connector.ready && "cursor-not-allowed opacity-50"
-              )}
-            >
-              {connector.name}
-              {pendingConnector?.id === connector.id ? " (connecting)" : ""}
-            </button>
-          ))}
+          {availableConnectors.map((connector) => {
+            const pendingId = (variables?.connector as { id?: string } | undefined)?.id;
+            const isConnectorPending = isPending && pendingId === connector.id;
+
+            return (
+              <button
+                key={connector.id}
+                disabled={!connector.ready}
+                onClick={() => handleConnect(connector.id)}
+                className={clsx(
+                  "block w-full px-4 py-2 text-left text-sm hover:bg-slate-800",
+                  !connector.ready && "cursor-not-allowed opacity-50"
+                )}
+              >
+                {connector.name}
+                {isConnectorPending ? " (connecting)" : ""}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
