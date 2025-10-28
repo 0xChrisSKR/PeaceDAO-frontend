@@ -1,0 +1,6 @@
+[
+  {"type":"function","name":"donate","stateMutability":"payable","inputs":[{"name":"beneficiary","type":"address"}],"outputs":[]},
+  {"type":"function","name":"donateBNB","stateMutability":"payable","inputs":[{"name":"beneficiary","type":"address"}],"outputs":[]},
+  {"type":"function","name":"donateTo","stateMutability":"payable","inputs":[{"name":"beneficiary","type":"address"}],"outputs":[]},
+  {"type":"function","name":"executeDonation","stateMutability":"payable","inputs":[{"name":"beneficiary","type":"address"}],"outputs":[]}
+]
