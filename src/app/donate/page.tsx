@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useAccount, usePublicClient, useWalletClient, useChainId } from "wagmi";
 import type { Address } from "viem";
@@ -25,7 +25,7 @@ export default function DonatePage() {
 
   const donateAddress = env.peaceFund as Address;
 
-  const resolveMethod = async (value: bigint, account: Address) => {
+  const resolveMethod = async (value: bigint, account: Address, beneficiaryAddress: Address) => {
     if (!publicClient) throw new Error("Public client unavailable");
     const methods = Array.from(new Set([env.donateMethod, ...FALLBACK_METHODS]));
     for (const method of methods) {
@@ -36,7 +36,7 @@ export default function DonatePage() {
           address: donateAddress,
           abi: peaceFundAbi,
           functionName: method as typeof FALLBACK_METHODS[number],
-          args: [beneficiary as Address],
+          args: [beneficiaryAddress],
           value
         });
         return method;
@@ -49,6 +49,7 @@ export default function DonatePage() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    const normalizedBeneficiary = beneficiary.trim() as Address;
     if (!isConnected || !address) {
       toast.error("Connect your wallet to donate");
       return;
@@ -61,11 +62,11 @@ export default function DonatePage() {
       toast.error("PeaceFund contract address is not configured");
       return;
     }
-    if (!isAddress(beneficiary)) {
+    if (!isAddress(normalizedBeneficiary)) {
       toast.error("Enter a valid beneficiary address");
       return;
     }
-    const value = toWei(amount || "0");
+    const value = toWei((amount || "0").trim());
     if (value <= 0n) {
       toast.error("Enter an amount greater than zero");
       return;
@@ -77,15 +78,16 @@ export default function DonatePage() {
 
     try {
       setSubmitting(true);
+      setResolvedMethod(null);
       toast.loading("Resolving donation method...", { id: "donate" });
-      const method = await resolveMethod(value, address as Address);
+      const method = await resolveMethod(value, address as Address, normalizedBeneficiary);
       setResolvedMethod(method);
       toast.loading("Sending donation...", { id: "donate" });
       const txHash = await walletClient.writeContract({
         address: donateAddress,
         abi: peaceFundAbi,
         functionName: method as typeof FALLBACK_METHODS[number],
-        args: [beneficiary as Address],
+        args: [normalizedBeneficiary],
         value,
         account: address as Address
       });
@@ -101,6 +103,10 @@ export default function DonatePage() {
       setSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    setResolvedMethod(null);
+  }, [beneficiary, amount]);
 
   return (
     <div className="space-y-6">
