@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "es2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
@@ -14,14 +18,38 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
-      "@/components/*": ["./src/components/*"],
-      "@/providers/*": ["./src/providers/*"],
-      "@/config/*": ["./src/config/*"],
-      "@/lib/*": ["./src/lib/*"],
-      "@/hooks/*": ["./src/hooks/*"],
-      "@/abi/*": ["./src/abi/*"]
-    }
+      "@/components/*": [
+        "./src/components/*"
+      ],
+      "@/providers/*": [
+        "./src/providers/*"
+      ],
+      "@/config/*": [
+        "./src/config/*"
+      ],
+      "@/lib/*": [
+        "./src/lib/*"
+      ],
+      "@/hooks/*": [
+        "./src/hooks/*"
+      ],
+      "@/abi/*": [
+        "./src/abi/*"
+      ]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
