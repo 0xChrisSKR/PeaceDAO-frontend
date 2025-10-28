@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Route } from "next";
 import env from "@/config/env";
 import { VerifiedTGButton } from "@/components/VerifiedTGButton";
 
@@ -23,7 +24,11 @@ const CTA_CARDS = [
     description: "Earn access to gated spaces (coming soon).",
     href: "/verify"
   }
-];
+] satisfies Array<{
+  title: string;
+  description: string;
+  href: Route;
+}>;
 
 export default function HomePage() {
   return (
@@ -54,13 +59,14 @@ export default function HomePage() {
           <p className="mt-2 text-sm text-slate-300">
             Our public Telegram keeps everyone aligned with the mission.
           </p>
-          <Link
+          <a
             href={env.tgPublic || "#"}
             target="_blank"
+            rel="noopener noreferrer"
             className="mt-4 inline-flex w-full justify-center rounded-lg bg-brand px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-light"
           >
             Open Public Telegram
-          </Link>
+          </a>
         </div>
         <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
           <h3 className="text-lg font-semibold text-white">Unlock verified access</h3>

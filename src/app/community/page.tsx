@@ -12,13 +12,14 @@ export default function CommunityPage() {
         <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
           <h2 className="text-xl font-semibold text-white">Public Telegram</h2>
           <p className="mt-2 text-sm text-slate-300">Stay up-to-date with mission updates and call-to-actions.</p>
-          <Link
+          <a
             href={env.tgPublic || "#"}
             target="_blank"
+            rel="noopener noreferrer"
             className="mt-4 inline-flex w-full justify-center rounded-lg bg-brand px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-light"
           >
             Join Public Chat
-          </Link>
+          </a>
         </div>
         <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
           <h2 className="text-xl font-semibold text-white">Verified Telegram</h2>

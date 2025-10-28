@@ -15,3 +15,4 @@ npm run dev
 
 - The donate page auto-detects the PeaceFund payable method. It attempts the value provided in `NEXT_PUBLIC_DONATE_METHOD` and falls back through `donate`, `donateBNB`, `donateTo`, and `executeDonation`.
 - Swapping requires a functioning PeaceSwap router address. If the configured address is a placeholder the swap form will surface a warning and transactions will fail fast.
+- The UI uses Tailwind CSS's default system font stack so builds succeed in fully offline environments (no Google font downloads required).

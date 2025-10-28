@@ -1,12 +1,9 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { Header } from "@/components/Header";
 import { WagmiProvider } from "@/providers/wagmi";
 import { Toast } from "@/components/Toast";
 import { NetworkGuard } from "@/components/NetworkGuard";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "PeaceDAO DApp",
@@ -16,7 +13,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} min-h-screen bg-slate-950 text-slate-100`}>
+      <body className="min-h-screen bg-slate-950 text-slate-100 font-sans">
         <WagmiProvider>
           <div className="flex min-h-screen flex-col">
             <Header />

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { Route } from "next";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { ConnectButton } from "@/components/ConnectButton";
@@ -13,7 +14,7 @@ const NAV_ITEMS = [
   { href: "/proposals", label: "Proposals" },
   { href: "/verify", label: "Verify" },
   { href: "/community", label: "Community" }
-];
+] satisfies Array<{ href: Route; label: string }>;
 
 export function Header() {
   const pathname = usePathname();
