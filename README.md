@@ -35,8 +35,6 @@ Set these environment variables in `.env.local` (or your hosting provider):
 
 ## Connect Wallet Support
 
-- Supported wallets:
-  - Binance Web3 Wallet (via WalletConnect)
-  - MetaMask (via WalletConnect QR)
-- Removed the direct MetaMask SDK dependency to support Vercel builds.
+- We use wagmi with WalletConnect to support Binance Web3 Wallet and MetaMask via WalletConnect QR.
+- The direct `@metamask/sdk` dependency was removed because its React Native modules are incompatible with Vercel/browser builds.
 - Wallet connections work across desktop and mobile platforms.

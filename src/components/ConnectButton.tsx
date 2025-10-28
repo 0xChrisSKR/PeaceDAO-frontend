@@ -89,24 +89,8 @@ export function ConnectButton() {
             );
           })}
           {!hasInjectedProvider && (
-            <div className="space-y-1 rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-100">
-              <p className="font-medium">
-                Use Binance Web3 Wallet or WalletConnect QR to connect.
-              </p>
-              <p>
-                No browser wallet detected. You can
-                {" "}
-                <a
-                  href="https://metamask.io/download/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline"
-                >
-                  install MetaMask
-                </a>
-                {" "}
-                for direct browser support.
-              </p>
+            <div className="rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-100">
+              <p className="font-medium">Use Binance Web3 Wallet or WalletConnect QR.</p>
             </div>
           )}
         </div>
