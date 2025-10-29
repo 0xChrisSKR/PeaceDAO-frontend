@@ -1,5 +1,5 @@
 const path = require("path");
-const { i18n } = require("./next-i18next.config");
+const i18nConfig = require("./next-i18next.config");
 
 /**
  * @type {import('next').NextConfig}
@@ -9,14 +9,18 @@ const nextConfig = {
   experimental: {
     typedRoutes: true
   },
+  i18n: i18nConfig.i18n,
   webpack: (config, { isServer }) => {
-    // 🔧 Ignore React Native & CLI-only modules that break SSR builds
+    config.resolve = config.resolve || {};
     config.resolve.alias = config.resolve.alias || {};
+
+    // 🔧 Ignore React Native & CLI-only modules that break SSR builds
     config.resolve.alias["@"] = path.resolve(__dirname, "src");
-    config.resolve.alias["@react-native-async-storage/async-storage"] = require.resolve("core-js/features/promise");
+    config.resolve.alias["@react-native-async-storage/async-storage"] = false;
     config.resolve.alias["pino-pretty"] = false;
     config.resolve.alias["pino-abstract-transport"] = false;
     config.resolve.alias["sonic-boom"] = false;
+
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -33,8 +37,7 @@ const nextConfig = {
     }
     return config;
   },
-  images: { unoptimized: true },
-  i18n
+  images: { unoptimized: true }
 };
 
 module.exports = nextConfig;
