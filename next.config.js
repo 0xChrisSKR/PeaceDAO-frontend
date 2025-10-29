@@ -1,38 +1,21 @@
-/**
- * @type {import('next').NextConfig}
- */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  experimental: {
-    typedRoutes: true
-  },
   webpack: (config, { isServer }) => {
-    config.resolve = config.resolve || {};
-    config.resolve.alias = {
-      ...(config.resolve.alias || {}),
-      // Stub RN storage (MetaMask SDK tries to require it)
-      '@react-native-async-storage/async-storage': require.resolve('./src/shims/empty.js'),
-      // Disable server-only logger pretty-printer in client bundles
-      'pino-pretty': false,
-      'pino-abstract-transport': false,
-      'sonic-boom': false
-    };
-
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        'react-native': false,
-        '@react-native-async-storage/async-storage': false
-      };
-    }
-
+    // Patch async-storage (mobile only) and pino-pretty (CLI only)
+    config.resolve.alias['@react-native-async-storage/async-storage'] = require.resolve('core-js/features/promise');
+    config.resolve.alias['pino-pretty'] = false;
     return config;
   },
+  images: {
+    remotePatterns: [],
+  },
+  // Safe default for i18n (Next.js native i18n, not next-i18next)
   i18n: {
-    locales: ['zh', 'en'],
-    defaultLocale: 'zh',
-    localeDetection: false
-  }
+    locales: ['en', 'zh'],
+    defaultLocale: 'en',
+    localeDetection: false,
+  },
 };
 
 module.exports = nextConfig;
