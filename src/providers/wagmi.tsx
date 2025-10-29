@@ -5,6 +5,7 @@ import { WagmiProvider, createConfig } from 'wagmi';
 import { createWeb3Modal } from '@web3modal/wagmi/react';
 import { cookieStorage, createStorage } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import MetaMaskSDKInitializer from '@/providers/metamask-sdk';
 
 import env from '@/config/env';
 import { CHAINS, DEFAULT_CHAIN, transports } from '@/config/chains';
@@ -45,6 +46,7 @@ export function Web3Providers({ children }: { children: ReactNode }) {
 
   return (
     <WagmiProvider config={wagmiConfig}>
+      <MetaMaskSDKInitializer />
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </WagmiProvider>
   );
