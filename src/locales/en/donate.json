@@ -1,0 +1,7 @@
+{
+  "title": "On-chain Donation",
+  "subtitle": "Every act of kindness lives forever on the blockchain.",
+  "input_label": "Donation Amount (BNB)",
+  "submit_btn": "Donate Now",
+  "success": "Thank you for your donation! Transaction confirmed on-chain."
+}

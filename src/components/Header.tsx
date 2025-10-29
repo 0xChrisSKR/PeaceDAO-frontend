@@ -6,10 +6,12 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { ConnectButton } from "@/components/ConnectButton";
 import { NetworkPill } from "@/components/NetworkPill";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 const NAV_ITEMS = [
   { href: "/", label: "Home" },
   { href: "/donate", label: "Donate" },
+  { href: "/treasury", label: "Treasury" },
   { href: "/swap", label: "Swap" },
   { href: "/proposals", label: "Proposals" },
   { href: "/verify", label: "Verify" },
@@ -48,6 +50,7 @@ export function Header() {
           <div className="sm:hidden">
             <NetworkPill />
           </div>
+          <LanguageToggle />
           <ConnectButton />
         </div>
       </div>

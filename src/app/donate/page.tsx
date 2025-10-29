@@ -9,6 +9,7 @@ import env from "@/config/env";
 import peaceFundAbi from "@/abi/peaceFund.json";
 import { DEFAULT_CHAIN } from "@/config/chains";
 import { toWei } from "@/lib/format";
+import { useT } from "@/hooks/useT";
 
 const FALLBACK_METHODS = ["donate", "donateBNB", "donateTo", "executeDonation"];
 
@@ -17,6 +18,7 @@ export default function DonatePage() {
   const chainId = useChainId();
   const publicClient = usePublicClient({ chainId });
   const { data: walletClient } = useWalletClient();
+  const t = useT("donate");
 
   const [beneficiary, setBeneficiary] = useState("");
   const [amount, setAmount] = useState("");
@@ -99,7 +101,7 @@ export default function DonatePage() {
       });
       toast.success(`Transaction sent: ${txHash.slice(0, 10)}…`, { id: "donate" });
       await publicClient?.waitForTransactionReceipt({ hash: txHash });
-      toast.success("Donation confirmed", { id: "donate" });
+      toast.success(t("success"), { id: "donate" });
       setAmount("");
       setBeneficiary("");
     } catch (error: any) {
@@ -119,10 +121,8 @@ export default function DonatePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-white">Donate BNB</h1>
-        <p className="mt-2 text-sm text-slate-300">
-          90% of every donation is streamed directly to the beneficiary while 10% sustains PeaceDAO operations.
-        </p>
+        <h1 className="text-3xl font-bold text-white">{t("title")}</h1>
+        <p className="mt-2 text-sm text-slate-300">{t("subtitle")}</p>
       </div>
       {!isPeaceFundConfigured && (
         <div className="rounded-lg border border-amber-500 bg-amber-500/20 p-4 text-sm text-amber-100">
@@ -145,7 +145,7 @@ export default function DonatePage() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-200">Amount (BNB)</label>
+              <label className="text-sm font-semibold text-slate-200">{t("input_label")}</label>
               <input
                 type="number"
                 min="0"
@@ -166,7 +166,7 @@ export default function DonatePage() {
               disabled={isSubmitting || !isPeaceFundConfigured}
               className="w-full rounded-lg bg-brand px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-light disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isSubmitting ? "Processing..." : "Donate Now"}
+              {isSubmitting ? "Processing..." : t("submit_btn")}
             </button>
           </fieldset>
         </form>
