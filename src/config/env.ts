@@ -16,6 +16,7 @@ const env = {
   tgPublic: process.env.NEXT_PUBLIC_TG_PUBLIC ?? "",
   tgVerified: process.env.NEXT_PUBLIC_TG_VERIFIED ?? "",
   guildLink: process.env.NEXT_PUBLIC_GUILD_LINK ?? "",
+  twitter: process.env.NEXT_PUBLIC_TWITTER ?? "https://x.com/WorldPeace_BNB",
   defaultNetwork: (process.env.NEXT_PUBLIC_DEFAULT_NETWORK ?? "bsctest").toLowerCase()
 };
 
