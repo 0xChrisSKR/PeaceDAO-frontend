@@ -1,25 +1,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   i18n: {
-    locales: ['en', 'zh'],
+    // Next.js 的多語系設定放這裡
+    locales: ['en', 'zh-TW'],
     defaultLocale: 'en',
-    localeDetection: false, // 必須為 false
+    // 依照 Vercel 日誌要求，這裡必須是 false
+    localeDetection: false,
   },
   webpack: (config) => {
+    // 關閉只在原生/Node 用得到的套件，避免 web bundle 把它們打進來
+    config.resolve = config.resolve || {};
     config.resolve.alias = {
-      ...(config.resolve.alias || {}),
-      'pino-pretty': false,
+      ...(config.resolve.alias ?? {}),
       '@react-native-async-storage/async-storage': false,
-      'react-native-quick-base64': false,
-      'thread-stream': false,
+      'pino-pretty': false,
+      'pino-std-serializers': false,
       'sonic-boom': false,
-      'lokijs': false,
-      'encoding': false,
-      'bufferutil': false,
-      'utf-8-validate': false,
-      'fsevents': false,
-      'canvas': false,
-      'trezor-connect': false,
     };
     return config;
   },
