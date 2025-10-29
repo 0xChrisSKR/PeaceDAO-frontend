@@ -1,3 +1,5 @@
+const path = require("path");
+
 /**
  * @type {import('next').NextConfig}
  */
@@ -10,6 +12,7 @@ const nextConfig = {
     config.resolve = config.resolve || {};
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
+      "@": path.resolve(__dirname, "src"),
       // Stub RN storage (MetaMask SDK tries to require it)
       '@react-native-async-storage/async-storage': require.resolve('./src/shims/empty.js'),
       // Disable server-only logger pretty-printer in client bundles
