@@ -1,16 +1,15 @@
-import { UserConfig } from 'next-i18next';
+import type { UserConfig } from 'next-i18next';
 
-export const LOCALES = ['en', 'zh'];
-export const DEFAULT_LOCALE = 'en';
+export const LOCALES = ['en', 'zh'] as const;
 
 const i18nConfig: UserConfig = {
   i18n: {
-    locales: LOCALES,
-    defaultLocale: DEFAULT_LOCALE,
-    // Next.js 14 schema：只有禁用時才需要顯式設定；設定 true 會出現 "expected false" 的警告
-    localeDetection: false,
+    defaultLocale: LOCALES[0],
+    locales: [...LOCALES],
+    localeDetection: false, // Next.js 14 必須關閉
   },
   reloadOnPrerender: process.env.NODE_ENV === 'development',
+  fallbackLng: 'en',
 };
 
 export default i18nConfig;
