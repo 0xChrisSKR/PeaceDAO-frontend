@@ -1,5 +1,6 @@
 "use client";
 
+import type { Route } from "next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -10,14 +11,14 @@ import { useLanguage } from "@/components/LanguageProvider";
 import { SHORT_BRAND_NAME } from "@/lib/branding";
 import type { Dictionary } from "@/lib/i18n";
 
-const NAV_LINKS: Array<{ href: string; key: keyof Dictionary["nav"] }> = [
+const NAV_LINKS = [
   { href: "/", key: "home" },
   { href: "/donate", key: "donate" },
   { href: "/treasury", key: "treasury" },
   { href: "/governance", key: "governance" },
   { href: "/verify", key: "verify" },
   { href: "/about", key: "about" }
-];
+] satisfies Array<{ href: Route; key: keyof Dictionary["nav"] }>;
 
 function LanguageToggle() {
   const { locale, setLocale } = useLanguage();
@@ -36,13 +37,13 @@ function LanguageToggle() {
       </button>
       <button
         type="button"
-        onClick={() => setLocale("cn")}
+        onClick={() => setLocale("zh")}
         className={clsx(
           "px-3 py-1 text-xs font-semibold uppercase tracking-wide transition",
-          locale === "cn" ? "rounded-full bg-emerald-500 text-white" : "text-emerald-600"
+          locale === "zh" ? "rounded-full bg-emerald-500 text-white" : "text-emerald-600"
         )}
       >
-        CN
+        ZH
       </button>
     </div>
   );

@@ -7,6 +7,17 @@ const nextConfig = {
     typedRoutes: true
   },
   webpack: (config, { isServer }) => {
+    config.resolve = config.resolve || {};
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      // Stub RN storage (MetaMask SDK tries to require it)
+      '@react-native-async-storage/async-storage': require.resolve('./src/shims/empty.js'),
+      // Disable server-only logger pretty-printer in client bundles
+      'pino-pretty': false,
+      'pino-abstract-transport': false,
+      'sonic-boom': false
+    };
+
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -14,7 +25,13 @@ const nextConfig = {
         '@react-native-async-storage/async-storage': false
       };
     }
+
     return config;
+  },
+  i18n: {
+    locales: ['zh', 'en'],
+    defaultLocale: 'zh',
+    localeDetection: false
   }
 };
 

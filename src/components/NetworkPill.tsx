@@ -2,7 +2,7 @@
 
 import { useChainId, useSwitchChain, useChains } from "wagmi";
 import { useMemo } from "react";
-import { bsc, bscTestnet, DEFAULT_CHAIN } from "@/config/chains";
+import { bsc, DEFAULT_CHAIN } from "@/config/chains";
 
 export function NetworkPill() {
   const chainId = useChainId();
@@ -22,7 +22,6 @@ export function NetworkPill() {
 
   const label = useMemo(() => {
     if (current.id === bsc.id) return "BSC Mainnet";
-    if (current.id === bscTestnet.id) return "BSC Testnet";
     return current.name ?? "Unknown";
   }, [current]);
 

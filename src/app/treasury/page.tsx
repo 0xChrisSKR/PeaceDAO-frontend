@@ -102,7 +102,8 @@ export default function TreasuryPage() {
     };
   }, [dictionary.treasury.fallback, isConfigured, peaceFund, publicClient]);
 
-  const balance = balanceData ? Number(fromWei(balanceData)) : 0;
+  const balanceValue = typeof balanceData === "bigint" ? balanceData : 0n;
+  const balance = Number(fromWei(balanceValue));
 
   return (
     <div className="space-y-8">
