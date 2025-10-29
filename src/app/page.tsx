@@ -16,6 +16,7 @@ function shortAddress(address?: string) {
 export default function HomePage() {
   const { dictionary } = useLanguage();
   const peaceFund = env.peaceFund;
+  const peaceToken = env.peaceToken;
 
   const heroCtas = [
     { href: "/donate", label: dictionary.hero.donateCta, color: "bg-emerald-500 hover:bg-emerald-600" },
@@ -48,7 +49,11 @@ export default function HomePage() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Stat label="BSC" value={dictionary.home.statChain} helper={dictionary.home.statChainHelper} />
-          <Stat label={dictionary.home.statToken} value="0x4444…c509" helper={dictionary.home.statTokenHelper} />
+          <Stat
+            label={dictionary.home.statToken}
+            value={peaceToken ? shortAddress(peaceToken) : "—"}
+            helper={dictionary.home.statTokenHelper}
+          />
           <Stat label={dictionary.home.statTelegram} value="@WorldPeace_BNB" helper={dictionary.home.statTelegramHelper} />
         </div>
         <Card className="flex flex-col gap-3 bg-white/80 text-sm text-slate-700 sm:flex-row sm:items-center sm:justify-between">

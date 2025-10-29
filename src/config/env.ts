@@ -2,6 +2,7 @@ const env = {
   wcProjectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID ?? "",
   rpcBsc: process.env.NEXT_PUBLIC_RPC_BSC ?? "https://bsc-dataseed.binance.org",
   peaceFund: process.env.NEXT_PUBLIC_PEACE_FUND ?? "",
+  peaceSwapRouter: process.env.NEXT_PUBLIC_PEACE_SWAP_ROUTER ?? "",
   peaceToken:
     process.env.NEXT_PUBLIC_TOKEN ?? "0x4444def5cf226bf50aa4b45e5748b676945bc509",
   guildLink: process.env.NEXT_PUBLIC_GUILD_LINK ?? "https://guild.xyz/world-peace-dao",

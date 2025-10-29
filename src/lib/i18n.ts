@@ -352,11 +352,16 @@ const dictionaries: Record<Locale, Dictionary> = {
   }
 };
 
+export const SUPPORTED_LOCALES: readonly Locale[] = ["en", "zh"] as const;
 export const DEFAULT_LOCALE: Locale = "zh";
 
 export function resolveLocale(value?: string | null): Locale {
-  if (!value) return DEFAULT_LOCALE;
-  return value === "zh" ? "zh" : DEFAULT_LOCALE;
+  if (!value) {
+    return DEFAULT_LOCALE;
+  }
+  const normalized = value.toLowerCase();
+  const match = SUPPORTED_LOCALES.find((locale) => locale === normalized);
+  return match ?? DEFAULT_LOCALE;
 }
 
 export function getDictionary(locale?: string | null): Dictionary {
