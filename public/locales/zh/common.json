@@ -1,1 +1,16 @@
-{"hello":"你好"}
+{
+  "hello": "你好",
+  "proposal": {
+    "create": "建立提案",
+    "vote": "投票",
+    "validate": "驗證",
+    "for": "贊成",
+    "against": "反對",
+    "abstain": "棄權"
+  },
+  "stats": {
+    "quorum": "法定人數",
+    "pass": "通過比例",
+    "like": "社群讚同比"
+  }
+}

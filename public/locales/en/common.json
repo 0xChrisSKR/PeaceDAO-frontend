@@ -1,1 +1,16 @@
-{"hello":"Hello"}
+{
+  "hello": "Hello",
+  "proposal": {
+    "create": "Create Proposal",
+    "vote": "Vote",
+    "validate": "Validate",
+    "for": "For",
+    "against": "Against",
+    "abstain": "Abstain"
+  },
+  "stats": {
+    "quorum": "Quorum",
+    "pass": "Pass Ratio",
+    "like": "Like Ratio"
+  }
+}
