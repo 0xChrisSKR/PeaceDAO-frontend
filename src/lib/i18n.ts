@@ -4,6 +4,7 @@ export interface Dictionary {
   nav: {
     home: string;
     donate: string;
+    swap: string;
     treasury: string;
     governance: string;
     verify: string;
@@ -53,6 +54,8 @@ export interface Dictionary {
     missingPeaceFund: string;
     noteHelper: string;
     disabledTitle: string;
+    selectToken: string;
+    unsupportedToken: string;
   };
   treasury: {
     title: string;
@@ -121,6 +124,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     nav: {
       home: "Home",
       donate: "Donate",
+      swap: "Swap",
       treasury: "Treasury",
       governance: "Governance",
       verify: "Verify",
@@ -156,8 +160,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     },
     donate: {
       title: "Donate to the PeaceFund",
-      subtitle: "Fuel peace missions with BNB. Every donation is recorded on Binance Smart Chain.",
-      amountLabel: "Amount (BNB)",
+      subtitle: "Fuel peace missions with crypto on BNB Chain. Every donation is recorded on Binance Smart Chain.",
+      amountLabel: "Amount",
       noteLabel: "Note (optional)",
       amountPlaceholder: "0.5",
       notePlaceholder: "Share a message of peace",
@@ -170,7 +174,9 @@ const dictionaries: Record<Locale, Dictionary> = {
       networkError: "Switch to BSC mainnet to donate",
       missingPeaceFund: "PeaceFund contract address is not configured",
       noteHelper: "Notes are saved on-chain to celebrate every act of peace.",
-      disabledTitle: "PeaceFund not configured"
+      disabledTitle: "PeaceFund not configured",
+      selectToken: "Select token",
+      unsupportedToken: "Donations in {token} are coming soon. Please use BNB."
     },
     treasury: {
       title: "Treasury",
@@ -239,6 +245,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     nav: {
       home: "首页",
       donate: "捐赠",
+      swap: "兑换",
       treasury: "资金池",
       governance: "治理",
       verify: "验证",
@@ -273,8 +280,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     },
     donate: {
       title: "向 PeaceFund 捐赠",
-      subtitle: "用 BNB 支持和平任务。每笔捐赠都会记录在币安智能链上。",
-      amountLabel: "金额（BNB）",
+      subtitle: "用加密资产支持和平任务。每笔捐赠都会记录在币安智能链上。",
+      amountLabel: "金额",
       noteLabel: "留言（可选）",
       amountPlaceholder: "0.5",
       notePlaceholder: "写下你的和平祝福",
@@ -287,7 +294,9 @@ const dictionaries: Record<Locale, Dictionary> = {
       networkError: "切换到 BSC 主网后再捐赠",
       missingPeaceFund: "PeaceFund 合约地址未配置",
       noteHelper: "留言将保存在链上，记录每一次和平行动。",
-      disabledTitle: "PeaceFund 未配置"
+      disabledTitle: "PeaceFund 未配置",
+      selectToken: "选择代币",
+      unsupportedToken: "{token} 捐赠即将上线，请使用 BNB。"
     },
     treasury: {
       title: "资金池",

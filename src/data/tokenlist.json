@@ -1,0 +1,32 @@
+{
+  "name": "PeaceSwap Default Token List",
+  "timestamp": "2024-05-18T00:00:00.000Z",
+  "version": { "major": 1, "minor": 0, "patch": 0 },
+  "tokens": [
+    {
+      "chainId": 56,
+      "address": "0x0000000000000000000000000000000000000000",
+      "symbol": "BNB",
+      "name": "Binance Coin",
+      "decimals": 18,
+      "logoURI": "/images/tokens/bnb.svg",
+      "isNative": true
+    },
+    {
+      "chainId": 56,
+      "address": "0x55d398326f99059fF775485246999027B3197955",
+      "symbol": "USDT",
+      "name": "Tether USD",
+      "decimals": 18,
+      "logoURI": "/images/tokens/usdt.svg"
+    },
+    {
+      "chainId": 56,
+      "address": "0x4444def5cf226bf50aa4b45e5748b676945bc509",
+      "symbol": "世界和平",
+      "name": "World Peace Token",
+      "decimals": 18,
+      "logoURI": "/images/tokens/peace.svg"
+    }
+  ]
+}

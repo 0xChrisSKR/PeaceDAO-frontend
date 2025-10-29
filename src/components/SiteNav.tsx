@@ -14,6 +14,7 @@ import type { Dictionary } from "@/lib/i18n";
 const NAV_LINKS = [
   { href: "/", key: "home" },
   { href: "/donate", key: "donate" },
+  { href: "/swap", key: "swap" },
   { href: "/treasury", key: "treasury" },
   { href: "/governance", key: "governance" },
   { href: "/verify", key: "verify" },

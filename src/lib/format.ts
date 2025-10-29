@@ -21,3 +21,14 @@ export function formatNumber(value: string | number | bigint, maximumFractionDig
     minimumFractionDigits: 0
   }).format(numeric);
 }
+
+export function shortenAddress(address: string | undefined, chars = 4) {
+  if (!address) return "-";
+  if (address.startsWith("0x") && address.length > 2 + chars * 2) {
+    return `${address.slice(0, 2 + chars)}…${address.slice(-chars)}`;
+  }
+  if (address.length > chars * 2) {
+    return `${address.slice(0, chars)}…${address.slice(-chars)}`;
+  }
+  return address;
+}

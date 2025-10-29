@@ -35,6 +35,12 @@
       ],
       "@/abi/*": [
         "./src/abi/*"
+      ],
+      "@/data/*": [
+        "./src/data/*"
+      ],
+      "@/types/*": [
+        "./src/types/*"
       ]
     },
     "plugins": [
