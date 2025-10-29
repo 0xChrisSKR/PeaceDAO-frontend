@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fcd9bd" />
+      <stop offset="100%" stop-color="#fb7185" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="48" fill="url(#grad)" />
+  <path d="M256 320c-40-44-92-60-92-116a52 52 0 0 1 104 0 52 52 0 0 1 104 0c0 56-52 72-92 116z" fill="#fff1f2" opacity="0.6" />
+  <text x="50%" y="70%" fill="#831843" font-family="'Inter', 'Segoe UI', sans-serif" font-size="60" font-weight="700" text-anchor="middle">PAWS</text>
+</svg>

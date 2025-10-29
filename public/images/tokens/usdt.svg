@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="usdt" cx="40%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#ccfbf1" />
+      <stop offset="100%" stop-color="#10b981" />
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="256" fill="url(#usdt)" />
+  <text x="50%" y="54%" fill="#ecfeff" font-family="'Inter', 'Segoe UI', sans-serif" font-size="160" font-weight="700" text-anchor="middle">USDT</text>
+</svg>

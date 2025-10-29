@@ -7,11 +7,7 @@ import { Card } from "@/components/Card";
 import { Section } from "@/components/Section";
 import { Stat } from "@/components/Stat";
 import { useLanguage } from "@/components/LanguageProvider";
-
-function shortAddress(address?: string) {
-  if (!address) return "";
-  return `${address.slice(0, 6)}…${address.slice(-4)}`;
-}
+import { shortenAddress } from "@/lib/utils";
 
 export default function HomePage() {
   const { dictionary } = useLanguage();
@@ -25,7 +21,13 @@ export default function HomePage() {
 
   return (
     <div className="space-y-12">
-      <Section className="space-y-6 rounded-3xl bg-gradient-to-br from-white/90 via-sky-50 to-emerald-100 p-8 shadow-lg">
+      <Section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white/90 via-sky-50 to-emerald-100 p-8 shadow-lg">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-60"
+          style={{ backgroundImage: "url(/images/hero/peace-hero.svg)", backgroundSize: "cover", backgroundPosition: "center" }}
+        />
+        <div className="relative space-y-6">
         <div className="space-y-4">
           <p className="inline-flex items-center rounded-full bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-emerald-700 shadow-sm">
             {dictionary.home.badge}
@@ -57,7 +59,7 @@ export default function HomePage() {
               {dictionary.hero.peaceFundLabel}
             </p>
             <p className="font-mono text-base text-slate-900">
-              {peaceFund ? shortAddress(peaceFund) : dictionary.hero.peaceFundMissing}
+              {peaceFund ? shortenAddress(peaceFund) : dictionary.hero.peaceFundMissing}
             </p>
           </div>
           {peaceFund ? (
@@ -71,6 +73,7 @@ export default function HomePage() {
             </a>
           ) : null}
         </Card>
+        </div>
       </Section>
 
       <Section className="grid gap-6 md:grid-cols-2">

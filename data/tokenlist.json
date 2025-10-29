@@ -1,0 +1,30 @@
+[
+  {
+    "symbol": "BNB",
+    "name": "Binance Coin",
+    "address": "0x0000000000000000000000000000000000000000",
+    "decimals": 18,
+    "logoURI": "/images/tokens/bnb.svg"
+  },
+  {
+    "symbol": "世界和平",
+    "name": "World Peace Token",
+    "address": "0x4444def5cf226bf50aa4b45e5748b676945bc509",
+    "decimals": 18,
+    "logoURI": "/images/tokens/worldpeace.svg"
+  },
+  {
+    "symbol": "USDT",
+    "name": "Tether USD (BEP20)",
+    "address": "0x55d398326f99059ff775485246999027b3197955",
+    "decimals": 18,
+    "logoURI": "/images/tokens/usdt.svg"
+  },
+  {
+    "symbol": "CAKE",
+    "name": "PancakeSwap Token",
+    "address": "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82",
+    "decimals": 18,
+    "logoURI": "/images/tokens/cake.svg"
+  }
+]
