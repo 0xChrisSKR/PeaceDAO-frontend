@@ -26,11 +26,23 @@ Set these environment variables in `.env.local` (or your hosting provider):
 * `NEXT_PUBLIC_GUILD_LINK` (Guild join link)
 * Telegram links (`NEXT_PUBLIC_TG_PUBLIC`, `NEXT_PUBLIC_TG_VERIFIED`) — may change later
 
-## Deploy on Vercel
+## Deploy to Vercel
 
 1. Import this repository into Vercel.
-2. In **Project Settings → Environment Variables**, add the keys from `.env.example` (use the owner-provided values above plus any optional RPC overrides).
-3. Trigger a deploy — the default build command (`npm run build`) and output directory (`.next`) work out of the box.
+2. In **Project Settings → Environment Variables**, add every key from `.env.example`:
+   - `NEXT_PUBLIC_WC_PROJECT_ID`
+   - `NEXT_PUBLIC_RPC_BSC`
+   - `NEXT_PUBLIC_PEACE_FUND`
+   - `NEXT_PUBLIC_TOKEN`
+   - `NEXT_PUBLIC_GUILD_LINK`
+   - `NEXT_PUBLIC_TG_PUBLIC`
+   - `NEXT_PUBLIC_TG_VERIFIED`
+   - `NEXT_PUBLIC_TWITTER`
+3. Redeploy so the new environment variables are available to the build and runtime.
+4. After the deployment finishes:
+   - Open `/api/health` on your deployed domain and confirm the JSON response includes `{"ok":true}`.
+   - Connect a wallet via WalletConnect (Binance Web3) to verify the connection flow.
+   - Ensure `NEXT_PUBLIC_PEACE_FUND` is set — the Donate page will enable once it is present and the Treasury view will display the contract balance.
 
 ## Known integration notes
 
