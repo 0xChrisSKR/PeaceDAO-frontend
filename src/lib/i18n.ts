@@ -1,4 +1,4 @@
-export type Locale = "en" | "cn";
+export type Locale = "en" | "zh";
 
 export interface Dictionary {
   nav: {
@@ -32,6 +32,9 @@ export interface Dictionary {
     impactBody: string;
     joinTitle: string;
     joinBody: string;
+    bscScanCta: string;
+    guildCta: string;
+    telegramCta: string;
   };
   donate: {
     title: string;
@@ -232,7 +235,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       updated: "Updated"
     }
   },
-  cn: {
+  zh: {
     nav: {
       home: "首页",
       donate: "捐赠",
@@ -349,11 +352,11 @@ const dictionaries: Record<Locale, Dictionary> = {
   }
 };
 
-export const DEFAULT_LOCALE: Locale = "en";
+export const DEFAULT_LOCALE: Locale = "zh";
 
 export function resolveLocale(value?: string | null): Locale {
   if (!value) return DEFAULT_LOCALE;
-  return value === "cn" ? "cn" : DEFAULT_LOCALE;
+  return value === "zh" ? "zh" : DEFAULT_LOCALE;
 }
 
 export function getDictionary(locale?: string | null): Dictionary {

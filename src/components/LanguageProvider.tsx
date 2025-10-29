@@ -21,7 +21,7 @@ export function LanguageProvider({ initialLocale, children }: { initialLocale?: 
 
   useEffect(() => {
     document.cookie = `lang=${locale}; path=/; max-age=31536000; SameSite=Lax`;
-    document.documentElement.lang = locale === "cn" ? "zh-CN" : "en";
+    document.documentElement.lang = locale === "zh" ? "zh-CN" : "en";
   }, [locale]);
 
   const value = useMemo<LanguageContextValue>(

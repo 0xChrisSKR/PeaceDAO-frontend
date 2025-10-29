@@ -37,7 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const cookieStore = cookies();
   const lang = resolveLocale(cookieStore.get("lang")?.value);
   return (
-    <html lang={lang === "cn" ? "zh-CN" : "en"}>
+    <html lang={lang === "zh" ? "zh-CN" : "en"}>
       <body className="min-h-screen bg-gradient-to-b from-white via-sky-50 to-emerald-50 text-slate-900">
         <WagmiProvider>
           <LanguageProvider initialLocale={lang}>

@@ -1,5 +1,6 @@
 "use client";
 
+import type { Route } from "next";
 import Link from "next/link";
 import env from "@/config/env";
 import { Card } from "@/components/Card";
@@ -16,6 +17,12 @@ export default function HomePage() {
   const { dictionary } = useLanguage();
   const peaceFund = env.peaceFund;
 
+  const heroCtas = [
+    { href: "/donate", label: dictionary.hero.donateCta, color: "bg-emerald-500 hover:bg-emerald-600" },
+    { href: "/treasury", label: dictionary.hero.treasuryCta, color: "bg-sky-500 hover:bg-sky-600" },
+    { href: "/verify", label: dictionary.hero.verifyCta, color: "bg-amber-500 hover:bg-amber-600" }
+  ] satisfies Array<{ href: Route; label: string; color: string }>;
+
   return (
     <div className="space-y-12">
       <Section className="space-y-6 rounded-3xl bg-gradient-to-br from-white/90 via-sky-50 to-emerald-100 p-8 shadow-lg">
@@ -29,11 +36,7 @@ export default function HomePage() {
           <p className="max-w-2xl text-base text-slate-600 sm:text-lg">{dictionary.hero.subtitle}</p>
         </div>
         <div className="flex flex-wrap gap-3">
-          {[
-            { href: "/donate", label: dictionary.hero.donateCta, color: "bg-emerald-500 hover:bg-emerald-600" },
-            { href: "/treasury", label: dictionary.hero.treasuryCta, color: "bg-sky-500 hover:bg-sky-600" },
-            { href: "/verify", label: dictionary.hero.verifyCta, color: "bg-amber-500 hover:bg-amber-600" }
-          ].map((cta) => (
+          {heroCtas.map((cta) => (
             <Link
               key={cta.href}
               href={cta.href}
