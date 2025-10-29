@@ -76,6 +76,61 @@ export interface Dictionary {
     frontendRepo: string;
     contractsRepo: string;
   };
+  proposals: {
+    common: {
+      accessTitle: string;
+      balanceLabel: string;
+      contractMissing: string;
+      notConnected: string;
+      wrongNetwork: string;
+      createRequirement: string;
+      voteRequirement: string;
+      validateRequirement: string;
+      txLabel: string;
+      viewOnExplorer: string;
+    };
+    new: {
+      title: string;
+      subtitle: string;
+      recipientLabel: string;
+      titleLabel: string;
+      descriptionLabel: string;
+      periodLabel: string;
+      periodHelper: string;
+      submit: string;
+      success: string;
+    };
+    detail: {
+      title: string;
+      subtitle: string;
+      voteTitle: string;
+      voteHelper: string;
+      supportLabel: string;
+      supportFor: string;
+      supportAgainst: string;
+      reasonLabel: string;
+      reasonPlaceholder: string;
+      submit: string;
+      success: string;
+      finalizeTitle: string;
+      finalizeHelper: string;
+      finalizeCta: string;
+      finalizeSuccess: string;
+      executeTitle: string;
+      executeHelper: string;
+      executeCta: string;
+      executeSuccess: string;
+    };
+    validate: {
+      title: string;
+      subtitle: string;
+      helper: string;
+      approve: string;
+      reject: string;
+      successApprove: string;
+      successReject: string;
+    };
+  };
   verify: {
     title: string;
     subtitle: string;
@@ -194,6 +249,61 @@ const dictionaries: Record<Locale, Dictionary> = {
       frontendRepo: "Frontend repository",
       contractsRepo: "Contracts repository"
     },
+    proposals: {
+      common: {
+        accessTitle: "Governance access",
+        balanceLabel: "Your PEACE balance",
+        contractMissing: "PeaceDAO contract address is not configured.",
+        notConnected: "Connect your wallet to interact with governance.",
+        wrongNetwork: "Switch to the configured network to continue.",
+        createRequirement: "At least {amount} PEACE are required to create proposals.",
+        voteRequirement: "At least {amount} PEACE are required to vote.",
+        validateRequirement: "At least {amount} PEACE are required to validate impact.",
+        txLabel: "Latest transaction hash",
+        viewOnExplorer: "View on block explorer"
+      },
+      new: {
+        title: "Create a proposal",
+        subtitle: "Draft a funding proposal that the DAO can evaluate and support.",
+        recipientLabel: "Recipient address",
+        titleLabel: "Proposal title",
+        descriptionLabel: "Description",
+        periodLabel: "Voting period (days)",
+        periodHelper: "Proposals stay open for the selected number of days before finalization.",
+        submit: "Publish proposal",
+        success: "Proposal transaction submitted"
+      },
+      detail: {
+        title: "Proposal",
+        subtitle: "Cast your weighted vote and steward the PeaceFund responsibly.",
+        voteTitle: "Cast your vote",
+        voteHelper: "Your PEACE holdings determine your voting power.",
+        supportLabel: "Support",
+        supportFor: "For",
+        supportAgainst: "Against",
+        reasonLabel: "Reason (optional)",
+        reasonPlaceholder: "Share context for your vote",
+        submit: "Submit vote",
+        success: "Vote transaction submitted",
+        finalizeTitle: "Finalize proposal",
+        finalizeHelper: "Finalize after the voting period ends.",
+        finalizeCta: "Finalize",
+        finalizeSuccess: "Finalize transaction submitted",
+        executeTitle: "Execute donation",
+        executeHelper: "Send the approved donation to the recipient.",
+        executeCta: "Execute donation",
+        executeSuccess: "Execute transaction submitted"
+      },
+      validate: {
+        title: "Validate proposal impact",
+        subtitle: "Signal whether the deliverables matched the community promises.",
+        helper: "Validators lock in the final verdict that documents the PeaceDAO impact.",
+        approve: "Mark as delivered",
+        reject: "Flag issues",
+        successApprove: "Validation submitted: marked as delivered",
+        successReject: "Validation submitted: flagged issues"
+      }
+    },
     verify: {
       title: "Verify your membership",
       subtitle: "Use Guild to prove your holdings and join the global coordination hubs.",
@@ -310,6 +420,61 @@ const dictionaries: Record<Locale, Dictionary> = {
       whitepaper: "查看白皮书",
       frontendRepo: "前端仓库",
       contractsRepo: "合约仓库"
+    },
+    proposals: {
+      common: {
+        accessTitle: "治理权限",
+        balanceLabel: "你的 PEACE 余额",
+        contractMissing: "尚未配置 PeaceDAO 合约地址。",
+        notConnected: "请连接钱包以参与治理。",
+        wrongNetwork: "请切换到指定网络后继续操作。",
+        createRequirement: "创建提案至少需要持有 {amount} 枚 PEACE。",
+        voteRequirement: "投票至少需要持有 {amount} 枚 PEACE。",
+        validateRequirement: "验证成效至少需要持有 {amount} 枚 PEACE。",
+        txLabel: "最新交易哈希",
+        viewOnExplorer: "在区块浏览器查看"
+      },
+      new: {
+        title: "创建提案",
+        subtitle: "撰写一个让 DAO 能够评估并支持的资金提案。",
+        recipientLabel: "受款地址",
+        titleLabel: "提案标题",
+        descriptionLabel: "提案说明",
+        periodLabel: "投票期间（天）",
+        periodHelper: "提案将在所选天数后结束并可执行。",
+        submit: "提交提案",
+        success: "提案交易已送出"
+      },
+      detail: {
+        title: "提案",
+        subtitle: "投下与你持仓权重相符的一票，共同守护和平基金。",
+        voteTitle: "投票",
+        voteHelper: "你的 PEACE 持仓将决定投票权重。",
+        supportLabel: "立场",
+        supportFor: "赞成",
+        supportAgainst: "反对",
+        reasonLabel: "理由（选填）",
+        reasonPlaceholder: "写下你投票的背景说明",
+        submit: "送出投票",
+        success: "投票交易已送出",
+        finalizeTitle: "完成提案",
+        finalizeHelper: "投票期结束后即可执行完成。",
+        finalizeCta: "完成提案",
+        finalizeSuccess: "完成交易已送出",
+        executeTitle: "执行捐款",
+        executeHelper: "将获准的款项发送给受款方。",
+        executeCta: "执行捐款",
+        executeSuccess: "执行交易已送出"
+      },
+      validate: {
+        title: "验证提案成效",
+        subtitle: "确认交付成果是否符合社区承诺。",
+        helper: "验证者的判断将写入链上，记录 PeaceDAO 的影响成果。",
+        approve: "标记为已达成",
+        reject: "提出疑虑",
+        successApprove: "验证已送出：标记为已达成",
+        successReject: "验证已送出：提出疑虑"
+      }
     },
     verify: {
       title: "验证你的身份",
