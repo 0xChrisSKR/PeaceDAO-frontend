@@ -7,6 +7,7 @@ import { Card } from "@/components/Card";
 import { Section } from "@/components/Section";
 import { Stat } from "@/components/Stat";
 import { useLanguage } from "@/components/LanguageProvider";
+import ConnectButton from "@/components/ConnectButton";
 
 function shortAddress(address?: string) {
   if (!address) return "";
@@ -27,6 +28,9 @@ export default function HomePage() {
   return (
     <div className="space-y-12">
       <Section className="space-y-6 rounded-3xl bg-gradient-to-br from-white/90 via-sky-50 to-emerald-100 p-8 shadow-lg">
+        <div className="flex justify-end">
+          <ConnectButton />
+        </div>
         <div className="space-y-4">
           <p className="inline-flex items-center rounded-full bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-emerald-700 shadow-sm">
             {dictionary.home.badge}
