@@ -1,28 +1,36 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useMemo, useState } from "react";
 import { WagmiProvider as BaseWagmiProvider, createConfig } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
 import { injected, walletConnect } from "wagmi/connectors";
 import env from "@/config/env";
 import { CHAINS, DEFAULT_CHAIN, transports } from "@/config/chains";
+import { DOVE_ICON_DATA_URL } from "@/lib/branding";
+
+const metadata = {
+  name: "World Peace DAO",
+  description: "On-chain charity for a peaceful future.",
+  url: "https://worldpeace.example",
+  icons: [DOVE_ICON_DATA_URL]
+};
+
+const connectorList = [
+  injected({ shimDisconnect: true }),
+  ...(env.wcProjectId
+    ? [
+        walletConnect({
+          projectId: env.wcProjectId,
+          showQrModal: true,
+          metadata
+        })
+      ]
+    : [])
+] as const;
 
 export const wagmiConfig = createConfig({
   chains: CHAINS,
-  connectors: [
-    injected({ shimDisconnect: true }),
-    walletConnect({
-      projectId: env.wcProjectId,
-      showQrModal: true,
-      metadata: {
-        name: "PeaceDAO",
-        description: "Support PeaceDAO with donations and swaps",
-        url: "https://peacedao.org",
-        icons: ["https://avatars.githubusercontent.com/u/123552499?s=200&v=4"]
-      }
-    })
-  ],
+  connectors: connectorList,
   transports,
   ssr: true,
   multiInjectedProviderDiscovery: false,
@@ -36,18 +44,21 @@ wagmiConfig.setState((state) => ({
 
 export function WagmiProvider({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
-    () => new QueryClient({
-      defaultOptions: {
-        queries: {
-          staleTime: 30_000,
-          refetchOnWindowFocus: false
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 15_000,
+            refetchOnWindowFocus: false
+          }
         }
-      }
-    })
+      })
   );
 
+  const connectors = useMemo(() => wagmiConfig.connectors, []);
+
   return (
-    <BaseWagmiProvider config={wagmiConfig}>
+    <BaseWagmiProvider config={{ ...wagmiConfig, connectors }}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </BaseWagmiProvider>
   );

@@ -1,6 +1,30 @@
 [
-  {"type":"function","name":"donate","stateMutability":"payable","inputs":[{"name":"beneficiary","type":"address"}],"outputs":[]},
-  {"type":"function","name":"donateBNB","stateMutability":"payable","inputs":[{"name":"beneficiary","type":"address"}],"outputs":[]},
-  {"type":"function","name":"donateTo","stateMutability":"payable","inputs":[{"name":"beneficiary","type":"address"}],"outputs":[]},
-  {"type":"function","name":"executeDonation","stateMutability":"payable","inputs":[{"name":"beneficiary","type":"address"}],"outputs":[]}
+  {
+    "type": "function",
+    "name": "donate",
+    "stateMutability": "payable",
+    "inputs": [
+      { "name": "note", "type": "string" }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "balance",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [
+      { "name": "", "type": "uint256" }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "Donated",
+    "inputs": [
+      { "name": "donor", "type": "address", "indexed": true },
+      { "name": "amount", "type": "uint256", "indexed": false },
+      { "name": "note", "type": "string", "indexed": false }
+    ],
+    "anonymous": false
+  }
 ]

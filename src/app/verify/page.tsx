@@ -1,53 +1,49 @@
-import Link from "next/link";
-import clsx from "clsx";
+"use client";
+
 import env from "@/config/env";
-import { VerifiedTGButton } from "@/components/VerifiedTGButton";
+import { Card } from "@/components/Card";
+import { PageTitle } from "@/components/PageTitle";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function VerifyPage() {
-  const hasGuildLink = Boolean(env.guildLink);
-  const guildButtonClassName = clsx(
-    "inline-flex w-full justify-center rounded-lg bg-brand px-4 py-3 text-sm font-semibold text-white transition",
-    {
-      "hover:bg-brand-light": hasGuildLink,
-      "pointer-events-none opacity-60": !hasGuildLink
-    }
-  );
+  const { dictionary } = useLanguage();
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-white">Verify Access</h1>
-      <p className="text-sm text-slate-300">
-        Hold PEACE tokens and complete the Guild.xyz quest to unlock verified Telegram access. Collab.Land quests will continue
-        to roll out for additional mission roles.
-      </p>
+    <div className="space-y-8">
+      <PageTitle title={dictionary.verify.title} subtitle={dictionary.verify.subtitle} />
 
-      <div className="space-y-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+      <Card className="bg-white/80 text-center">
         <a
-          href={hasGuildLink ? env.guildLink : "#"}
+          href={env.guildLink}
           target="_blank"
           rel="noopener noreferrer"
-          className={guildButtonClassName}
-          aria-disabled={!hasGuildLink}
-          onClick={(event) => {
-            if (!hasGuildLink) {
-              event.preventDefault();
-            }
-          }}
+          className="inline-flex w-full max-w-xs justify-center rounded-full bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-600"
         >
-          Verify with Guild.xyz
+          {dictionary.verify.guildCta}
         </a>
-        <p className="text-xs text-slate-400">
-          Need help? Ensure your wallet holds at least 100 $PEACE before attempting verification.
-        </p>
-        <VerifiedTGButton requiredBalance={100} />
-      </div>
+        <p className="mt-3 text-xs text-slate-500">{dictionary.verify.helper}</p>
+      </Card>
 
-      <Link
-        href="/community"
-        className="inline-flex w-full justify-center rounded-lg border border-brand px-4 py-3 text-sm font-semibold text-brand transition hover:bg-brand/10"
-      >
-        Back to Community
-      </Link>
+      <Card className="bg-white/80">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <a
+            href={env.tgPublic}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-2xl border border-sky-200 bg-sky-50/80 px-4 py-3 text-center text-sm font-semibold text-sky-700 transition hover:bg-sky-100"
+          >
+            {dictionary.verify.public}
+          </a>
+          <a
+            href={env.tgVerified}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 text-center text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100"
+          >
+            {dictionary.verify.verified}
+          </a>
+        </div>
+      </Card>
     </div>
   );
 }

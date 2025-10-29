@@ -7,12 +7,11 @@
 }
 
 body {
-  @apply bg-slate-950 text-slate-100;
   font-feature-settings: "rlig" 1, "calt" 1;
 }
 
 a {
-  @apply text-brand-light hover:text-brand;
+  @apply text-emerald-600 hover:text-emerald-700;
 }
 
 button:disabled {
