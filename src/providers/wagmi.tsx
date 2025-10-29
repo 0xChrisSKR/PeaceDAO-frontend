@@ -1,65 +1,51 @@
-"use client";
+'use client';
 
-import { ReactNode, useMemo, useState } from "react";
-import { WagmiProvider as BaseWagmiProvider, createConfig } from "wagmi";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { injected, walletConnect } from "wagmi/connectors";
-import env from "@/config/env";
-import { CHAINS, DEFAULT_CHAIN, transports } from "@/config/chains";
-import { DOVE_ICON_DATA_URL } from "@/lib/branding";
+import { ReactNode, useEffect } from 'react';
+import { WagmiProvider, createConfig } from 'wagmi';
+import { createWeb3Modal } from '@web3modal/wagmi/react';
+import { cookieStorage, createStorage } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-const metadata = {
-  name: "World Peace DAO",
-  description: "On-chain charity for a peaceful future.",
-  url: "https://worldpeace.example",
-  icons: [DOVE_ICON_DATA_URL]
-};
+import env from '@/config/env';
+import { CHAINS, DEFAULT_CHAIN, transports } from '@/config/chains';
 
-const connectorList = [
-  injected({ shimDisconnect: true }),
-  ...(env.wcProjectId
-    ? [
-        walletConnect({
-          projectId: env.wcProjectId,
-          showQrModal: true,
-          metadata
-        })
-      ]
-    : [])
-] as const;
+const projectId = env.wcProjectId;
 
+// wagmi 設定
 export const wagmiConfig = createConfig({
   chains: CHAINS,
-  connectors: connectorList,
   transports,
-  ssr: true,
-  multiInjectedProviderDiscovery: false,
-  pollingInterval: 4_000
+  storage: createStorage({
+    storage: cookieStorage
+  }),
+  ssr: true
 });
 
-wagmiConfig.setState((state) => ({
-  ...state,
-  chainId: DEFAULT_CHAIN.id
-}));
+const queryClient = new QueryClient();
 
-export function WagmiProvider({ children }: { children: ReactNode }) {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: 15_000,
-            refetchOnWindowFocus: false
-          }
-        }
-      })
-  );
+// 只需初始化一次 Web3Modal
+let web3ModalInited = false;
+function initWeb3Modal() {
+  if (web3ModalInited) return;
+  if (!projectId) return;
+  createWeb3Modal({
+    wagmiConfig,
+    projectId,
+    themeMode: 'light',
+    defaultChain: DEFAULT_CHAIN,
+    enableAnalytics: false
+  });
+  web3ModalInited = true;
+}
 
-  const connectors = useMemo(() => wagmiConfig.connectors, []);
+export function Web3Providers({ children }: { children: ReactNode }) {
+  useEffect(() => {
+    initWeb3Modal();
+  }, []);
 
   return (
-    <BaseWagmiProvider config={{ ...wagmiConfig, connectors }}>
+    <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </BaseWagmiProvider>
+    </WagmiProvider>
   );
 }

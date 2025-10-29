@@ -1,5 +1,5 @@
 const env = {
-  wcProjectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID ?? "",
+  wcProjectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? process.env.NEXT_PUBLIC_WC_PROJECT_ID ?? "",
   rpcBsc: process.env.NEXT_PUBLIC_RPC_BSC ?? "https://bsc-dataseed.binance.org",
   peaceFund: process.env.NEXT_PUBLIC_PEACE_FUND ?? "",
   peaceSwapRouter: process.env.NEXT_PUBLIC_PEACE_SWAP_ROUTER ?? "",

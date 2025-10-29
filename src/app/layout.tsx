@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { WagmiProvider } from "@/providers/wagmi";
+import { Web3Providers } from "@/providers/wagmi";
 import { Toast } from "@/components/Toast";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import { SiteNav } from "@/components/SiteNav";
@@ -39,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang={lang === "zh" ? "zh-CN" : "en"}>
       <body className="min-h-screen bg-gradient-to-b from-white via-sky-50 to-emerald-50 text-slate-900">
-        <WagmiProvider>
+        <Web3Providers>
           <LanguageProvider initialLocale={lang}>
             <div className="flex min-h-screen flex-col">
               <SiteNav />
@@ -51,7 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
             <Toast />
           </LanguageProvider>
-        </WagmiProvider>
+        </Web3Providers>
       </body>
     </html>
   );
