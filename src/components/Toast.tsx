@@ -8,9 +8,11 @@ export function Toast() {
       position="top-right"
       toastOptions={{
         style: {
-          background: "#0f172a",
-          color: "#f8fafc",
-          border: "1px solid #1e293b"
+          background: "rgba(255,255,255,0.92)",
+          color: "#1f2937",
+          border: "1px solid rgba(16, 185, 129, 0.25)",
+          borderRadius: "16px",
+          fontWeight: 500
         }
       }}
     />
