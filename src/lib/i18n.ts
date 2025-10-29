@@ -6,6 +6,8 @@ export interface Dictionary {
     donate: string;
     treasury: string;
     governance: string;
+    proposals: string;
+    propose: string;
     verify: string;
     about: string;
     openMenu: string;
@@ -76,6 +78,48 @@ export interface Dictionary {
     frontendRepo: string;
     contractsRepo: string;
   };
+  proposals: {
+    title: string;
+    subtitle: string;
+    ctaLabel: string;
+    progressLabel: string;
+    empty: string;
+  };
+  proposal: {
+    overviewTitle: string;
+    regionLabel: string;
+    orgLabel: string;
+    raisedLabel: string;
+    goalLabel: string;
+    progressLabel: string;
+    donateTitle: string;
+    donateDescription: string;
+    amountLabel: string;
+    amountPlaceholder: string;
+    submitLabel: string;
+    toast: string;
+    approvalNote: string;
+    receiverLabel: string;
+  };
+  proposePage: {
+    title: string;
+    subtitle: string;
+    connectCta: string;
+    gateTitle: string;
+    gateRequirement: string;
+    gateDescription: string;
+    formTitle: string;
+    titleLabel: string;
+    regionLabel: string;
+    orgLabel: string;
+    goalLabel: string;
+    receiverLabel: string;
+    descriptionLabel: string;
+    submitLabel: string;
+    toast: string;
+    addressError: string;
+    goalError: string;
+  };
   verify: {
     title: string;
     subtitle: string;
@@ -83,6 +127,13 @@ export interface Dictionary {
     public: string;
     verified: string;
     helper: string;
+    connectCta: string;
+    gateRequirement: string;
+    validatorMissing: string;
+    proposalIdLabel: string;
+    likeCta: string;
+    claimCta: string;
+    comingSoon: string;
   };
   about: {
     title: string;
@@ -123,6 +174,8 @@ const dictionaries: Record<Locale, Dictionary> = {
       donate: "Donate",
       treasury: "Treasury",
       governance: "Governance",
+      proposals: "Proposals",
+      propose: "Propose",
       verify: "Verify",
       about: "About",
       openMenu: "Open menu",
@@ -194,13 +247,63 @@ const dictionaries: Record<Locale, Dictionary> = {
       frontendRepo: "Frontend repository",
       contractsRepo: "Contracts repository"
     },
+    proposals: {
+      title: "Live proposals",
+      subtitle: "Preview humanitarian missions requesting PeaceFund support before on-chain streaming launches.",
+      ctaLabel: "View proposal",
+      progressLabel: "Progress",
+      empty: "No proposals submitted yet."
+    },
+    proposal: {
+      overviewTitle: "Overview",
+      regionLabel: "Region",
+      orgLabel: "Organization",
+      raisedLabel: "Raised",
+      goalLabel: "Goal",
+      progressLabel: "Progress",
+      donateTitle: "Support this mission",
+      donateDescription: "Send BNB to the PeaceFund while governance finalizes on-chain proposal flows.",
+      amountLabel: "Amount (BNB)",
+      amountPlaceholder: "1",
+      submitLabel: "Donate preview",
+      toast: "On-chain donations from proposal pages are coming soon.",
+      approvalNote:
+        "After approval, proposer provides a BNB-receiving address; the fund releases directly from treasury.",
+      receiverLabel: "Proposed receiver"
+    },
+    proposePage: {
+      title: "Submit a proposal",
+      subtitle: "Draft impact-driven plans for PeaceFund consideration once full governance tooling is live.",
+      connectCta: "Connect wallet",
+      gateTitle: "Insufficient PEACE balance",
+      gateRequirement: "You need at least 1,000,000 $世界和平 to start a proposal.",
+      gateDescription: "Accumulate governance weight by contributing to missions or purchasing tokens on supported venues.",
+      formTitle: "Proposal details",
+      titleLabel: "Title",
+      regionLabel: "Region",
+      orgLabel: "Organization",
+      goalLabel: "Funding goal (BNB)",
+      receiverLabel: "Receiving address",
+      descriptionLabel: "Full description",
+      submitLabel: "Save draft",
+      toast: "On-chain proposal coming soon; stored locally for demo.",
+      addressError: "Enter a valid BNB address.",
+      goalError: "Set a funding goal greater than zero."
+    },
     verify: {
       title: "Verify your membership",
       subtitle: "Use Guild to prove your holdings and join the global coordination hubs.",
       guildCta: "Verify with Guild",
       public: "Public Telegram",
       verified: "Verified Telegram",
-      helper: "Guild checks PEACE balances on BSC to unlock coordination hubs."
+      helper: "Guild checks PEACE balances on BSC to unlock coordination hubs.",
+      connectCta: "Connect wallet",
+      gateRequirement: "You need at least 200,000 $世界和平 to verify proposals and claim rewards.",
+      validatorMissing: "Peace Validator contract not configured. Like & claim actions are temporarily disabled.",
+      proposalIdLabel: "Proposal ID",
+      likeCta: "Like (驗證按讚)",
+      claimCta: "Claim reward (領取驗證獎勵)",
+      comingSoon: "On-chain validator actions coming soon."
     },
     about: {
       title: "About World Peace DAO",
@@ -241,6 +344,8 @@ const dictionaries: Record<Locale, Dictionary> = {
       donate: "捐赠",
       treasury: "资金池",
       governance: "治理",
+      proposals: "提案",
+      propose: "发起提案",
       verify: "验证",
       about: "关于",
       openMenu: "打开菜单",
@@ -311,13 +416,62 @@ const dictionaries: Record<Locale, Dictionary> = {
       frontendRepo: "前端仓库",
       contractsRepo: "合约仓库"
     },
+    proposals: {
+      title: "进行中的提案",
+      subtitle: "在链上流程上线前，先行预览等待 PeaceFund 支持的人道任务。",
+      ctaLabel: "查看提案",
+      progressLabel: "进度",
+      empty: "目前还没有提交的提案。"
+    },
+    proposal: {
+      overviewTitle: "提案概览",
+      regionLabel: "地区",
+      orgLabel: "组织",
+      raisedLabel: "已筹集",
+      goalLabel: "目标",
+      progressLabel: "进度",
+      donateTitle: "支持这项任务",
+      donateDescription: "治理流程完善前，可向 PeaceFund 捐赠 BNB 以表态支持。",
+      amountLabel: "金额（BNB）",
+      amountPlaceholder: "1",
+      submitLabel: "预览捐赠",
+      toast: "提案页面的链上捐赠即将上线。",
+      approvalNote: "提案通过后，发起人会提交 BNB 收款地址，资金将由金库直接拨付。",
+      receiverLabel: "拟收款地址"
+    },
+    proposePage: {
+      title: "发起提案",
+      subtitle: "在完整治理工具上线前，先编写你的影响力计划以便讨论。",
+      connectCta: "连接钱包",
+      gateTitle: "PEACE 余额不足",
+      gateRequirement: "需要至少 1,000,000 枚 $世界和平 才能发起提案。",
+      gateDescription: "通过支持任务或在支持的场所购买代币，累积你的治理权重。",
+      formTitle: "提案详情",
+      titleLabel: "标题",
+      regionLabel: "地区",
+      orgLabel: "组织",
+      goalLabel: "目标金额（BNB）",
+      receiverLabel: "收款地址",
+      descriptionLabel: "详细说明",
+      submitLabel: "保存草稿",
+      toast: "链上提案即将推出；目前先在本地保存演示数据。",
+      addressError: "请输入有效的 BNB 地址。",
+      goalError: "请设置大于零的目标金额。"
+    },
     verify: {
       title: "验证你的身份",
       subtitle: "使用 Guild 证明持仓，加入全球协作网络。",
       guildCta: "前往 Guild 验证",
       public: "公开 Telegram",
       verified: "验证 Telegram",
-      helper: "Guild 会读取 BSC 上的 PEACE 余额，为你解锁协作空间。"
+      helper: "Guild 会读取 BSC 上的 PEACE 余额，为你解锁协作空间。",
+      connectCta: "连接钱包",
+      gateRequirement: "需要至少 200,000 枚 $世界和平 才能验证提案并领取奖励。",
+      validatorMissing: "Peace Validator 合约未配置，点赞与领奖功能暂时停用。",
+      proposalIdLabel: "提案 ID",
+      likeCta: "按讚验证",
+      claimCta: "领取验证奖励",
+      comingSoon: "链上验证操作即将上线。"
     },
     about: {
       title: "关于 World Peace DAO",

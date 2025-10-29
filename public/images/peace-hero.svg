@@ -1,0 +1,20 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="hero_glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(800 0) rotate(90) scale(900 1200)">
+      <stop offset="0" stop-color="#38bdf8" stop-opacity="0.45"/>
+      <stop offset="0.55" stop-color="#34d399" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#0f172a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#hero_glow)"/>
+  <g opacity="0.35" stroke="rgba(148, 163, 184, 0.35)">
+    <circle cx="800" cy="-120" r="320" fill="none" stroke-width="1.5"/>
+    <circle cx="820" cy="-140" r="480" fill="none" stroke-width="1.5"/>
+    <circle cx="780" cy="-160" r="640" fill="none" stroke-width="1.5"/>
+  </g>
+  <g opacity="0.4" fill="rgba(226, 232, 240, 0.18)">
+    <path d="M640 120c60-40 140-40 200 0 60-40 140-40 200 0 60-40 140-40 200 0l-200 180H840L640 120z"/>
+    <circle cx="480" cy="220" r="60"/>
+    <circle cx="1120" cy="200" r="72"/>
+  </g>
+</svg>

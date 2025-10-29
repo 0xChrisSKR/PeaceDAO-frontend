@@ -16,6 +16,8 @@ const NAV_LINKS = [
   { href: "/donate", key: "donate" },
   { href: "/treasury", key: "treasury" },
   { href: "/governance", key: "governance" },
+  { href: "/proposals", key: "proposals" },
+  { href: "/propose", key: "propose" },
   { href: "/verify", key: "verify" },
   { href: "/about", key: "about" }
 ] satisfies Array<{ href: Route; key: keyof Dictionary["nav"] }>;

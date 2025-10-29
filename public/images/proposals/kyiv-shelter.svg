@@ -1,0 +1,18 @@
+<svg width="640" height="400" viewBox="0 0 640 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="kyiv_bg" x1="0" y1="0" x2="640" y2="400" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1d4ed8"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" rx="32" fill="#020617"/>
+  <rect x="24" y="24" width="592" height="352" rx="28" fill="url(#kyiv_bg)" fill-opacity="0.28" stroke="rgba(226,232,240,0.22)" stroke-width="2"/>
+  <circle cx="200" cy="220" r="80" fill="rgba(56,189,248,0.6)"/>
+  <circle cx="440" cy="180" r="110" fill="rgba(29,78,216,0.45)"/>
+  <path d="M140 280h360" stroke="rgba(226,232,240,0.75)" stroke-width="12" stroke-linecap="round"/>
+  <path d="M200 150h240l40 110H160l40-110z" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.35)" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="220" y="210" width="60" height="60" rx="10" fill="rgba(2,6,23,0.7)"/>
+  <rect x="360" y="210" width="60" height="60" rx="10" fill="rgba(2,6,23,0.7)"/>
+  <path d="M308 210h24v60h-24z" fill="rgba(2,6,23,0.7)"/>
+  <text x="48" y="360" fill="white" font-family="'Inter', 'Helvetica', 'Arial', sans-serif" font-weight="600" font-size="32">KYIV SHELTER</text>
+</svg>

@@ -8,6 +8,12 @@
 
 body {
   font-feature-settings: "rlig" 1, "calt" 1;
+  background-color: #020617;
+  background-image: url("/images/peace-hero.svg"), radial-gradient(circle at top, rgba(56, 189, 248, 0.25), transparent 55%),
+    radial-gradient(circle at 20% 0%, rgba(52, 211, 153, 0.2), transparent 45%), linear-gradient(180deg, #020617 0%, #0f172a 55%, #082f49 100%);
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+  background-position: top center, top center, top left, top center;
+  background-size: 1600px auto, 1400px 600px, 1200px 500px, cover;
 }
 
 a {

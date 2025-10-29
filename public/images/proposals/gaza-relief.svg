@@ -1,0 +1,15 @@
+<svg width="640" height="400" viewBox="0 0 640 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gaza_bg" x1="0" y1="0" x2="640" y2="400" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ef4444"/>
+      <stop offset="1" stop-color="#f97316"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" rx="32" fill="#111827"/>
+  <rect x="24" y="24" width="592" height="352" rx="28" fill="url(#gaza_bg)" fill-opacity="0.25" stroke="rgba(248,250,252,0.24)" stroke-width="2"/>
+  <path d="M180 280l140-160 140 160" stroke="rgba(248,250,252,0.8)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="320" cy="210" r="64" fill="rgba(248,250,252,0.18)" stroke="rgba(248,250,252,0.45)" stroke-width="8"/>
+  <path d="M320 164l26 44h-52l26-44z" fill="rgba(248,250,252,0.7)"/>
+  <rect x="280" y="230" width="80" height="70" rx="16" fill="rgba(17,24,39,0.7)"/>
+  <text x="48" y="360" fill="white" font-family="'Inter', 'Helvetica', 'Arial', sans-serif" font-weight="600" font-size="32">GAZA RELIEF</text>
+</svg>

@@ -1,0 +1,14 @@
+<svg width="640" height="400" viewBox="0 0 640 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sudan_bg" x1="0" y1="0" x2="640" y2="400" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22c55e"/>
+      <stop offset="1" stop-color="#0f766e"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" rx="32" fill="#022c22"/>
+  <rect x="24" y="24" width="592" height="352" rx="28" fill="url(#sudan_bg)" fill-opacity="0.26" stroke="rgba(226,252,239,0.2)" stroke-width="2"/>
+  <path d="M120 280c40-80 120-120 200-120s160 40 200 120" stroke="rgba(226,252,239,0.75)" stroke-width="12" stroke-linecap="round"/>
+  <path d="M320 100c-36 44-54 80-54 108 0 40 24 72 54 72s54-32 54-72c0-28-18-64-54-108z" fill="rgba(226,252,239,0.7)"/>
+  <circle cx="320" cy="220" r="46" fill="rgba(2,44,34,0.7)"/>
+  <text x="48" y="360" fill="white" font-family="'Inter', 'Helvetica', 'Arial', sans-serif" font-weight="600" font-size="32">SUDAN WATER</text>
+</svg>

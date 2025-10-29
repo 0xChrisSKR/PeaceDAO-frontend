@@ -16,6 +16,14 @@ npm run dev
 - PeaceFund (BSC Testnet): `{{PEACEFUND_BSCTEST}}`
 - `donate(string note)` accepts BNB contributions, emits a `Donated` event with the sender, amount, and note, and holds funds without any withdrawal path until a future governance executor is deployed.
 
+## Participation thresholds
+
+- Join / Like: **15,000 $世界和平**
+- Vote / Verify: **200,000 $世界和平**
+- Propose: **1,000,000 $世界和平**
+
+Passing a vote does **not** trigger an automatic transfer to the proposer. After a proposal is approved, the proposer submits a BNB receiving address and the treasury releases funds directly to that wallet.
+
 ## Required owner-provided values
 
 Set these environment variables in `.env.local` (or your hosting provider):
@@ -25,6 +33,8 @@ Set these environment variables in `.env.local` (or your hosting provider):
 * `NEXT_PUBLIC_PEACE_SWAP_ROUTER` (your Router address)
 * `NEXT_PUBLIC_GUILD_LINK` (Guild join link)
 * Telegram links (`NEXT_PUBLIC_TG_PUBLIC`, `NEXT_PUBLIC_TG_VERIFIED`) — may change later
+* `NEXT_PUBLIC_TOKEN_ADDRESS` (PEACE token address)
+* `NEXT_PUBLIC_PEACE_VALIDATOR` (Peace Validator contract address)
 
 ## Deploy to Vercel
 
@@ -33,7 +43,8 @@ Set these environment variables in `.env.local` (or your hosting provider):
    - `NEXT_PUBLIC_WC_PROJECT_ID`
    - `NEXT_PUBLIC_RPC_BSC`
    - `NEXT_PUBLIC_PEACE_FUND`
-   - `NEXT_PUBLIC_TOKEN`
+   - `NEXT_PUBLIC_TOKEN_ADDRESS`
+   - `NEXT_PUBLIC_PEACE_VALIDATOR`
    - `NEXT_PUBLIC_GUILD_LINK`
    - `NEXT_PUBLIC_TG_PUBLIC`
    - `NEXT_PUBLIC_TG_VERIFIED`

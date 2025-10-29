@@ -1,0 +1,15 @@
+<svg width="640" height="400" viewBox="0 0 640 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="haiti_bg" x1="0" y1="0" x2="640" y2="400" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f472b6"/>
+      <stop offset="1" stop-color="#fb7185"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" rx="32" fill="#3b0a2e"/>
+  <rect x="24" y="24" width="592" height="352" rx="28" fill="url(#haiti_bg)" fill-opacity="0.3" stroke="rgba(255,228,230,0.3)" stroke-width="2"/>
+  <path d="M140 270c60-40 120-60 180-60s120 20 180 60" stroke="rgba(255,228,230,0.6)" stroke-width="12" stroke-linecap="round"/>
+  <rect x="200" y="150" width="240" height="120" rx="24" fill="rgba(255,228,230,0.28)" stroke="rgba(255,228,230,0.6)" stroke-width="8"/>
+  <path d="M240 190h160v60H240z" fill="rgba(59,10,46,0.65)"/>
+  <path d="M320 140l52 52h-104l52-52z" fill="rgba(255,255,255,0.45)"/>
+  <text x="48" y="360" fill="white" font-family="'Inter', 'Helvetica', 'Arial', sans-serif" font-weight="600" font-size="32">HAITI RENEWAL</text>
+</svg>

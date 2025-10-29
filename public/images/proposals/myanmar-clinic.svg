@@ -1,0 +1,15 @@
+<svg width="640" height="400" viewBox="0 0 640 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="myanmar_bg" x1="0" y1="0" x2="640" y2="400" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#a855f7"/>
+      <stop offset="1" stop-color="#6366f1"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" rx="32" fill="#1e1b4b"/>
+  <rect x="24" y="24" width="592" height="352" rx="28" fill="url(#myanmar_bg)" fill-opacity="0.28" stroke="rgba(237,233,254,0.25)" stroke-width="2"/>
+  <rect x="200" y="150" width="240" height="160" rx="28" fill="rgba(237,233,254,0.25)" stroke="rgba(237,233,254,0.45)" stroke-width="8"/>
+  <path d="M320 170v120" stroke="rgba(237,233,254,0.8)" stroke-width="16" stroke-linecap="round"/>
+  <path d="M260 230h120" stroke="rgba(237,233,254,0.8)" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="320" cy="140" r="42" fill="rgba(99,102,241,0.6)"/>
+  <text x="48" y="360" fill="white" font-family="'Inter', 'Helvetica', 'Arial', sans-serif" font-weight="600" font-size="32">MYANMAR CLINIC</text>
+</svg>
