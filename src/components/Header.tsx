@@ -6,18 +6,21 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { ConnectButton } from "@/components/ConnectButton";
 import { NetworkPill } from "@/components/NetworkPill";
+import LanguageToggle from "@/components/LanguageToggle";
+import { useT } from "@/lib/useT";
 
 const NAV_ITEMS = [
-  { href: "/", label: "Home" },
-  { href: "/donate", label: "Donate" },
-  { href: "/swap", label: "Swap" },
-  { href: "/proposals", label: "Proposals" },
-  { href: "/verify", label: "Verify" },
-  { href: "/community", label: "Community" }
-] satisfies Array<{ href: Route; label: string }>;
+  { href: "/", labelKey: "nav_home", fallback: "Home" },
+  { href: "/donate", labelKey: "nav_donate", fallback: "Donate" },
+  { href: "/swap", labelKey: "nav_swap", fallback: "Swap" },
+  { href: "/proposals", labelKey: "nav_proposals", fallback: "Proposals" },
+  { href: "/verify", labelKey: "nav_verify", fallback: "Verify" },
+  { href: "/community", labelKey: "nav_community", fallback: "Community" }
+] satisfies Array<{ href: Route; labelKey: string; fallback: string }>;
 
 export function Header() {
   const pathname = usePathname();
+  const t = useT();
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/80 backdrop-blur">
@@ -40,7 +43,7 @@ export function Header() {
                 pathname === item.href ? "bg-brand/20 text-white" : "hover:text-white"
               )}
             >
-              {item.label}
+              {t(item.labelKey, item.fallback)}
             </Link>
           ))}
         </nav>
@@ -48,6 +51,7 @@ export function Header() {
           <div className="sm:hidden">
             <NetworkPill />
           </div>
+          <LanguageToggle />
           <ConnectButton />
         </div>
       </div>

@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import type { Route } from "next";
 import env from "@/config/env";
 import { VerifiedTGButton } from "@/components/VerifiedTGButton";
+import { useT } from "@/lib/useT";
 
 const CTA_CARDS = [
   {
@@ -31,14 +34,40 @@ const CTA_CARDS = [
 }>;
 
 export default function HomePage() {
+  const t = useT();
+
   return (
     <div className="space-y-10">
       <section className="rounded-3xl bg-gradient-to-br from-brand-dark to-slate-900 p-8 text-white shadow-lg">
-        <h1 className="text-3xl font-bold sm:text-4xl">PeaceDAO Operations Console</h1>
+        <h1 className="text-3xl font-bold sm:text-4xl">
+          {t("title", "PeaceDAO Operations Console")}
+        </h1>
         <p className="mt-3 max-w-2xl text-base text-slate-200">
-          Connect your wallet to donate BNB, execute swaps, and unlock community access.
-          PeaceDAO routes 90% of donations to beneficiaries while sustaining the movement.
+          {t(
+            "subtitle",
+            "Connect your wallet to donate BNB, execute swaps, and unlock community access. PeaceDAO routes 90% of donations to beneficiaries while sustaining the movement."
+          )}
         </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link
+            href="/donate"
+            className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2 text-sm font-semibold text-brand-dark transition hover:bg-slate-100"
+          >
+            {t("cta_donate", "Donate to PeaceFund")}
+          </Link>
+          <Link
+            href="/swap"
+            className="inline-flex items-center justify-center rounded-full border border-white/60 px-5 py-2 text-sm font-semibold text-white transition hover:border-white hover:bg-white/10"
+          >
+            {t("cta_treasury", "Swap on PeaceSwap")}
+          </Link>
+          <Link
+            href="/verify"
+            className="inline-flex items-center justify-center rounded-full border border-white/60 px-5 py-2 text-sm font-semibold text-white transition hover:border-white hover:bg-white/10"
+          >
+            {t("cta_verify", "Verify (Guild)")}
+          </Link>
+        </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           {CTA_CARDS.map((card) => (
             <Link
