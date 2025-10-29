@@ -2,12 +2,15 @@
 
 import { useChainId, useSwitchChain, useChains } from "wagmi";
 import { useMemo } from "react";
+import { useTranslation } from "next-i18next";
+
 import { bsc, bscTestnet, DEFAULT_CHAIN } from "@/config/chains";
 
 export function NetworkPill() {
   const chainId = useChainId();
   const chains = useChains();
   const { switchChainAsync, isPending } = useSwitchChain();
+  const { t } = useTranslation();
 
   const current = useMemo(
     () => chains.find((chain) => chain.id === chainId) ?? DEFAULT_CHAIN,
@@ -21,10 +24,10 @@ export function NetworkPill() {
   }, [chains, current.id]);
 
   const label = useMemo(() => {
-    if (current.id === bsc.id) return "BSC Mainnet";
-    if (current.id === bscTestnet.id) return "BSC Testnet";
-    return current.name ?? "Unknown";
-  }, [current]);
+    if (current.id === bsc.id) return t("network.bscMainnet");
+    if (current.id === bscTestnet.id) return t("network.bscTestnet");
+    return current.name ?? t("network.unknown");
+  }, [current, t]);
 
   const handleClick = async () => {
     if (!nextChain) return;
@@ -42,7 +45,7 @@ export function NetworkPill() {
       disabled={!nextChain || isPending}
       className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
     >
-      {isPending ? "Switching..." : label}
+      {isPending ? t("network.switching") : label}
     </button>
   );
 }

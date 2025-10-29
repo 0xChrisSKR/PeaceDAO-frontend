@@ -1,0 +1,223 @@
+{
+  "brand": {
+    "name": "PeaceDAO"
+  },
+  "language": {
+    "switcherLabel": "Switch language",
+    "english": "EN",
+    "chinese": "中文"
+  },
+  "nav": {
+    "home": "Home",
+    "donate": "Donate",
+    "swap": "Swap",
+    "governance": "Governance",
+    "verify": "Verify",
+    "community": "Community",
+    "treasury": "Treasury",
+    "about": "About"
+  },
+  "footer": {
+    "credit": "Built with love by PeaceDAO contributors."
+  },
+  "home": {
+    "hero": {
+      "title": "PeaceDAO Operations Console",
+      "subtitle": "Connect your wallet to donate BNB, execute swaps, and unlock community access. PeaceDAO routes 90% of donations to beneficiaries while sustaining the movement."
+    },
+    "cta": {
+      "donate": {
+        "title": "Donate to PeaceFund",
+        "description": "Support frontline peacemakers with a direct BNB donation."
+      },
+      "swap": {
+        "title": "Swap on PeaceSwap",
+        "description": "Trade with the PeaceDAO router and fund the movement."
+      },
+      "governance": {
+        "title": "Governance",
+        "description": "Community-driven decisions (coming soon)."
+      },
+      "verify": {
+        "title": "Verify",
+        "description": "Earn access to gated spaces (coming soon)."
+      }
+    },
+    "join": {
+      "title": "Join the global chat",
+      "description": "Our public Telegram keeps everyone aligned with the mission.",
+      "action": "Open Public Telegram"
+    },
+    "unlock": {
+      "title": "Unlock verified access",
+      "description": "Hold PEACE tokens to enter the verified coordination hub."
+    }
+  },
+  "common": {
+    "errors": {
+      "publicClientUnavailable": "Public client unavailable",
+      "walletClientUnavailable": "Wallet client unavailable",
+      "amountGreaterThanZero": "Enter an amount greater than zero",
+      "connectWallet": "Connect your wallet"
+    }
+  },
+  "donate": {
+    "title": "Donate BNB",
+    "description": "90% of every donation is streamed directly to the beneficiary while 10% sustains PeaceDAO operations.",
+    "alert": {
+      "notConfigured": "PeaceFund is not configured. Set <strong>NEXT_PUBLIC_PEACE_FUND</strong> in your <code></code> to enable donations."
+    },
+    "errors": {
+      "contractMissing": "PeaceFund contract is not configured",
+      "methodNotFound": "No donate method matched on PeaceFund contract"
+    },
+    "form": {
+      "beneficiaryLabel": "Beneficiary Address",
+      "beneficiaryPlaceholder": "0x...",
+      "amountLabel": "Amount (BNB)",
+      "amountPlaceholder": "0.5",
+      "methodResolved": "Using PeaceFund method <strong>{{method}}</strong>",
+      "submit": "Donate Now",
+      "submitLoading": "Processing..."
+    },
+    "toast": {
+      "connectWallet": "Connect your wallet to donate",
+      "switchNetwork": "Switch to {{chain}} to donate",
+      "contractMissing": "PeaceFund contract address is not configured",
+      "invalidBeneficiary": "Enter a valid beneficiary address",
+      "resolving": "Resolving donation method...",
+      "sending": "Sending donation...",
+      "txSent": "Transaction sent: {{hash}}",
+      "confirmed": "Donation confirmed",
+      "failed": "Donation failed"
+    },
+    "contract": {
+      "label": "PeaceFund Contract",
+      "gasNotice": "Keep at least 0.01 BNB for gas fees. Donations are executed on {{chain}}.",
+      "configure": "Configure your PeaceFund address to enable donations on {{chain}}."
+    }
+  },
+  "community": {
+    "title": "Community",
+    "description": "Join the movement across our public and token-gated communities. Verification is powered by Guild.xyz and Collab.Land.",
+    "public": {
+      "title": "Public Telegram",
+      "description": "Stay up-to-date with mission updates and call-to-actions.",
+      "action": "Join Public Chat"
+    },
+    "verified": {
+      "title": "Verified Telegram",
+      "description": "Token holders coordinate here for verified missions. Hold PEACE tokens and verify through Guild.xyz / Collab.Land to gain access.",
+      "action": "View Verification Guide"
+    }
+  },
+  "verify": {
+    "title": "Verify Access",
+    "description": "Hold PEACE tokens and complete the Guild.xyz quest to unlock verified Telegram access. Collab.Land quests will continue to roll out for additional mission roles.",
+    "guildAction": "Verify with Guild.xyz",
+    "guildHelp": "Need help? Ensure your wallet holds at least 100 $PEACE before attempting verification.",
+    "back": "Back to Community",
+    "toast": {
+      "connect": "Connect your wallet to verify access",
+      "insufficient": "You need at least {{amount}} tokens to access the verified channel."
+    },
+    "button": {
+      "openVerified": "Open Verified Telegram",
+      "holdToUnlock": "Hold {{amount}}+ $PEACE to unlock",
+      "currentBalance": "Current balance: {{balance}}",
+      "connectWallet": "Current balance: Connect wallet"
+    }
+  },
+  "connectButton": {
+    "toast": {
+      "connected": "Wallet connected",
+      "connectError": "Failed to connect",
+      "disconnected": "Disconnected",
+      "disconnectError": "Failed to disconnect"
+    },
+    "button": {
+      "disconnecting": "Disconnecting...",
+      "disconnect": "Disconnect",
+      "connecting": "Connecting...",
+      "connect": "Connect Wallet",
+      "connectorPending": "(connecting)"
+    },
+    "warning": "Use Binance Web3 Wallet or WalletConnect QR."
+  },
+  "network": {
+    "bscMainnet": "BSC Mainnet",
+    "bscTestnet": "BSC Testnet",
+    "unknown": "Unknown",
+    "switching": "Switching..."
+  },
+  "networkGuard": {
+    "message": "You are connected to the wrong network. Please switch to {{chain}} to continue.",
+    "button": {
+      "switching": "Switching...",
+      "switch": "Switch to {{chain}}"
+    },
+    "toast": {
+      "switched": "Switched to {{chain}}",
+      "error": "Failed to switch network"
+    }
+  },
+  "governance": {
+    "title": "Governance",
+    "description": "Governance proposals are coming soon. PeaceDAO is finalizing integrations to track on-chain votes and social proofs."
+  },
+  "swap": {
+    "title": "PeaceSwap Router",
+    "description": "Swap WORLDPEACE ↔ WBNB through PeaceSwap Router. When no wallet is connected we fall back to the BSC Testnet pair so you can explore safely before deploying capital on mainnet.",
+    "alert": {
+      "notConfigured": "PeaceSwap router is not configured. Set <strong>NEXT_PUBLIC_PEACE_SWAP_ROUTER</strong> in your <code></code> to enable swaps."
+    },
+    "notice": "Router may charge {{fee}}% fee (DAO 80% / Founder 20%) if using PeaceSwapRouter. Plan for slippage and keep BNB for gas.",
+    "form": {
+      "tokenIn": "Token In",
+      "tokenOut": "Token Out",
+      "addressPlaceholder": "0x...",
+      "amountIn": "Amount In",
+      "amountPlaceholder": "0.0",
+      "balance": "Balance: {{value}} {{symbol}}",
+      "balanceUnknown": "Balance: -",
+      "minAmount": "Min Amount Out (before slippage)",
+      "slippageAdjusted": "Slippage adjusted minimum: {{value}} {{symbol}}",
+      "slippageLabel": "Slippage (bps)",
+      "deadlineLabel": "Deadline (seconds)",
+      "approve": "Approve TokenIn",
+      "approving": "Approving...",
+      "swap": "Swap",
+      "swapping": "Swapping..."
+    },
+    "toast": {
+      "switchNetworkApprove": "Switch to {{chain}} to approve",
+      "switchNetworkSwap": "Switch to {{chain}} to swap",
+      "tokenInInvalid": "Enter a valid Token In address",
+      "tokenAddressesInvalid": "Enter valid token addresses",
+      "routerMissing": "PeaceSwap router address is not configured",
+      "approving": "Approving token...",
+      "approvalTx": "Approval tx: {{hash}}",
+      "approvalSuccess": "Approval confirmed",
+      "approvalFailed": "Approval failed",
+      "metadataMissing": "Unable to load token metadata",
+      "insufficientBalance": "Insufficient balance",
+      "deadlineShort": "Deadline should be at least 60 seconds",
+      "minOutRequired": "Set a minimum amount out",
+      "simulate": "Simulating swap...",
+      "simulateFailed": "Swap simulation failed",
+      "liquidityMissing": "Liquidity not found for this pair (WORLDPEACE/WBNB). Please add LP on PancakeSwap.",
+      "submitting": "Submitting swap...",
+      "swapTx": "Swap tx: {{hash}}",
+      "swapConfirmed": "Swap confirmed",
+      "swapFailed": "Swap failed"
+    },
+    "footer": {
+      "routerAddress": "Router Address",
+      "gasNotice": "Keep a small BNB balance to cover gas. Without a valid PeaceSwap router deployment, this interface will not execute.",
+      "configure": "Router is disabled until <strong>NEXT_PUBLIC_PEACE_SWAP_ROUTER</strong> is set for {{chain}}."
+    },
+    "logs": {
+      "swapWithFee": "SwapWithFee: in {{amountIn}} {{tokenIn}}, out {{amountOut}} {{tokenOut}}, fee {{fee}}"
+    }
+  }
+}

@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import type { Address } from "viem";
 import { isAddress } from "viem";
 import { useMemo } from "react";
+import { useTranslation } from "next-i18next";
 
 interface Props {
   requiredBalance: number;
@@ -15,6 +16,7 @@ interface Props {
 
 export function VerifiedTGButton({ requiredBalance }: Props) {
   const { isConnected } = useAccount();
+  const { t } = useTranslation();
   const peaceTokenAddress = useMemo(() => {
     if (!env.peaceToken) return undefined;
     return isAddress(env.peaceToken) ? (env.peaceToken as Address) : undefined;
@@ -27,11 +29,11 @@ export function VerifiedTGButton({ requiredBalance }: Props) {
 
   const handleClick = () => {
     if (!isConnected) {
-      toast.error("Connect your wallet to verify access");
+      toast.error(t("verify.toast.connect"));
       return;
     }
     if (!hasAccess) {
-      toast.error(`You need at least ${requiredBalance} tokens to access the verified channel.`);
+      toast.error(t("verify.toast.insufficient", { amount: requiredBalance }));
       return;
     }
     if (env.tgVerified) {
@@ -39,15 +41,21 @@ export function VerifiedTGButton({ requiredBalance }: Props) {
     }
   };
 
+  const balanceLabel = isConnected
+    ? t("verify.button.currentBalance", {
+        balance: `${formatNumber(numericBalance, 2)} $PEACE`
+      })
+    : t("verify.button.connectWallet");
+
   return (
     <button
       onClick={handleClick}
       className="w-full rounded-lg border border-brand bg-brand/80 px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-brand"
     >
-      {hasAccess ? "Open Verified Telegram" : `Hold ${requiredBalance}+ $PEACE to unlock`}
-      <div className="mt-1 text-xs text-slate-200/80">
-        Current balance: {isConnected ? `${formatNumber(numericBalance, 2)} $PEACE` : "Connect wallet"}
-      </div>
+      {hasAccess
+        ? t("verify.button.openVerified")
+        : t("verify.button.holdToUnlock", { amount: requiredBalance })}
+      <div className="mt-1 text-xs text-slate-200/80">{balanceLabel}</div>
     </button>
   );
 }

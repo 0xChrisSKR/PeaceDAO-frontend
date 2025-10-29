@@ -3,6 +3,11 @@
  */
 const nextConfig = {
   reactStrictMode: true,
+  i18n: {
+    defaultLocale: "en",
+    locales: ["en", "zh"],
+    localeDetection: true
+  },
   experimental: {
     typedRoutes: true
   },

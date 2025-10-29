@@ -1,0 +1,223 @@
+{
+  "brand": {
+    "name": "PeaceDAO"
+  },
+  "language": {
+    "switcherLabel": "切换语言",
+    "english": "EN",
+    "chinese": "中文"
+  },
+  "nav": {
+    "home": "首页",
+    "donate": "捐赠",
+    "swap": "兑换",
+    "governance": "治理",
+    "verify": "验证",
+    "community": "社区",
+    "treasury": "国库",
+    "about": "关于"
+  },
+  "footer": {
+    "credit": "由 PeaceDAO 贡献者倾情构建。"
+  },
+  "home": {
+    "hero": {
+      "title": "PeaceDAO 运营控制台",
+      "subtitle": "连接钱包即可捐赠 BNB、执行兑换并解锁社区权限。PeaceDAO 将 90% 的捐款直接发送给受益方，同时保障组织持续运转。"
+    },
+    "cta": {
+      "donate": {
+        "title": "捐赠至 PeaceFund",
+        "description": "直接向前线和平行动者捐赠 BNB。"
+      },
+      "swap": {
+        "title": "在 PeaceSwap 兑换",
+        "description": "通过 PeaceDAO 路由进行交易，为运动提供资金支持。"
+      },
+      "governance": {
+        "title": "治理",
+        "description": "社区驱动的提案（即将推出）。"
+      },
+      "verify": {
+        "title": "身份验证",
+        "description": "赚取访问受限空间的资格（即将推出）。"
+      }
+    },
+    "join": {
+      "title": "加入全球聊天",
+      "description": "公共 Telegram 频道让所有人保持使命一致。",
+      "action": "打开公共 Telegram"
+    },
+    "unlock": {
+      "title": "解锁验证权限",
+      "description": "持有 PEACE 代币即可进入经过验证的协同枢纽。"
+    }
+  },
+  "common": {
+    "errors": {
+      "publicClientUnavailable": "公共客户端不可用",
+      "walletClientUnavailable": "钱包客户端不可用",
+      "amountGreaterThanZero": "请输入大于零的数额",
+      "connectWallet": "请先连接钱包"
+    }
+  },
+  "donate": {
+    "title": "捐赠 BNB",
+    "description": "每笔捐款的 90% 会直接流向受益方，10% 用于支持 PeaceDAO 的运营。",
+    "alert": {
+      "notConfigured": "PeaceFund 尚未配置。请在 <strong>NEXT_PUBLIC_PEACE_FUND</strong> 中设置，并在 <code></code> 内启用捐赠功能。"
+    },
+    "errors": {
+      "contractMissing": "未配置 PeaceFund 合约地址",
+      "methodNotFound": "未找到 PeaceFund 合约可用的捐赠方法"
+    },
+    "form": {
+      "beneficiaryLabel": "受益人地址",
+      "beneficiaryPlaceholder": "0x...",
+      "amountLabel": "金额（BNB）",
+      "amountPlaceholder": "0.5",
+      "methodResolved": "使用 PeaceFund 方法 <strong>{{method}}</strong>",
+      "submit": "立即捐赠",
+      "submitLoading": "处理中..."
+    },
+    "toast": {
+      "connectWallet": "请连接钱包以完成捐赠",
+      "switchNetwork": "切换至 {{chain}} 以完成捐赠",
+      "contractMissing": "PeaceFund 合约地址尚未配置",
+      "invalidBeneficiary": "请输入有效的受益人地址",
+      "resolving": "正在解析捐赠方法...",
+      "sending": "正在发送捐赠...",
+      "txSent": "交易已发送：{{hash}}",
+      "confirmed": "捐赠已确认",
+      "failed": "捐赠失败"
+    },
+    "contract": {
+      "label": "PeaceFund 合约",
+      "gasNotice": "请至少保留 0.01 BNB 用于燃料费。捐赠将在 {{chain}} 上执行。",
+      "configure": "请配置 PeaceFund 地址以便在 {{chain}} 上启用捐赠。"
+    }
+  },
+  "community": {
+    "title": "社区",
+    "description": "加入我们的公共与代币门控社区。验证由 Guild.xyz 与 Collab.Land 提供。",
+    "public": {
+      "title": "公共 Telegram",
+      "description": "随时掌握最新任务动态与行动号召。",
+      "action": "加入公共聊天"
+    },
+    "verified": {
+      "title": "验证 Telegram",
+      "description": "代币持有者在此协调执行任务。持有 PEACE 并通过 Guild.xyz / Collab.Land 验证即可获得访问权限。",
+      "action": "查看验证指南"
+    }
+  },
+  "verify": {
+    "title": "访问验证",
+    "description": "持有 PEACE 代币并完成 Guild.xyz 任务即可解锁验证 Telegram。Collab.Land 任务将持续推出更多角色权限。",
+    "guildAction": "使用 Guild.xyz 验证",
+    "guildHelp": "需要帮助？请确保钱包至少持有 100 枚 $PEACE 再尝试验证。",
+    "back": "返回社区",
+    "toast": {
+      "connect": "请连接钱包以验证访问权限",
+      "insufficient": "进入验证频道至少需要 {{amount}} 枚代币。"
+    },
+    "button": {
+      "openVerified": "打开验证 Telegram",
+      "holdToUnlock": "持有 {{amount}}+ $PEACE 以解锁",
+      "currentBalance": "当前余额：{{balance}}",
+      "connectWallet": "当前余额：请连接钱包"
+    }
+  },
+  "connectButton": {
+    "toast": {
+      "connected": "钱包已连接",
+      "connectError": "连接失败",
+      "disconnected": "已断开连接",
+      "disconnectError": "断开失败"
+    },
+    "button": {
+      "disconnecting": "正在断开...",
+      "disconnect": "断开连接",
+      "connecting": "正在连接...",
+      "connect": "连接钱包",
+      "connectorPending": "(连接中)"
+    },
+    "warning": "请使用 Binance Web3 钱包或 WalletConnect 扫码。"
+  },
+  "network": {
+    "bscMainnet": "BSC 主网",
+    "bscTestnet": "BSC 测试网",
+    "unknown": "未知网络",
+    "switching": "切换中..."
+  },
+  "networkGuard": {
+    "message": "您当前连接的网络不正确，请切换至 {{chain}} 后继续。",
+    "button": {
+      "switching": "切换中...",
+      "switch": "切换到 {{chain}}"
+    },
+    "toast": {
+      "switched": "已切换至 {{chain}}",
+      "error": "切换网络失败"
+    }
+  },
+  "governance": {
+    "title": "治理",
+    "description": "治理提案即将上线。PeaceDAO 正在完善链上投票与社交凭证的集成。"
+  },
+  "swap": {
+    "title": "PeaceSwap 路由",
+    "description": "通过 PeaceSwap 路由兑换 WORLDPEACE ↔ WBNB。未连接钱包时将默认使用 BSC 测试网交易对，方便在部署主网资金前先行体验。",
+    "alert": {
+      "notConfigured": "PeaceSwap 路由尚未配置。请在 <strong>NEXT_PUBLIC_PEACE_SWAP_ROUTER</strong> 中设置，并在 <code></code> 内启用兑换功能。"
+    },
+    "notice": "使用 PeaceSwapRouter 时，路由可能收取 {{fee}}% 手续费（DAO 80% / 创始人 20%）。请预留滑点并保留 BNB 用于燃料费。",
+    "form": {
+      "tokenIn": "输入代币",
+      "tokenOut": "输出代币",
+      "addressPlaceholder": "0x...",
+      "amountIn": "输入数量",
+      "amountPlaceholder": "0.0",
+      "balance": "余额：{{value}} {{symbol}}",
+      "balanceUnknown": "余额：-",
+      "minAmount": "最小输出（滑点前）",
+      "slippageAdjusted": "滑点调整后最小值：{{value}} {{symbol}}",
+      "slippageLabel": "滑点（基点）",
+      "deadlineLabel": "截止时间（秒）",
+      "approve": "授权 TokenIn",
+      "approving": "授权中...",
+      "swap": "兑换",
+      "swapping": "兑换中..."
+    },
+    "toast": {
+      "switchNetworkApprove": "切换至 {{chain}} 以授权",
+      "switchNetworkSwap": "切换至 {{chain}} 以兑换",
+      "tokenInInvalid": "请输入有效的输入代币地址",
+      "tokenAddressesInvalid": "请输入有效的代币地址",
+      "routerMissing": "尚未配置 PeaceSwap 路由地址",
+      "approving": "正在授权代币...",
+      "approvalTx": "授权交易：{{hash}}",
+      "approvalSuccess": "授权成功",
+      "approvalFailed": "授权失败",
+      "metadataMissing": "无法加载代币元数据",
+      "insufficientBalance": "余额不足",
+      "deadlineShort": "截止时间至少需 60 秒",
+      "minOutRequired": "请设置最小输出数量",
+      "simulate": "正在模拟兑换...",
+      "simulateFailed": "兑换模拟失败",
+      "liquidityMissing": "该交易对缺少流动性（WORLDPEACE/WBNB）。请先在 PancakeSwap 添加 LP。",
+      "submitting": "正在提交兑换...",
+      "swapTx": "兑换交易：{{hash}}",
+      "swapConfirmed": "兑换已确认",
+      "swapFailed": "兑换失败"
+    },
+    "footer": {
+      "routerAddress": "路由地址",
+      "gasNotice": "请保留少量 BNB 支付燃料费。若未正确部署 PeaceSwap 路由，本界面将无法执行。",
+      "configure": "在为 {{chain}} 设置 <strong>NEXT_PUBLIC_PEACE_SWAP_ROUTER</strong> 之前，路由功能将保持禁用。"
+    },
+    "logs": {
+      "swapWithFee": "SwapWithFee：输入 {{amountIn}} {{tokenIn}}，输出 {{amountOut}} {{tokenOut}}，手续费 {{fee}}"
+    }
+  }
+}

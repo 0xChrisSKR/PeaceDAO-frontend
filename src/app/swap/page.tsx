@@ -6,6 +6,7 @@ import type { Address } from "viem";
 import { isAddress, decodeEventLog, maxUint256, formatUnits } from "viem";
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { Trans, useTranslation } from "next-i18next";
 
 import env from "@/config/env";
 import { DEFAULT_CHAIN, bsc, bscTestnet } from "@/config/chains";
@@ -24,6 +25,7 @@ export default function SwapPage() {
   const chainId = useChainId();
   const publicClient = usePublicClient({ chainId });
   const { data: walletClient } = useWalletClient();
+  const { t } = useTranslation();
 
   const [tokenIn, setTokenIn] = useState<string>("");
   const [tokenOut, setTokenOut] = useState<string>("");
@@ -71,7 +73,7 @@ export default function SwapPage() {
     queryKey: ["token-meta", chainId, normalizedTokenIn, "in"],
     enabled: Boolean(publicClient && isAddress(normalizedTokenIn)),
     queryFn: async () => {
-      if (!publicClient) throw new Error("public client unavailable");
+      if (!publicClient) throw new Error(t("common.errors.publicClientUnavailable"));
       const [decimals, symbol] = await Promise.all([
         publicClient.readContract({
           address: normalizedTokenIn as Address,
@@ -92,7 +94,7 @@ export default function SwapPage() {
     queryKey: ["token-meta", chainId, normalizedTokenOut, "out"],
     enabled: Boolean(publicClient && isAddress(normalizedTokenOut)),
     queryFn: async () => {
-      if (!publicClient) throw new Error("public client unavailable");
+      if (!publicClient) throw new Error(t("common.errors.publicClientUnavailable"));
       const [decimals, symbol] = await Promise.all([
         publicClient.readContract({
           address: normalizedTokenOut as Address,
@@ -162,32 +164,32 @@ export default function SwapPage() {
 
   const executeApprove = async () => {
     if (!isConnected || !address) {
-      toast.error("Connect your wallet");
+      toast.error(t("common.errors.connectWallet"));
       return;
     }
     if (chainId !== DEFAULT_CHAIN.id) {
-      toast.error(`Switch to ${DEFAULT_CHAIN.name} to approve`);
+      toast.error(t("swap.toast.switchNetworkApprove", { chain: DEFAULT_CHAIN.name }));
       return;
     }
     if (!walletClient) {
-      toast.error("Wallet client unavailable");
+      toast.error(t("common.errors.walletClientUnavailable"));
       return;
     }
     if (!publicClient) {
-      toast.error("Public client unavailable");
+      toast.error(t("common.errors.publicClientUnavailable"));
       return;
     }
     if (!isAddress(normalizedTokenIn)) {
-      toast.error("Enter a valid Token In address");
+      toast.error(t("swap.toast.tokenInInvalid"));
       return;
     }
     if (!routerAddress) {
-      toast.error("PeaceSwap router address is not configured");
+      toast.error(t("swap.toast.routerMissing"));
       return;
     }
     try {
       setApproving(true);
-      toast.loading("Approving token...", { id: "approve" });
+      toast.loading(t("swap.toast.approving"), { id: "approve" });
       const txHash = await walletClient.writeContract({
         address: normalizedTokenIn as Address,
         abi: erc20Abi,
@@ -195,13 +197,15 @@ export default function SwapPage() {
         args: [routerAddress, maxUint256],
         account: address as Address
       });
-      toast.success(`Approval tx: ${txHash.slice(0, 10)}…`, { id: "approve" });
+      toast.success(t("swap.toast.approvalTx", { hash: `${txHash.slice(0, 10)}…` }), { id: "approve" });
       await publicClient?.waitForTransactionReceipt({ hash: txHash });
-      toast.success("Approval confirmed", { id: "approve" });
+      toast.success(t("swap.toast.approvalSuccess"), { id: "approve" });
       await refetchAllowance();
     } catch (error: any) {
       console.error(error);
-      toast.error(error?.shortMessage ?? error?.message ?? "Approval failed", { id: "approve" });
+      const fallback = t("swap.toast.approvalFailed");
+      const message = error?.shortMessage ?? error?.message ?? error?.cause?.shortMessage ?? fallback;
+      toast.error(message, { id: "approve" });
     } finally {
       setApproving(false);
     }
@@ -209,43 +213,43 @@ export default function SwapPage() {
 
   const executeSwap = async () => {
     if (!isConnected || !address) {
-      toast.error("Connect your wallet");
+      toast.error(t("common.errors.connectWallet"));
       return;
     }
     if (chainId !== DEFAULT_CHAIN.id) {
-      toast.error(`Switch to ${DEFAULT_CHAIN.name} to swap`);
+      toast.error(t("swap.toast.switchNetworkSwap", { chain: DEFAULT_CHAIN.name }));
       return;
     }
     if (!walletClient) {
-      toast.error("Wallet client unavailable");
+      toast.error(t("common.errors.walletClientUnavailable"));
       return;
     }
     if (!tokenInMeta || !tokenOutMeta) {
-      toast.error("Unable to load token metadata");
+      toast.error(t("swap.toast.metadataMissing"));
       return;
     }
     if (!isAddress(normalizedTokenIn) || !isAddress(normalizedTokenOut)) {
-      toast.error("Enter valid token addresses");
+      toast.error(t("swap.toast.tokenAddressesInvalid"));
       return;
     }
     if (amountInBigInt <= 0n) {
-      toast.error("Enter an amount greater than zero");
+      toast.error(t("common.errors.amountGreaterThanZero"));
       return;
     }
     if (balance && amountInBigInt > balance) {
-      toast.error("Insufficient balance");
+      toast.error(t("swap.toast.insufficientBalance"));
       return;
     }
     if (deadlineSecs < 60) {
-      toast.error("Deadline should be at least 60 seconds");
+      toast.error(t("swap.toast.deadlineShort"));
       return;
     }
     if (!routerAddress) {
-      toast.error("PeaceSwap router address is not configured");
+      toast.error(t("swap.toast.routerMissing"));
       return;
     }
     if (slippageAdjustedMinOut <= 0n) {
-      toast.error("Set a minimum amount out");
+      toast.error(t("swap.toast.minOutRequired"));
       return;
     }
 
@@ -254,7 +258,7 @@ export default function SwapPage() {
     try {
       setSwapping(true);
       setSwapLogs([]);
-      toast.loading("Simulating swap...", { id: "swap" });
+      toast.loading(t("swap.toast.simulate"), { id: "swap" });
       try {
         await publicClient.simulateContract({
           address: routerAddress,
@@ -271,21 +275,19 @@ export default function SwapPage() {
         });
       } catch (error: any) {
         console.error(error);
+        const fallback = t("swap.toast.simulateFailed");
         const rawMessage =
-          error?.shortMessage ?? error?.message ?? error?.cause?.shortMessage ?? "Swap simulation failed";
+          error?.shortMessage ?? error?.message ?? error?.cause?.shortMessage ?? fallback;
         const normalizedMessage = String(rawMessage).toLowerCase();
         if (normalizedMessage.includes("liquidity")) {
-          toast.error(
-            "Liquidity not found for this pair (WORLDPEACE/WBNB). Please add LP on PancakeSwap.",
-            { id: "swap" }
-          );
+          toast.error(t("swap.toast.liquidityMissing"), { id: "swap" });
         } else {
           toast.error(rawMessage, { id: "swap" });
         }
         return;
       }
 
-      toast.loading("Submitting swap...", { id: "swap" });
+      toast.loading(t("swap.toast.submitting"), { id: "swap" });
       const txHash = await walletClient.writeContract({
         address: routerAddress,
         abi: routerAbi,
@@ -299,9 +301,9 @@ export default function SwapPage() {
         ],
         account: address as Address
       });
-      toast.success(`Swap tx: ${txHash.slice(0, 10)}…`, { id: "swap" });
+      toast.success(t("swap.toast.swapTx", { hash: `${txHash.slice(0, 10)}…` }), { id: "swap" });
       const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
-      toast.success("Swap confirmed", { id: "swap" });
+      toast.success(t("swap.toast.swapConfirmed"), { id: "swap" });
       if (receipt?.logs?.length) {
         const logMessages: string[] = [];
         for (const log of receipt.logs) {
@@ -318,7 +320,13 @@ export default function SwapPage() {
               const formattedOut = formatNumber(Number(formatUnits(amountOut, tokenOutMeta.decimals)), 4);
               const formattedFee = formatNumber(Number(formatUnits(fee, tokenInMeta.decimals)), 4);
               logMessages.push(
-                `SwapWithFee: in ${formattedIn} ${tokenInMeta.symbol}, out ${formattedOut} ${tokenOutMeta.symbol}, fee ${formattedFee}`
+                t("swap.logs.swapWithFee", {
+                  amountIn: formattedIn,
+                  tokenIn: tokenInMeta.symbol,
+                  amountOut: formattedOut,
+                  tokenOut: tokenOutMeta.symbol,
+                  fee: formattedFee
+                })
               );
             }
           } catch (error) {
@@ -331,52 +339,79 @@ export default function SwapPage() {
       setMinOut("");
     } catch (error: any) {
       console.error(error);
-      const message = error?.shortMessage ?? error?.message ?? error?.cause?.shortMessage ?? "Swap failed";
+      const fallback = t("swap.toast.swapFailed");
+      const message = error?.shortMessage ?? error?.message ?? error?.cause?.shortMessage ?? fallback;
       toast.error(message, { id: "swap" });
     } finally {
       setSwapping(false);
     }
   };
 
+  const formattedBalance = useMemo(() => {
+    if (!balance || !tokenInMeta) return null;
+    try {
+      return formatNumber(Number(balance) / 10 ** tokenInMeta.decimals, 4);
+    } catch (error) {
+      return null;
+    }
+  }, [balance, tokenInMeta]);
+
+  const formattedSlippageMin = useMemo(() => {
+    if (!tokenOutMeta || slippageAdjustedMinOut === 0n) return null;
+    try {
+      return formatNumber(Number(slippageAdjustedMinOut) / 10 ** tokenOutMeta.decimals, 6);
+    } catch (error) {
+      return null;
+    }
+  }, [slippageAdjustedMinOut, tokenOutMeta]);
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-white">PeaceSwap Router</h1>
-        <p className="mt-2 text-sm text-slate-300">
-          Swap WORLDPEACE ↔ WBNB through PeaceSwap Router. When no wallet is connected we fall back to the BSC Testnet pair so
-          you can explore safely before deploying capital on mainnet.
-        </p>
+        <h1 className="text-3xl font-bold text-white">{t("swap.title")}</h1>
+        <p className="mt-2 text-sm text-slate-300">{t("swap.description")}</p>
       </div>
 
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 shadow-lg">
         {!isRouterConfigured && (
           <div className="mb-4 rounded-lg border border-amber-500 bg-amber-500/20 p-3 text-xs text-amber-100">
-            PeaceSwap router is not configured. Set <span className="font-semibold">NEXT_PUBLIC_PEACE_SWAP_ROUTER</span> in your
-            <code className="mx-1 rounded bg-amber-500/20 px-1 py-0.5 text-[10px] text-amber-100">.env.local</code> to enable
-            swaps.
+            <Trans
+              i18nKey="swap.alert.notConfigured"
+              components={{
+                strong: <span className="font-semibold" />,
+                code: (
+                  <code className="mx-1 rounded bg-amber-500/20 px-1 py-0.5 text-[10px] text-amber-100">.env.local</code>
+                )
+              }}
+            />
           </div>
         )}
         <div className="mb-4 rounded-lg border border-brand/30 bg-brand/10 p-3 text-xs text-brand-light">
-          Router may charge {env.swapFeeBps / 100}% fee (DAO 80% / Founder 20%) if using PeaceSwapRouter. Plan for slippage and
-          keep BNB for gas.
+          {t("swap.notice", { fee: env.swapFeeBps / 100 })}
         </div>
         <div className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase text-slate-300">Token In</label>
+              <label className="text-xs font-semibold uppercase text-slate-300" htmlFor="token-in">
+                {t("swap.form.tokenIn")}
+              </label>
               <input
+                id="token-in"
                 value={tokenIn}
                 onChange={(event) => setTokenIn(event.target.value)}
-                placeholder="0x..."
+                placeholder={t("swap.form.addressPlaceholder")}
                 className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white focus:border-brand focus:outline-none"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase text-slate-300">Token Out</label>
+              <label className="text-xs font-semibold uppercase text-slate-300" htmlFor="token-out">
+                {t("swap.form.tokenOut")}
+              </label>
               <input
+                id="token-out"
                 value={tokenOut}
                 onChange={(event) => setTokenOut(event.target.value)}
-                placeholder="0x..."
+                placeholder={t("swap.form.addressPlaceholder")}
                 className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white focus:border-brand focus:outline-none"
               />
             </div>
@@ -384,41 +419,55 @@ export default function SwapPage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase text-slate-300">Amount In</label>
+              <label className="text-xs font-semibold uppercase text-slate-300" htmlFor="amount-in">
+                {t("swap.form.amountIn")}
+              </label>
               <input
+                id="amount-in"
                 type="number"
                 min="0"
                 step="0.0001"
                 value={amountIn}
                 onChange={(event) => setAmountIn(event.target.value)}
-                placeholder="0.0"
+                placeholder={t("swap.form.amountPlaceholder")}
                 className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white focus:border-brand focus:outline-none"
               />
               <p className="text-xs text-slate-400">
-                Balance: {balance ? formatNumber(Number(balance) / 10 ** (tokenInMeta?.decimals ?? 18), 4) : "-"} {tokenInMeta?.symbol}
+                {formattedBalance && tokenInMeta
+                  ? t("swap.form.balance", { value: formattedBalance, symbol: tokenInMeta.symbol })
+                  : t("swap.form.balanceUnknown")}
               </p>
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase text-slate-300">Min Amount Out (before slippage)</label>
+              <label className="text-xs font-semibold uppercase text-slate-300" htmlFor="min-out">
+                {t("swap.form.minAmount")}
+              </label>
               <input
+                id="min-out"
                 type="number"
                 min="0"
                 step="0.0001"
                 value={minOut}
                 onChange={(event) => setMinOut(event.target.value)}
-                placeholder="0.0"
+                placeholder={t("swap.form.amountPlaceholder")}
                 className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white focus:border-brand focus:outline-none"
               />
             </div>
             <div className="text-xs text-slate-400">
-              Slippage adjusted minimum: {slippageAdjustedMinOut ? formatNumber(Number(slippageAdjustedMinOut) / 10 ** (tokenOutMeta?.decimals ?? 18), 6) : "-"} {tokenOutMeta?.symbol}
+              {t("swap.form.slippageAdjusted", {
+                value: formattedSlippageMin ?? "-",
+                symbol: tokenOutMeta?.symbol ?? ""
+              })}
             </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase text-slate-300">Slippage (bps)</label>
+              <label className="text-xs font-semibold uppercase text-slate-300" htmlFor="slippage">
+                {t("swap.form.slippageLabel")}
+              </label>
               <input
+                id="slippage"
                 type="number"
                 min="0"
                 value={slippageBps}
@@ -427,8 +476,11 @@ export default function SwapPage() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase text-slate-300">Deadline (seconds)</label>
+              <label className="text-xs font-semibold uppercase text-slate-300" htmlFor="deadline">
+                {t("swap.form.deadlineLabel")}
+              </label>
               <input
+                id="deadline"
                 type="number"
                 min="60"
                 value={deadlineSecs}
@@ -445,7 +497,7 @@ export default function SwapPage() {
                 disabled={isApproving || !amountInBigInt || !isRouterConfigured}
                 className="flex-1 rounded-lg bg-slate-800 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isApproving ? "Approving..." : "Approve TokenIn"}
+                {isApproving ? t("swap.form.approving") : t("swap.form.approve")}
               </button>
             ) : null}
             <button
@@ -453,7 +505,7 @@ export default function SwapPage() {
               disabled={isSwapping || !amountInBigInt || needsApproval || !isRouterConfigured}
               className="flex-1 rounded-lg bg-brand px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-light disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isSwapping ? "Swapping..." : "Swap"}
+              {isSwapping ? t("swap.form.swapping") : t("swap.form.swap")}
             </button>
           </div>
         </div>
@@ -463,15 +515,17 @@ export default function SwapPage() {
         {isRouterConfigured ? (
           <>
             <p>
-              Router Address: <span className="font-mono text-slate-100">{routerAddress}</span>
+              {t("swap.footer.routerAddress")}: <span className="font-mono text-slate-100">{routerAddress}</span>
             </p>
-            <p className="mt-2">
-              Keep a small BNB balance to cover gas. Without a valid PeaceSwap router deployment, this interface will not execute.
-            </p>
+            <p className="mt-2">{t("swap.footer.gasNotice")}</p>
           </>
         ) : (
           <p className="text-amber-200">
-            Router is disabled until <span className="font-semibold">NEXT_PUBLIC_PEACE_SWAP_ROUTER</span> is set for {DEFAULT_CHAIN.name}.
+            <Trans
+              i18nKey="swap.footer.configure"
+              values={{ chain: DEFAULT_CHAIN.name }}
+              components={{ strong: <span className="font-semibold" /> }}
+            />
           </p>
         )}
         {swapLogs.length > 0 && (
