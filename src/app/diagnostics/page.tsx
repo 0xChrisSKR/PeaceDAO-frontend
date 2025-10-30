@@ -1,26 +1,17 @@
-export const dynamic = 'force-static';
-
-function getPublicEnv() {
-  const allowedPrefix = 'NEXT_PUBLIC_';
-  return Object.entries(process.env)
-    .filter(([k]) => k.startsWith(allowedPrefix))
-    .map(([k, v]) => [k, String(v ?? '')])
-    .sort(([a], [b]) => a.localeCompare(b));
-}
+"use client";
+import { ENV } from "@/lib/env";
+import Link from "next/link";
 
 export default function DiagnosticsPage() {
-  const env = getPublicEnv();
   return (
-    <>
-      <h1 style={{fontSize: 28, fontWeight: 700, marginBottom: 12}}>Diagnostics</h1>
-      <div className="card">
-        {env.length === 0 ? <p className="small">No NEXT_PUBLIC_* variables.</p> : (
-          <ul style={{margin:0, paddingLeft:18}}>
-            {env.map(([k, v]) => (<li key={k} style={{margin:'6px 0'}}><code>{k}</code> = <code>{v}</code></li>))}
-          </ul>
-        )}
-      </div>
-      <p style={{marginTop:12}}><a className="btn" href="/api/peace/config" target="_blank" rel="noreferrer">Open /api/peace/config</a></p>
-    </>
+    <main style={{padding:20,fontFamily:"ui-sans-serif,system-ui"}}>
+      <h1>Diagnostics</h1>
+      <p>Client OK. ENV (public-only) below:</p>
+      <pre style={{background:"#111",color:"#0f0",padding:12,borderRadius:8,overflow:"auto"}}>
+        {JSON.stringify(ENV, null, 2)}
+      </pre>
+      <p><Link href="/api/peace/config">Open /api/peace/config</Link></p>
+      <p><Link href="/">Back Home</Link></p>
+    </main>
   );
 }
