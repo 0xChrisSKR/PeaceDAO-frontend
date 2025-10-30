@@ -17,7 +17,7 @@ export default function Page() {
   return (
     <main style={{ padding: 24, fontFamily: 'ui-sans-serif,system-ui' }}>
       <h1>Diagnostics</h1>
-      <p>Check these are not "(undefined)".</p>
+      <p>Check these are not &quot;(undefined)&quot;.</p>
       <pre>{JSON.stringify(vars, null, 2)}</pre>
       <p>Config JSON: <a href="/api/peace/config">/api/peace/config</a></p>
     </main>
