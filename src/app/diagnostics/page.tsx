@@ -1,5 +1,6 @@
 'use client';
 /* eslint-disable react/no-unescaped-entities */
+import Link from 'next/link';
 const get = (k:string) => (process as any).env?.[k] ?? '&quot;(undefined)&quot;';
 export default function Page(){
   const keys = [
@@ -18,6 +19,7 @@ export default function Page(){
       <h1>Diagnostics</h1>
       <pre>{JSON.stringify(vars,null,2)}</pre>
       <p>Config: <a href="/api/peace/config">/api/peace/config</a></p>
+      <p><Link href="/">Back to home</Link></p>
     </main>
   );
 }
