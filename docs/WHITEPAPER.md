@@ -15,3 +15,15 @@
 
 - EN: Future upgrades will route withdrawals through a multisig or DAO-controlled executor to preserve the donation-only guarantee while enabling transparent grants.
 - ZH: 未来升级将通过多签或 DAO 控制的执行合约进行提取，以在启用透明资助的同时维持仅捐赠的安全保证。
+
+## Frontend Integration (Next.js)
+
+Configure the Next.js frontend with these environment variables:
+
+- `NEXT_PUBLIC_WC_PROJECT_ID` = `demo`
+- `NEXT_PUBLIC_RPC_BSC` = `https://bsc-dataseed.binance.org/`
+- `NEXT_PUBLIC_PEACE_FUND` = `0x071B1baf97D85a70A6Ca786E7Fe90b45f50464e5`
+- `NEXT_PUBLIC_PEACEDAO_CONFIG_PATH` = `/config`
+- (Optional) `NEXT_PUBLIC_GOVERNANCE_API` = `https://api.<your-domain>`
+
+After updating these values, redeploy your hosting provider (e.g., Vercel) so the refreshed configuration is available to the build and runtime.
