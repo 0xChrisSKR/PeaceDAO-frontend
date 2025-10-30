@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { getTokenList } from "@/config/tokenlist";
 
-export const revalidate = 300;
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export function GET() {
   const tokenList = getTokenList();
