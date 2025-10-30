@@ -1,23 +1,49 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<svg width="2400" height="1000" viewBox="0 0 2400 1000" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="g6" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#111827"/>
-      <stop offset="100%" stop-color="#1f2937"/>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#111"/>
+      <stop offset="1" stop-color="#1b1b1b"/>
     </linearGradient>
-    <radialGradient id="glow6" cx="50%" cy="35%" r="65%">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22"/>
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
-    </radialGradient>
-    <filter id="grain6">
-      <feTurbulence type="fractalNoise" baseFrequency="0.95" numOctaves="2" stitchTiles="stitch"/>
-      <feColorMatrix type="saturate" values="0"/>
-      <feComponentTransfer>
-        <feFuncA type="linear" slope="0.06"/>
-      </feComponentTransfer>
-      <feBlend mode="soft-light"/>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8"/>
     </filter>
   </defs>
-  <rect width="100%" height="100%" fill="url(#g6)"/>
-  <ellipse cx="960" cy="380" rx="720" ry="380" fill="url(#glow6)"/>
-  <g filter="url(#grain6)"><rect width="100%" height="100%" fill="transparent"/></g>
+
+  <!-- 背景 -->
+  <rect width="2400" height="1000" fill="url(#g)"/>
+
+  <!-- 光暈圓 -->
+  <circle cx="500" cy="300" r="220" fill="#2dd4bf" opacity="0.12" filter="url(#soft)"/>
+  <circle cx="2000" cy="180" r="260" fill="#60a5fa" opacity="0.12" filter="url(#soft)"/>
+  <circle cx="1800" cy="820" r="220" fill="#f59e0b" opacity="0.10" filter="url(#soft)"/>
+
+  <!-- 和平符號 -->
+  <g transform="translate(1200,530) scale(1.1)">
+    <circle cx="0" cy="0" r="170" fill="none" stroke="#ffffff" stroke-width="18"/>
+    <line x1="0" y1="-170" x2="0" y2="150" stroke="#ffffff" stroke-width="18"/>
+    <line x1="0" y1="0" x2="-140" y2="120" stroke="#ffffff" stroke-width="18"/>
+    <line x1="0" y1="0" x2="140" y2="120" stroke="#ffffff" stroke-width="18"/>
+  </g>
+
+  <!-- 主標：$世界和平 -->
+  <text x="1200" y="240" text-anchor="middle"
+        font-size="140" font-weight="700" fill="#ffffff"
+        font-family="-apple-system, BlinkMacSystemFont, 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif">
+    $世界和平
+  </text>
+
+  <!-- 次標：WORLD PEACE -->
+  <text x="1200" y="330" text-anchor="middle"
+        font-size="64" font-weight="700" fill="#d1d5db"
+        font-family="Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+        letter-spacing="6">
+    WORLD PEACE
+  </text>
+
+  <!-- 說明副文 -->
+  <text x="1200" y="392" text-anchor="middle"
+        font-size="30" fill="#9ca3af"
+        font-family="Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang TC', 'Noto Sans TC', sans-serif">
+    去中心化慈善 · 社群治理 · 公開透明
+  </text>
 </svg>
