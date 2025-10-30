@@ -21,3 +21,19 @@ export function formatNumber(value: string | number | bigint, maximumFractionDig
     minimumFractionDigits: 0
   }).format(numeric);
 }
+
+export function formatTokenAmount(
+  value: bigint | undefined,
+  decimals = 18,
+  maximumFractionDigits = 2
+) {
+  if (typeof value === "undefined") return "0";
+  const formatted = formatUnits(value, decimals);
+  const [integerPart, fractionPart] = formatted.split(".");
+  const withThousands = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  if (!fractionPart || Number.parseInt(fractionPart, 10) === 0) {
+    return withThousands;
+  }
+  const trimmedFraction = fractionPart.slice(0, maximumFractionDigits).replace(/0+$/, "");
+  return trimmedFraction ? `${withThousands}.${trimmedFraction}` : withThousands;
+}

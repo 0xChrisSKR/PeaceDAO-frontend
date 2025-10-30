@@ -59,10 +59,75 @@ export interface Dictionary {
     subtitle: string;
     balanceLabel: string;
     updated: string;
-    eventsTitle: string;
-    empty: string;
-    fallback: string;
     loading: string;
+    missing: string;
+    executeTitle: string;
+    executeDescription: string;
+    proposalIdLabel: string;
+    proposalIdPlaceholder: string;
+    executeCta: string;
+    executeSuccess: string;
+    notConnected: string;
+    wrongNetwork: string;
+    invalidId: string;
+  };
+  proposal: {
+    titlePrefix: string;
+    subtitle: string;
+    invalidTitle: string;
+    invalidSubtitle: string;
+    notConfigured: string;
+    tokenNotConfigured: string;
+    statusLabel: string;
+    windowLabel: string;
+    status: {
+      pending: string;
+      active: string;
+      closed: string;
+      executed: string;
+      canceled: string;
+    };
+    thresholdHeading: string;
+    thresholds: {
+      propose: string;
+      vote: string;
+      validator: string;
+    };
+    lockNotice: string;
+    connectWallet: string;
+    wrongNetwork: string;
+    voteSectionTitle: string;
+    voteReady: string;
+    voteClosed: string;
+    voteThresholdNotice: string;
+    voteForCta: string;
+    voteAgainstCta: string;
+    voteSuccess: string;
+    voteReceipt: (direction: string, amount: string) => string;
+    forLabel: string;
+    againstLabel: string;
+    totalLabel: string;
+    validatorSectionTitle: string;
+    validatorReady: string;
+    validatorThresholdNotice: string;
+    likeLabel: string;
+    dislikeLabel: string;
+    likeCta: string;
+    dislikeCta: string;
+    validatorStatus: (status: string) => string;
+    validatorLiked: string;
+    validatorDisliked: string;
+    validatorNeutral: string;
+    validatorCleared: string;
+    validatorSuccess: string;
+    claimTitle: string;
+    claimDescription: string;
+    claimCta: string;
+    claimConnect: string;
+    claimWrongNetwork: string;
+    claimReady: string;
+    claimUnavailable: string;
+    claimSuccess: string;
   };
   governance: {
     title: string;
@@ -174,19 +239,87 @@ const dictionaries: Record<Locale, Dictionary> = {
     },
     treasury: {
       title: "Treasury",
-      subtitle: "Track live PeaceFund balances and recent donations from the community.",
+      subtitle: "Track balances and trigger governance-approved payouts from the Peace Treasury.",
       balanceLabel: "Treasury balance",
       updated: "Updated",
-      eventsTitle: "Recent donations",
-      empty: "No donations recorded yet.",
-      fallback: "We could not load recent donations. Try again soon or view the PeaceFund on BscScan.",
-      loading: "Loading treasury data..."
+      loading: "Loading treasury data...",
+      missing: "Treasury contract address is not configured.",
+      executeTitle: "Execute governance payout",
+      executeDescription:
+        "Use a passed proposal id to release funds. Only proposals that reached quorum and succeeded can execute.",
+      proposalIdLabel: "Proposal id",
+      proposalIdPlaceholder: "Enter proposal id",
+      executeCta: "Execute payout",
+      executeSuccess: "Payout transaction sent",
+      notConnected: "Connect your wallet to execute payouts.",
+      wrongNetwork: "Switch to the configured chain to execute payouts.",
+      invalidId: "Enter a valid proposal id."
+    },
+    proposal: {
+      titlePrefix: "Proposal",
+      subtitle:
+        "Each governance vote runs for 24 hours. Stake PEACE to participate across the proposal, voting, and validator tiers.",
+      invalidTitle: "Proposal unavailable",
+      invalidSubtitle: "The proposal id in the URL is invalid.",
+      notConfigured: "Governance contract address is not configured.",
+      tokenNotConfigured: "PEACE token address is not configured.",
+      statusLabel: "Status",
+      windowLabel: "Voting window",
+      status: {
+        pending: "Not started",
+        active: "Voting active",
+        closed: "Voting closed",
+        executed: "Executed",
+        canceled: "Canceled"
+      },
+      thresholdHeading: "Participation thresholds",
+      thresholds: {
+        propose: "Propose — stake 1,000,000 PEACE",
+        vote: "Vote — stake 200,000 PEACE",
+        validator: "Validator like/dislike — stake 15,000 PEACE"
+      },
+      lockNotice: "Voting and validation lock PEACE for the full 24-hour window.",
+      connectWallet: "Connect your wallet to participate.",
+      wrongNetwork: "Switch to the configured chain to participate.",
+      voteSectionTitle: "On-chain votes",
+      voteReady: "You can cast one vote during the 24-hour window.",
+      voteClosed: "Voting is closed.",
+      voteThresholdNotice: "Voting requires at least 200,000 PEACE staked.",
+      voteForCta: "Vote For",
+      voteAgainstCta: "Vote Against",
+      voteSuccess: "Vote submitted",
+      voteReceipt: (direction: string, amount: string) => `You voted ${direction} with ${amount}.`,
+      forLabel: "For",
+      againstLabel: "Against",
+      totalLabel: "Total",
+      validatorSectionTitle: "Validator feedback",
+      validatorReady: "Validators can signal once per proposal.",
+      validatorThresholdNotice: "Validator feedback requires at least 15,000 PEACE staked.",
+      likeLabel: "Likes",
+      dislikeLabel: "Dislikes",
+      likeCta: "Like",
+      dislikeCta: "Dislike",
+      validatorStatus: (status: string) => `Your current feedback: ${status}.`,
+      validatorLiked: "Like",
+      validatorDisliked: "Dislike",
+      validatorNeutral: "No feedback",
+      validatorCleared: "Feedback cleared",
+      validatorSuccess: "Feedback updated",
+      claimTitle: "Claim your stake",
+      claimDescription:
+        "After the 24-hour window ends you can reclaim the PEACE you locked to vote or validate.",
+      claimCta: "Claim stake",
+      claimConnect: "Connect your wallet to claim your locked PEACE.",
+      claimWrongNetwork: "Switch to the configured chain to claim.",
+      claimReady: "You can reclaim your staked PEACE.",
+      claimUnavailable: "You have no stake to claim for this proposal.",
+      claimSuccess: "Stake claimed"
     },
     governance: {
       title: "Governance",
       subtitle: "Token-weighted participation unlocks deeper coordination inside World Peace DAO.",
       thresholdsTitle: "Thresholds",
-      chat: "Chat access — 100 PEACE",
+      chat: "Validator like/dislike — 15,000 PEACE",
       vote: "Vote power — 200,000 PEACE",
       propose: "Proposal rights — 1,000,000 PEACE",
       resourcesTitle: "Resources",
@@ -291,19 +424,84 @@ const dictionaries: Record<Locale, Dictionary> = {
     },
     treasury: {
       title: "资金池",
-      subtitle: "实时跟踪 PeaceFund 余额和最新社区捐赠。",
+      subtitle: "监控资金池余额，并依治理提案执行金库拨款。",
       balanceLabel: "资金池余额",
       updated: "更新时间",
-      eventsTitle: "最新捐赠",
-      empty: "暂时没有捐赠记录。",
-      fallback: "无法加载最新捐赠，请稍后重试或在 BscScan 查看 PeaceFund。",
-      loading: "正在加载资金池数据..."
+      loading: "正在加载资金池数据...",
+      missing: "金库合约地址尚未设定。",
+      executeTitle: "执行治理拨款",
+      executeDescription: "输入已通过的提案编号触发拨款，仅限达到法定票数并通过的提案。",
+      proposalIdLabel: "提案编号",
+      proposalIdPlaceholder: "输入提案编号",
+      executeCta: "执行拨款",
+      executeSuccess: "拨款交易已送出",
+      notConnected: "请连接钱包以执行拨款。",
+      wrongNetwork: "请切换到指定的链以执行拨款。",
+      invalidId: "请输入有效的提案编号。"
+    },
+    proposal: {
+      titlePrefix: "提案",
+      subtitle: "每场治理投票皆为 24 小时时段，需质押 PEACE 才能进入提案、投票与验证三层门槛。",
+      invalidTitle: "无法显示提案",
+      invalidSubtitle: "网址中的提案编号无效。",
+      notConfigured: "治理合约地址尚未设定。",
+      tokenNotConfigured: "PEACE 代币地址尚未设定。",
+      statusLabel: "状态",
+      windowLabel: "投票时段",
+      status: {
+        pending: "未开始",
+        active: "投票进行中",
+        closed: "投票已结束",
+        executed: "已执行",
+        canceled: "已取消"
+      },
+      thresholdHeading: "参与门槛",
+      thresholds: {
+        propose: "提案 — 质押 1,000,000 PEACE",
+        vote: "投票 — 质押 200,000 PEACE",
+        validator: "验证按赞/倒赞 — 质押 15,000 PEACE"
+      },
+      lockNotice: "投票与验证的 PEACE 将在 24 小时投票期结束后才能领取。",
+      connectWallet: "请连接钱包以参与。",
+      wrongNetwork: "请切换到指定的链上网络。",
+      voteSectionTitle: "链上投票",
+      voteReady: "在 24 小时时段内你可投票一次。",
+      voteClosed: "投票已结束。",
+      voteThresholdNotice: "投票需质押至少 200,000 枚 PEACE。",
+      voteForCta: "投赞成票",
+      voteAgainstCta: "投反对票",
+      voteSuccess: "投票已送出",
+      voteReceipt: (direction: string, amount: string) => `你以 ${amount} 投下 ${direction}。`,
+      forLabel: "赞成",
+      againstLabel: "反对",
+      totalLabel: "总票数",
+      validatorSectionTitle: "验证者评价",
+      validatorReady: "验证者每个提案可送出一次态度。",
+      validatorThresholdNotice: "提交验证评价需质押至少 15,000 枚 PEACE。",
+      likeLabel: "按赞",
+      dislikeLabel: "倒赞",
+      likeCta: "按赞",
+      dislikeCta: "倒赞",
+      validatorStatus: (status: string) => `你的目前评价：${status}。`,
+      validatorLiked: "按赞",
+      validatorDisliked: "倒赞",
+      validatorNeutral: "尚未送出",
+      validatorCleared: "评价已清除",
+      validatorSuccess: "评价已更新",
+      claimTitle: "领回质押",
+      claimDescription: "24 小时投票期结束后，可领回用于投票或验证的 PEACE。",
+      claimCta: "领回质押",
+      claimConnect: "请连接钱包以领回质押。",
+      claimWrongNetwork: "请切换到指定的链以领回质押。",
+      claimReady: "你可领回本次质押的 PEACE。",
+      claimUnavailable: "此提案没有可领回的质押。",
+      claimSuccess: "质押已领回"
     },
     governance: {
       title: "治理",
       subtitle: "基于代币的参与机制，帮助你在 World Peace DAO 内更深入地协作。",
       thresholdsTitle: "门槛",
-      chat: "聊天权限 — 100 PEACE",
+      chat: "验证按赞/倒赞 — 15,000 PEACE",
       vote: "投票权 — 200,000 PEACE",
       propose: "提案权 — 1,000,000 PEACE",
       resourcesTitle: "资源",
