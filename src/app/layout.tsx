@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { Web3Providers } from "@/providers/wagmi";
 import { Toast } from "@/components/Toast";
 import { LanguageProvider } from "@/components/LanguageProvider";
+import Header from "@/components/Header";
 import { SiteNav } from "@/components/SiteNav";
 import { SiteFooter } from "@/components/SiteFooter";
 import { NetworkWatcher } from "@/components/NetworkWatcher";
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Web3Providers>
           <LanguageProvider initialLocale={lang}>
             <div className="flex min-h-screen flex-col">
+              <Header />
               <SiteNav />
               <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-16 pt-10 sm:px-6 lg:px-8">
                 <NetworkWatcher />
