@@ -25,6 +25,14 @@ export default function DonateCard() {
   const [busy, setBusy] = useState(false);
   const donation = (CONTRACTS.DONATION_ADDRESS || "") as `0x${string}`;
 
+  if (!donation) {
+    return (
+      <div className="p-4 rounded-xl border">
+        Donation not configured. Set NEXT_PUBLIC_DONATION_ADDRESS or addresses.local.json
+      </div>
+    );
+  }
+
   const hasDonateFn = useMemo(
     () => Array.isArray(DonationABI) && (DonationABI as any[]).some((f) => f.type === "function" && f.name === "donate"),
     []
