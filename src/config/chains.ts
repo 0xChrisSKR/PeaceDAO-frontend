@@ -1,21 +1,22 @@
-import { bsc as baseBsc } from "wagmi/chains";
+import { bsc as baseBsc, bscTestnet as baseBscTestnet } from "wagmi/chains";
 import { http } from "wagmi";
 import env from "@/config/env";
 
-const rpcUrl = env.rpcBsc || baseBsc.rpcUrls.default.http[0];
+const configuredChainId = env.chainId ?? baseBsc.id;
+const baseChain = configuredChainId === baseBscTestnet.id ? baseBscTestnet : baseBsc;
+const rpcUrl = env.rpcBsc || baseChain.rpcUrls.default.http[0];
 
-export const bsc = {
-  ...baseBsc,
+export const DEFAULT_CHAIN = {
+  ...baseChain,
   rpcUrls: {
-    ...baseBsc.rpcUrls,
+    ...baseChain.rpcUrls,
     default: { http: [rpcUrl] },
     public: { http: [rpcUrl] }
   }
 } as const;
 
-export const CHAINS = [bsc] as const;
-export const DEFAULT_CHAIN = bsc;
+export const CHAINS = [DEFAULT_CHAIN] as const;
 
 export const transports = {
-  [bsc.id]: http(rpcUrl)
+  [DEFAULT_CHAIN.id]: http(rpcUrl)
 };

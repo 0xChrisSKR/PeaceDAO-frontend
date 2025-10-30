@@ -1,167 +1,166 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { parseAbiItem } from "viem";
-import { usePublicClient, useReadContract } from "wagmi";
-import peaceFundAbi from "@/abi/peaceFund.json";
+import { useMemo, useState } from "react";
+import toast from "react-hot-toast";
+import { useAccount, useBalance, useChainId, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import env from "@/config/env";
 import { DEFAULT_CHAIN } from "@/config/chains";
+import treasuryAbi from "@/lib/contracts/treasuryAbi";
+import { formatNumber } from "@/lib/format";
 import { Card } from "@/components/Card";
 import { PageTitle } from "@/components/PageTitle";
 import { useLanguage } from "@/components/LanguageProvider";
-import { fromWei } from "@/lib/format";
-
-interface DonationEvent {
-  hash: `0x${string}`;
-  donor?: string;
-  amount: bigint;
-  note?: string;
-  timestamp?: Date;
-}
-
-const DONATED_EVENT = parseAbiItem("event Donated(address indexed donor,uint256 amount,string note)");
 
 export default function TreasuryPage() {
   const { dictionary } = useLanguage();
-  const peaceFund = env.peaceFund;
-  const isConfigured = useMemo(() => peaceFund.startsWith("0x") && peaceFund.length === 42, [peaceFund]);
+  const { isConnected } = useAccount();
+  const chainId = useChainId();
+  const treasuryAddress = env.treasury;
+  const isConfigured = useMemo(
+    () => typeof treasuryAddress === "string" && treasuryAddress.startsWith("0x") && treasuryAddress.length === 42,
+    [treasuryAddress]
+  );
 
-  const publicClient = usePublicClient({ chainId: DEFAULT_CHAIN.id });
-  const { data: balanceData, status } = useReadContract({
-    address: isConfigured ? (peaceFund as `0x${string}`) : undefined,
-    abi: peaceFundAbi,
-    functionName: "balance",
+  const { data: balanceData, status: balanceStatus } = useBalance({
+    address: isConfigured ? (treasuryAddress as `0x${string}`) : undefined,
     chainId: DEFAULT_CHAIN.id,
     query: {
       enabled: isConfigured,
-      refetchInterval: 15_000
+      refetchInterval: 30_000
     }
   });
 
-  const [events, setEvents] = useState<DonationEvent[]>([]);
-  const [eventsLoading, setEventsLoading] = useState(true);
-  const [eventsError, setEventsError] = useState<string | null>(null);
+  const { writeContractAsync, isPending } = useWriteContract();
+  const [proposalId, setProposalId] = useState("");
+  const [txHash, setTxHash] = useState<`0x${string}` | undefined>();
 
-  useEffect(() => {
-    if (!isConfigured || !publicClient) return;
-    let cancelled = false;
+  const { isLoading: isConfirming } = useWaitForTransactionReceipt({
+    hash: txHash,
+    chainId: DEFAULT_CHAIN.id
+  });
 
-    const fetchEvents = async () => {
-      setEventsLoading(true);
-      try {
-        const latest = await publicClient.getBlockNumber();
-        const fromBlock = latest > 50_000n ? latest - 50_000n : 0n;
-        const logs = await publicClient.getLogs({
-          address: peaceFund as `0x${string}`,
-          event: DONATED_EVENT,
-          fromBlock,
-          toBlock: latest
-        });
-        const limited = logs.slice(-10).reverse();
-        const enriched = await Promise.all(
-          limited.map(async (log) => {
-            let timestamp: Date | undefined;
-            if (log.blockHash) {
-              try {
-                const block = await publicClient.getBlock({ blockHash: log.blockHash });
-                timestamp = new Date(Number(block.timestamp) * 1000);
-              } catch {
-                timestamp = undefined;
-              }
-            }
-            return {
-              hash: (log.transactionHash ?? "0x") as `0x${string}`,
-              donor: log.args?.donor as string | undefined,
-              amount: (log.args?.amount as bigint) ?? 0n,
-              note: log.args?.note as string | undefined,
-              timestamp
-            } satisfies DonationEvent;
-          })
-        );
-        if (!cancelled) {
-          setEvents(enriched);
-          setEventsError(null);
-        }
-      } catch (error) {
-        if (!cancelled) {
-          setEvents([]);
-          setEventsError(dictionary.treasury.fallback);
-        }
-      } finally {
-        if (!cancelled) {
-          setEventsLoading(false);
-        }
-      }
-    };
+  const explorerUrl = DEFAULT_CHAIN.blockExplorers?.default.url ?? "https://bscscan.com";
 
-    fetchEvents();
-    const interval = setInterval(fetchEvents, 15_000);
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
-    };
-  }, [dictionary.treasury.fallback, isConfigured, peaceFund, publicClient]);
+  const balanceFormatted = balanceData?.formatted
+    ? `${formatNumber(balanceData.formatted)} ${balanceData.symbol}`
+    : "-";
 
-  const balanceValue = typeof balanceData === "bigint" ? balanceData : 0n;
-  const balance = Number(fromWei(balanceValue));
+  const statusMessage = !isConnected
+    ? dictionary.treasury.notConnected
+    : chainId !== DEFAULT_CHAIN.id
+      ? dictionary.treasury.wrongNetwork
+      : "";
+
+  const handleExecute = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!isConfigured || !treasuryAddress) {
+      toast.error(dictionary.treasury.missing);
+      return;
+    }
+    if (!isConnected) {
+      toast.error(dictionary.treasury.notConnected);
+      return;
+    }
+    if (chainId !== DEFAULT_CHAIN.id) {
+      toast.error(dictionary.treasury.wrongNetwork);
+      return;
+    }
+    const trimmed = proposalId.trim();
+    let id: bigint;
+    try {
+      if (!trimmed) throw new Error("empty");
+      id = BigInt(trimmed);
+      if (id < 0n) throw new Error("negative");
+    } catch {
+      toast.error(dictionary.treasury.invalidId);
+      return;
+    }
+
+    try {
+      const hash = await writeContractAsync({
+        address: treasuryAddress as `0x${string}`,
+        abi: treasuryAbi,
+        functionName: "executePayout",
+        args: [id],
+        chainId: DEFAULT_CHAIN.id
+      });
+      setTxHash(hash);
+      toast.success(dictionary.treasury.executeSuccess);
+      setProposalId("");
+    } catch (error: any) {
+      const message = error?.shortMessage ?? error?.message ?? "Failed to execute payout";
+      toast.error(message);
+    }
+  };
 
   return (
     <div className="space-y-8">
       <PageTitle title={dictionary.treasury.title} subtitle={dictionary.treasury.subtitle} />
 
       {!isConfigured ? (
-        <Card className="bg-white/60">
-          <p className="text-sm text-slate-600">{dictionary.donate.missingPeaceFund}</p>
-        </Card>
+        <Card className="bg-amber-50/80 text-sm text-amber-700">{dictionary.treasury.missing}</Card>
       ) : null}
 
       <Card className="bg-white/80">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold text-slate-600">{dictionary.treasury.balanceLabel}</p>
-            <p className="mt-2 text-4xl font-semibold text-slate-900">
-              {isConfigured ? `${balance.toLocaleString(undefined, { maximumFractionDigits: 4 })} BNB` : "-"}
-            </p>
+            <p className="mt-2 text-4xl font-semibold text-slate-900">{balanceFormatted}</p>
           </div>
           <div className="text-xs text-slate-500">
-            {status === "pending" ? dictionary.common.loading : `${dictionary.treasury.updated} ${new Date().toLocaleTimeString()}`}
+            {balanceStatus === "pending" ? dictionary.treasury.loading : `${dictionary.treasury.updated} ${new Date().toLocaleTimeString()}`}
           </div>
         </div>
       </Card>
 
       <Card className="bg-white/80">
-        <h2 className="text-lg font-semibold text-slate-800">{dictionary.treasury.eventsTitle}</h2>
-        <div className="mt-4 space-y-4">
-          {eventsLoading ? (
-            <div className="space-y-3">
-              {[...Array(3)].map((_, index) => (
-                <div key={index} className="h-16 w-full animate-pulse rounded-2xl bg-slate-100" />
-              ))}
-            </div>
-          ) : eventsError ? (
-            <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">{eventsError}</p>
-          ) : events.length === 0 ? (
-            <p className="text-sm text-slate-600">{dictionary.treasury.empty}</p>
-          ) : (
-            events.map((event) => (
-              <div key={`${event.hash}-${event.donor ?? "anon"}`} className="rounded-2xl border border-slate-200 bg-white/90 p-4 text-sm text-slate-700">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-mono text-xs text-slate-500">
-                    {event.donor ? `${event.donor.slice(0, 6)}…${event.donor.slice(-4)}` : "—"}
-                  </span>
-                  <span className="font-semibold text-emerald-600">
-                    {Number(fromWei(event.amount)).toLocaleString(undefined, { maximumFractionDigits: 4 })} BNB
-                  </span>
-                </div>
-                {event.note ? <p className="mt-2 text-slate-600">{event.note}</p> : null}
-                {event.timestamp ? (
-                  <p className="mt-2 text-xs text-slate-400">{event.timestamp.toLocaleString()}</p>
-                ) : null}
-              </div>
-            ))
-          )}
-        </div>
+        <form className="space-y-4" onSubmit={handleExecute}>
+          <div className="space-y-1">
+            <h2 className="text-lg font-semibold text-slate-900">{dictionary.treasury.executeTitle}</h2>
+            <p className="text-sm text-slate-600">{dictionary.treasury.executeDescription}</p>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-slate-700" htmlFor="proposalId">
+              {dictionary.treasury.proposalIdLabel}
+            </label>
+            <input
+              id="proposalId"
+              name="proposalId"
+              type="number"
+              min={0}
+              step={1}
+              value={proposalId}
+              onChange={(event) => setProposalId(event.target.value)}
+              placeholder={dictionary.treasury.proposalIdPlaceholder}
+              className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-base text-slate-900 shadow-inner focus:border-emerald-400 focus:outline-none"
+              disabled={!isConfigured || isPending || isConfirming}
+            />
+          </div>
+          <button
+            type="submit"
+            className="inline-flex items-center justify-center rounded-full bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={!isConfigured || isPending || isConfirming}
+          >
+            {isPending || isConfirming ? dictionary.common.loading : dictionary.treasury.executeCta}
+          </button>
+          {statusMessage ? <p className="text-xs text-slate-500">{statusMessage}</p> : null}
+        </form>
       </Card>
+
+      {txHash ? (
+        <Card className="bg-white/70 text-sm text-slate-700">
+          <p className="font-semibold text-slate-900">{dictionary.treasury.executeSuccess}</p>
+          <p className="mt-1 break-all font-mono text-xs text-slate-500">{txHash}</p>
+          <a
+            href={`${explorerUrl}/tx/${txHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 inline-flex items-center rounded-full border border-emerald-300 px-4 py-2 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-50"
+          >
+            {dictionary.donate.viewOnBscScan}
+          </a>
+        </Card>
+      ) : null}
     </div>
   );
 }
