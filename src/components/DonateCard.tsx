@@ -24,11 +24,18 @@ export default function DonateCard() {
   const [tx, setTx] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const donation = (CONTRACTS.DONATION_ADDRESS || "") as `0x${string}`;
-
   const hasDonateFn = useMemo(
     () => Array.isArray(DonationABI) && (DonationABI as any[]).some((f) => f.type === "function" && f.name === "donate"),
     []
   );
+
+  if (!donation) {
+    return (
+      <div className="p-4 rounded-xl border">
+        Donation not configured. Set NEXT_PUBLIC_DONATION_ADDRESS or addresses.local.json
+      </div>
+    );
+  }
 
   const doDonate = async () => {
     if (!donation) return alert("Donation address 未設定");
