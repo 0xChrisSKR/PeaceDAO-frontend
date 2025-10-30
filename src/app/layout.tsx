@@ -1,8 +1,22 @@
 import type { Metadata } from 'next';
-export const metadata: Metadata = {
-  title: 'World Peace DAO',
-  description: 'PeaceDAO Frontend',
-};
+import dynamic from 'next/dynamic';
+import QueryProvider from '../providers/QueryProvider';
+
+const SafeClientProvider = dynamic(
+  () => import('../providers/SafeClientProvider'),
+  { ssr: false }
+);
+
+export const metadata: Metadata = { title: 'World Peace DAO', description: 'PeaceDAO Frontend' };
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (<html lang="en"><body>{children}</body></html>);
+  return (
+    <html lang="en">
+      <body>
+        <QueryProvider>
+          <SafeClientProvider>{children}</SafeClientProvider>
+        </QueryProvider>
+      </body>
+    </html>
+  );
 }
