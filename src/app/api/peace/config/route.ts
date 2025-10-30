@@ -1,23 +1,13 @@
 import { NextResponse } from 'next/server';
-
-export const dynamic = 'force-static';
-
+export const dynamic = 'force-dynamic';
 export async function GET() {
-  const allow = (k: string) => k.startsWith('NEXT_PUBLIC_');
-  const env = Object.fromEntries(
-    Object.entries(process.env)
-      .filter(([k]) => allow(k))
-      .map(([k, v]) => [k, String(v ?? '')])
-  );
-
-  return NextResponse.json({
+  const out = {
     ok: true,
-    timestamp: Date.now(),
-    env,
-    docs: {
-      readme: 'Set NEXT_PUBLIC_* in Vercel Project → Settings → Environment Variables',
-      chains: 'NEXT_PUBLIC_CHAIN_ID + NEXT_PUBLIC_RPC_HTTP',
-      addresses: 'NEXT_PUBLIC_DONATION_ADDRESS / NEXT_PUBLIC_TREASURY_ADDRESS / NEXT_PUBLIC_GOVERNANCE_ADDRESS',
-    },
-  });
+    CHAIN_ID: Number(process.env.NEXT_PUBLIC_CHAIN_ID || '56'),
+    RPC_HTTP: process.env.NEXT_PUBLIC_RPC_HTTP || '',
+    DONATION_ADDRESS: process.env.NEXT_PUBLIC_DONATION_ADDRESS || '',
+    TREASURY_ADDRESS: process.env.NEXT_PUBLIC_TREASURY_ADDRESS || '',
+    GOVERNANCE_ADDRESS: process.env.NEXT_PUBLIC_GOVERNANCE_ADDRESS || '',
+  };
+  return NextResponse.json(out);
 }
