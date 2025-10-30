@@ -1,6 +1,10 @@
 # 🕊️ PeaceDAO Frontend (Next.js 14)
 Production UI for World Peace DAO on BSC.
 
+## Governance Threshold
+- 15000 via on-chain verification
+- 15000 用合約驗證
+
 ## Live Health / Diagnostics
 - `GET /api/peace/config` → 應回 `fundAddress`, `rpc`, `token`
 - `/diagnostics` → 檢查 `NEXT_PUBLIC_*` 是否為空
