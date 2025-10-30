@@ -1,7 +1,7 @@
 "use client";
 
-export const dynamic = "force-dynamic";
 export const revalidate = 0;
+export const dynamic = "force-dynamic";
 
 import { useState } from "react";
 import toast from "react-hot-toast";
