@@ -5,19 +5,20 @@ import toast from "react-hot-toast";
 import { isAddress } from "viem";
 import { useAccount, useChainId, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import peaceFundAbi from "@/abi/peaceFund.json";
-import env from "@/config/env";
 import { DEFAULT_CHAIN } from "@/config/chains";
 import { Card } from "@/components/Card";
 import { PageTitle } from "@/components/PageTitle";
 import { useLanguage } from "@/components/LanguageProvider";
 import { toWei } from "@/lib/format";
+import { usePeaceFundAddress } from "@/hooks/usePeaceFundAddress";
 
 export default function DonatePage() {
   const { dictionary } = useLanguage();
   const { isConnected } = useAccount();
   const chainId = useChainId();
-  const peaceFund = env.peaceFund;
+  const { peaceFund, isLoading: peaceFundLoading } = usePeaceFundAddress();
   const isConfigured = isAddress(peaceFund || "");
+  const canDonate = !peaceFundLoading && isConfigured;
 
   const [amount, setAmount] = useState("0.1");
   const [note, setNote] = useState("");
@@ -28,7 +29,11 @@ export default function DonatePage() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!isConfigured || !peaceFund) {
+    if (peaceFundLoading) {
+      toast.error(dictionary.common.loading);
+      return;
+    }
+    if (!canDonate || !peaceFund) {
       toast.error(dictionary.donate.missingPeaceFund);
       return;
     }
@@ -68,10 +73,12 @@ export default function DonatePage() {
     <div className="space-y-8">
       <PageTitle title={dictionary.donate.title} subtitle={dictionary.donate.subtitle} />
 
-      {!isConfigured ? (
+      {!canDonate ? (
         <Card className="bg-white/60">
           <h2 className="text-lg font-semibold text-slate-700">{dictionary.donate.disabledTitle}</h2>
-          <p className="mt-2 text-sm text-slate-600">{dictionary.donate.missingPeaceFund}</p>
+          <p className="mt-2 text-sm text-slate-600">
+            {peaceFundLoading ? dictionary.common.loading : dictionary.donate.missingPeaceFund}
+          </p>
         </Card>
       ) : null}
 
@@ -91,7 +98,7 @@ export default function DonatePage() {
               onChange={(event) => setAmount(event.target.value)}
               className="w-full rounded-2xl border border-emerald-200 bg-white/90 px-4 py-3 text-base text-slate-900 shadow-inner focus:border-emerald-400 focus:outline-none"
               placeholder={dictionary.donate.amountPlaceholder}
-              disabled={!isConfigured || isPending || isConfirming}
+              disabled={!canDonate || isPending || isConfirming}
             />
           </div>
           <div className="space-y-2">
@@ -106,13 +113,13 @@ export default function DonatePage() {
               onChange={(event) => setNote(event.target.value)}
               className="w-full rounded-2xl border border-emerald-200 bg-white/90 px-4 py-3 text-base text-slate-900 shadow-inner focus:border-emerald-400 focus:outline-none"
               placeholder={dictionary.donate.notePlaceholder}
-              disabled={!isConfigured || isPending || isConfirming}
+              disabled={!canDonate || isPending || isConfirming}
             />
             <p className="text-xs text-slate-500">{dictionary.donate.noteHelper}</p>
           </div>
           <button
             type="submit"
-            disabled={!isConfigured || isPending || isConfirming}
+            disabled={!canDonate || isPending || isConfirming}
             className="inline-flex w-full items-center justify-center rounded-full bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isPending || isConfirming ? dictionary.common.loading : dictionary.donate.submit}

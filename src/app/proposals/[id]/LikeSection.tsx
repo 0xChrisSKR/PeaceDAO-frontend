@@ -1,40 +1,165 @@
-'use client';
+"use client";
 
-import LikeBar from '@/components/proposal/LikeBar';
-import type { LikeSnapshot, UserLikeState } from '@/types/like';
-import { useState } from 'react';
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import LikeBar from "@/components/proposal/LikeBar";
+import { useLanguage } from "@/components/LanguageProvider";
+import type { LikeSnapshot, UserLikeState } from "@/types/like";
 
-export default function LikeSection({ proposalId }: { proposalId: string }) {
-  // 假資料：正式接鏈時改成從 API / 合約讀
-  const [snapshot, setSnapshot] = useState<LikeSnapshot>({
-    proposalId,
-    totalLikes: 42,
-    totalBackers: 17,
-    txHashes: ['0x123'],
-    verifiedProofUrl: '',
-    lastLikedAt: Date.now(),
-  });
+interface LikeSectionProps {
+  proposalId: string;
+  initialSnapshot?: LikeSnapshot;
+  initialUser?: UserLikeState;
+  reactionsEnabled?: boolean;
+}
 
-  const [user, setUser] = useState<UserLikeState>({
-    hasLiked: false,
-    isVerifier: true, // 測試用：顯示「提交收尾驗證」按鈕
-  });
+const createFallbackSnapshot = (proposalId: string): LikeSnapshot => ({
+  proposalId,
+  totalLikes: 0,
+  totalBackers: 0
+});
 
-  async function onLikeToggle(next: boolean) {
-    // TODO: 呼叫後端/合約 API（例如 /api/proposals/:id/like）
-    await new Promise((r) => setTimeout(r, 300)); // 模擬延遲
-    setUser((u) => ({ ...u, hasLiked: next }));
-    setSnapshot((s) => ({
-      ...s,
-      totalLikes: s.totalLikes + (next ? 1 : -1),
-      lastLikedAt: Date.now(),
-    }));
+export default function LikeSection({
+  proposalId,
+  initialSnapshot,
+  initialUser,
+  reactionsEnabled = false
+}: LikeSectionProps) {
+  const { dictionary } = useLanguage();
+  const [snapshot, setSnapshot] = useState<LikeSnapshot>(initialSnapshot ?? createFallbackSnapshot(proposalId));
+  const [user, setUser] = useState<UserLikeState>(initialUser ?? { hasLiked: false, isVerifier: false });
+  const [loading, setLoading] = useState(reactionsEnabled && !initialSnapshot);
+  const [pending, setPending] = useState(false);
+
+  useEffect(() => {
+    setSnapshot(initialSnapshot ?? createFallbackSnapshot(proposalId));
+  }, [initialSnapshot, proposalId]);
+
+  useEffect(() => {
+    setUser(initialUser ?? { hasLiked: false, isVerifier: false });
+  }, [initialUser]);
+
+  useEffect(() => {
+    if (!reactionsEnabled || initialSnapshot) return;
+    let cancelled = false;
+
+    const fetchLatest = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/governance/proposals/${encodeURIComponent(proposalId)}`, { cache: "no-store" });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (cancelled) return;
+        if (data?.proposal?.likeSnapshot) {
+          setSnapshot(data.proposal.likeSnapshot as LikeSnapshot);
+        }
+        if (data?.proposal?.user) {
+          setUser(data.proposal.user as UserLikeState);
+        }
+      } catch {
+        // ignore
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchLatest();
+    const interval = setInterval(fetchLatest, 15_000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [initialSnapshot, proposalId, reactionsEnabled]);
+
+  const disabled = !reactionsEnabled;
+
+  async function refreshLatest() {
+    try {
+      const response = await fetch(`/api/governance/proposals/${encodeURIComponent(proposalId)}`, { cache: "no-store" });
+      if (!response.ok) return;
+      const data = await response.json();
+      if (data?.proposal?.likeSnapshot) {
+        setSnapshot(data.proposal.likeSnapshot as LikeSnapshot);
+      }
+      if (data?.proposal?.user) {
+        setUser(data.proposal.user as UserLikeState);
+      }
+    } catch {
+      // ignore
+    }
   }
 
-  async function onSubmitVerification(payload: { proofUrl: string; note?: string }) {
-    // TODO: 上傳驗證資料（鏈上/後端）
-    await new Promise((r) => setTimeout(r, 500));
-    setSnapshot((s) => ({ ...s, verifiedProofUrl: payload.proofUrl }));
+  async function handleToggle(next: boolean) {
+    if (disabled) {
+      toast.error(dictionary.proposalLikes.unavailable);
+      return;
+    }
+    try {
+      setPending(true);
+      const response = await fetch(`/api/governance/proposals/${encodeURIComponent(proposalId)}/like`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ like: next })
+      });
+      const data = await response.json();
+      if (!response.ok || !data?.ok) {
+        throw new Error(data?.error ?? "toggle-failed");
+      }
+      if (data.snapshot) {
+        setSnapshot(data.snapshot as LikeSnapshot);
+      }
+      if (data.user) {
+        setUser(data.user as UserLikeState);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(dictionary.proposalLikes.toggleError);
+      await refreshLatest();
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function handleSubmitVerification(payload: { proofUrl: string; note?: string }) {
+    if (disabled) {
+      toast.error(dictionary.proposalLikes.unavailable);
+      return;
+    }
+    try {
+      setPending(true);
+      const response = await fetch(`/api/governance/proposals/${encodeURIComponent(proposalId)}/verify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json();
+      if (!response.ok || !data?.ok) {
+        throw new Error(data?.error ?? "verification-failed");
+      }
+      if (data.snapshot) {
+        setSnapshot(data.snapshot as LikeSnapshot);
+      }
+      if (data.user) {
+        setUser(data.user as UserLikeState);
+      }
+      toast.success(dictionary.proposalLikes.submitSuccess);
+    } catch (error) {
+      console.error(error);
+      toast.error(dictionary.proposalLikes.submitError);
+    } finally {
+      setPending(false);
+      await refreshLatest();
+    }
+  }
+
+  if (disabled) {
+    return (
+      <div className="mt-6 text-sm text-slate-600">
+        {dictionary.proposalLikes.unavailable}
+      </div>
+    );
   }
 
   return (
@@ -43,8 +168,10 @@ export default function LikeSection({ proposalId }: { proposalId: string }) {
         proposalId={proposalId}
         snapshot={snapshot}
         user={user}
-        onLikeToggle={onLikeToggle}
-        onSubmitVerification={onSubmitVerification}
+        onLikeToggle={handleToggle}
+        onSubmitVerification={handleSubmitVerification}
+        disabled={disabled}
+        loading={loading || pending}
       />
     </div>
   );

@@ -20,4 +20,6 @@ export interface LikeBarProps {
   user: UserLikeState;
   onLikeToggle?: (next: boolean) => Promise<void> | void;
   onSubmitVerification?: (payload: { proofUrl: string; note?: string }) => Promise<void> | void;
+  disabled?: boolean;
+  loading?: boolean;
 }

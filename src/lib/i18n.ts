@@ -76,6 +76,21 @@ export interface Dictionary {
     frontendRepo: string;
     contractsRepo: string;
   };
+  proposals: {
+    listTitle: string;
+    listEmpty: string;
+    listError: string;
+    detailError: string;
+    lastUpdated: string;
+    viewProposal: string;
+    likesUnavailable: string;
+    status: {
+      active: string;
+      closed: string;
+      draft: string;
+      pending: string;
+    };
+  };
   verify: {
     title: string;
     subtitle: string;
@@ -110,9 +125,28 @@ export interface Dictionary {
     switch: string;
     noConnector: string;
   };
+  proposalLikes: {
+    like: string;
+    liked: string;
+    likesLabel: string;
+    supportersLabel: string;
+    viewTx: string;
+    openVerify: string;
+    closeVerify: string;
+    proofPlaceholder: string;
+    notePlaceholder: string;
+    submit: string;
+    proofRequired: string;
+    submitSuccess: string;
+    submitError: string;
+    toggleError: string;
+    verifiedLabel: string;
+    unavailable: string;
+  };
   common: {
     loading: string;
     updated: string;
+    retry: string;
   };
 }
 
@@ -194,6 +228,21 @@ const dictionaries: Record<Locale, Dictionary> = {
       frontendRepo: "Frontend repository",
       contractsRepo: "Contracts repository"
     },
+    proposals: {
+      listTitle: "Active proposals",
+      listEmpty: "No governance proposals are live yet.",
+      listError: "We could not load proposals. Try again shortly.",
+      detailError: "This proposal is unavailable. Please try again soon.",
+      lastUpdated: "Last updated",
+      viewProposal: "View proposal",
+      likesUnavailable: "Proposal reactions are not available.",
+      status: {
+        active: "Active",
+        closed: "Closed",
+        draft: "Draft",
+        pending: "Pending"
+      }
+    },
     verify: {
       title: "Verify your membership",
       subtitle: "Use Guild to prove your holdings and join the global coordination hubs.",
@@ -230,9 +279,28 @@ const dictionaries: Record<Locale, Dictionary> = {
       switch: "Switch to",
       noConnector: "Install a Web3 wallet or configure WalletConnect."
     },
+    proposalLikes: {
+      like: "Like proposal",
+      liked: "Liked",
+      likesLabel: "likes",
+      supportersLabel: "supporters",
+      viewTx: "View latest transaction",
+      openVerify: "Submit field verification",
+      closeVerify: "Close verification form",
+      proofPlaceholder: "Proof link (image or cloud folder)",
+      notePlaceholder: "Notes for reviewers (optional)",
+      submit: "Submit verification",
+      proofRequired: "Paste a verification link before submitting.",
+      submitSuccess: "Verification submitted. Thank you!",
+      submitError: "Verification submission failed. Try again soon.",
+      toggleError: "Unable to update your reaction. Please retry.",
+      verifiedLabel: "Verification available",
+      unavailable: "Reactions are temporarily unavailable for this proposal."
+    },
     common: {
       loading: "Loading...",
-      updated: "Updated"
+      updated: "Updated",
+      retry: "Try again"
     }
   },
   zh: {
@@ -311,6 +379,21 @@ const dictionaries: Record<Locale, Dictionary> = {
       frontendRepo: "前端仓库",
       contractsRepo: "合约仓库"
     },
+    proposals: {
+      listTitle: "治理提案",
+      listEmpty: "目前尚無治理提案。",
+      listError: "提案列表載入失敗，請稍後再試。",
+      detailError: "無法載入提案內容，請稍後再試。",
+      lastUpdated: "最後更新",
+      viewProposal: "查看提案",
+      likesUnavailable: "暫無按讚與驗證功能。",
+      status: {
+        active: "進行中",
+        closed: "已結束",
+        draft: "草稿",
+        pending: "準備中"
+      }
+    },
     verify: {
       title: "验证你的身份",
       subtitle: "使用 Guild 证明持仓，加入全球协作网络。",
@@ -345,9 +428,28 @@ const dictionaries: Record<Locale, Dictionary> = {
       switch: "切换到",
       noConnector: "请安装 Web3 钱包或配置 WalletConnect。"
     },
+    proposalLikes: {
+      like: "按讚支持",
+      liked: "已按讚",
+      likesLabel: "個讚",
+      supportersLabel: "位贊助者",
+      viewTx: "查看最新鏈上交易",
+      openVerify: "提交收尾驗證",
+      closeVerify: "關閉驗證表單",
+      proofPlaceholder: "收據／證明連結（圖片或雲端資料夾）",
+      notePlaceholder: "備註給審核者（可選）",
+      submit: "送出驗證",
+      proofRequired: "請先貼上驗證連結後再提交。",
+      submitSuccess: "已提交驗證，感謝你的協助！",
+      submitError: "提交驗證失敗，請稍後再試。",
+      toggleError: "操作失敗，請稍後再試。",
+      verifiedLabel: "已提供驗證",
+      unavailable: "此提案暫不支援按讚或驗證。"
+    },
     common: {
       loading: "加载中...",
-      updated: "更新时间"
+      updated: "更新时间",
+      retry: "重试"
     }
   }
 };
