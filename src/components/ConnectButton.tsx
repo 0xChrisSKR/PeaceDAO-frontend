@@ -10,9 +10,9 @@ export default function ConnectButton() {
   return (
     <button
       onClick={() => open()}
-      className="px-3 py-2 rounded-md bg-black text-white text-sm"
+      className="rounded-full bg-amber-500 px-4 py-2 text-sm font-semibold text-black transition hover:bg-amber-400"
     >
-      {isConnected ? `${address?.slice(0, 6)}...${address?.slice(-4)}` : '連接錢包'}
+      {isConnected ? `${address?.slice(0, 6)}...${address?.slice(-4)}` : "Connect"}
     </button>
   );
 }

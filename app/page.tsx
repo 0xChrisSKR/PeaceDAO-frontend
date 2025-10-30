@@ -1,83 +1,60 @@
-'use client'
-import { useEffect, useState, type CSSProperties } from 'react'
+"use client";
+
+import Link from "next/link";
+import { Card } from "@/components/Card";
+import { Section } from "@/components/Section";
+
+const quickLinks = [
+  { href: "/donate", label: "Donate to the Treasury" },
+  { href: "/treasury", label: "View Treasury" },
+  { href: "/verify", label: "Verify Holder Status" }
+];
 
 export default function Home() {
-  const [ready, setReady] = useState(false)
-  useEffect(() => {
-    setReady(true)
-  }, [])
-
-  const handleDonate = () => {
-    if (!ready) return
-    const w = window as any
-    const provider = w.ethereum || w.okxwallet?.ethereum || w.okxwallet || null
-    if (!provider) {
-      alert('偵測不到錢包：請用 OKX/MetaMask App 的內建瀏覽器開啟此頁')
-      return
-    }
-    console.log('provider ready', provider) // 之後再接送交易
-  }
-
-  const linkStyle: CSSProperties = {
-    textDecoration: 'none',
-    padding: '8px 12px',
-    border: '1px solid #ddd',
-    borderRadius: 8,
-  }
-
   return (
-    <main
-      style={{
-        padding: 24,
-        fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto',
-      }}
-    >
-      <header
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: 16,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <img src="/peacedao.svg" alt="PeaceDAO" style={{ height: 36 }} />
-          <strong style={{ fontSize: 24 }}>PeaceDAO</strong>
-        </div>
-        <nav style={{ display: 'flex', gap: 8 }}>
-          <a href="/" style={linkStyle}>
-            Home
-          </a>
-          <a href="/swap" style={linkStyle}>
-            Swap
-          </a>
-        </nav>
-      </header>
-
-      <p style={{ margin: '8px 0 20px' }}>
-        這是 demo 頁面：按下 Donate 將連接錢包（手機請用錢包 App 的內建瀏覽器）。
-      </p>
-
-      <div style={{ border: '1px solid #aaa', borderRadius: 12, padding: 16, maxWidth: 560 }}>
-        <h2 style={{ marginTop: 0 }}>Donate</h2>
-        <div style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo' }}>To: 0x0000…0000</div>
-        <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
-          <input
-            defaultValue="0.01"
-            style={{ flex: 1, padding: 10, border: '1px solid #ccc', borderRadius: 8 }}
+    <div className="space-y-8">
+      <Section className="overflow-hidden rounded-3xl bg-zinc-900/70 p-10 ring-1 ring-white/10">
+        <div className="relative isolate overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-black via-zinc-900 to-black p-10">
+          <div
+            className="pointer-events-none absolute inset-0 -z-10 bg-[url('/assets/ui/hero-banner.svg')] bg-cover bg-center opacity-20"
+            aria-hidden="true"
           />
-          <button
-            onClick={handleDonate}
-            style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #ccc' }}
-          >
-            Donate
-          </button>
+          <div className="max-w-2xl space-y-4">
+            <span className="inline-flex rounded-full border border-amber-400/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-amber-200">
+              PeaceDAO
+            </span>
+            <h1 className="text-4xl font-semibold text-white md:text-5xl">World Peace DAO</h1>
+            <p className="text-lg text-zinc-300">
+              社群治理的世界和平基金，透過捐贈、提案與投票讓資金透明地流向最需要的地方。
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/donate"
+                className="inline-flex items-center justify-center rounded-full bg-amber-500 px-6 py-2 text-sm font-semibold text-black transition hover:bg-amber-400"
+              >
+                捐贈金庫
+              </Link>
+              <Link
+                href="/whitepaper"
+                className="inline-flex items-center justify-center rounded-full border border-amber-300/50 px-6 py-2 text-sm text-amber-200 transition hover:bg-amber-300/10"
+              >
+                檢視白皮書
+              </Link>
+            </div>
+          </div>
         </div>
-      </div>
+      </Section>
 
-      <section style={{ marginTop: 28 }}>
-        <img src="/peacedao.svg" alt="PeaceDAO Cover" style={{ height: 60 }} />
-      </section>
-    </main>
-  )
+      <Section className="grid gap-6 md:grid-cols-3">
+        {quickLinks.map((link) => (
+          <Card key={link.href} className="bg-black/40 p-6 ring-1 ring-white/10">
+            <h2 className="text-lg font-semibold text-white">{link.label}</h2>
+            <Link href={link.href} className="mt-3 inline-flex text-sm text-amber-300 transition hover:text-amber-200">
+              前往 ↗
+            </Link>
+          </Card>
+        ))}
+      </Section>
+    </div>
+  );
 }

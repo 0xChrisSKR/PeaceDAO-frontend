@@ -1,28 +1,41 @@
-import { useAccount, useChainId, usePublicClient } from "wagmi";
-import { useQuery } from "@tanstack/react-query";
-import type { Address } from "viem";
+"use client";
+
+import { useMemo } from "react";
+import { useAccount, useReadContract } from "wagmi";
 import { erc20Abi } from "@/abis/ERC20";
-import { DEFAULT_CHAIN } from "@/config/chains";
 
-export function useTokenBalance(token?: Address, options?: { watch?: boolean }) {
+export function useTokenBalance(token?: `0x${string}`) {
   const { address } = useAccount();
-  const chainId = useChainId();
-  const effectiveChainId = chainId || DEFAULT_CHAIN.id;
-  const client = usePublicClient({ chainId: effectiveChainId });
-  const watch = options?.watch ?? true;
 
-  return useQuery({
-    queryKey: ["token-balance", chainId, token, address],
-    queryFn: async () => {
-      if (!client || !address || !token) return 0n;
-      return (await client.readContract({
-        address: token,
-        abi: erc20Abi,
-        functionName: "balanceOf",
-        args: [address]
-      })) as bigint;
-    },
-    enabled: Boolean(client && address && token),
-    refetchInterval: watch ? 15_000 : false
+  const decimalsQuery = useReadContract({
+    address: token,
+    abi: erc20Abi,
+    functionName: "decimals",
+    query: { enabled: !!token }
   });
+
+  const balanceQuery = useReadContract({
+    address: token,
+    abi: erc20Abi,
+    functionName: "balanceOf",
+    args: address ? [address] : undefined,
+    query: { enabled: !!token && !!address }
+  });
+
+  const decimals = (decimalsQuery.data as number | undefined) ?? 18;
+  const raw = balanceQuery.data as bigint | undefined;
+
+  const value = useMemo(() => {
+    if (!raw) return undefined;
+    return Number(raw) / 10 ** decimals;
+  }, [raw, decimals]);
+
+  return {
+    address,
+    decimals,
+    raw,
+    value,
+    isLoading: decimalsQuery.isLoading || balanceQuery.isLoading,
+    isConnected: !!address
+  };
 }

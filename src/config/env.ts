@@ -38,6 +38,10 @@ const env = {
     "0x4444def5cf226bf50aa4b45e5748b676945bc509",
   guildLink: process.env.NEXT_PUBLIC_GUILD_LINK ?? "https://guild.xyz/world-peace-dao",
   tgPublic: process.env.NEXT_PUBLIC_TG_PUBLIC ?? "https://t.me/WorldPeace_BNB",
+  tgPrivate:
+    process.env.NEXT_PUBLIC_TG_PRIVATE ??
+    process.env.NEXT_PUBLIC_TG_VERIFIED ??
+    "https://t.me/+i-dpunM-luk1ZjRl",
   tgVerified: process.env.NEXT_PUBLIC_TG_VERIFIED ?? "https://t.me/+i-dpunM-luk1ZjRl",
   twitter: process.env.NEXT_PUBLIC_TWITTER ?? "https://x.com/WorldPeace_BNB",
   governanceApi:
