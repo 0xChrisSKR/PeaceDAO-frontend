@@ -37,6 +37,7 @@
     "typescript": "5.4.5"
   },
   "overrides": {
-    "@react-native-async-storage/async-storage": "0.0.0"
+    "@react-native-async-storage/async-storage": "1.23.1",
+    "pino-pretty": "^10.3.1"
   }
 }
