@@ -7,6 +7,7 @@ import { LanguageProvider } from "@/components/LanguageProvider";
 import { SiteNav } from "@/components/SiteNav";
 import { SiteFooter } from "@/components/SiteFooter";
 import { NetworkWatcher } from "@/components/NetworkWatcher";
+import Header from "@/components/Header";
 import { DOVE_ICON_DATA_URL } from "@/lib/branding";
 import { resolveLocale } from "@/lib/i18n";
 
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang={lang === "zh" ? "zh-CN" : "en"}>
       <body className="min-h-screen bg-gradient-to-b from-white via-sky-50 to-emerald-50 text-slate-900">
+        <Header />
         <Web3Providers>
           <LanguageProvider initialLocale={lang}>
             <div className="flex min-h-screen flex-col">
