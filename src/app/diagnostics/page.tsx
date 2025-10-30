@@ -1,26 +1,38 @@
-export const dynamic = 'force-static';
+'use client';
+import React from 'react';
 
-function getPublicEnv() {
-  const allowedPrefix = 'NEXT_PUBLIC_';
-  return Object.entries(process.env)
-    .filter(([k]) => k.startsWith(allowedPrefix))
-    .map(([k, v]) => [k, String(v ?? '')])
-    .sort(([a], [b]) => a.localeCompare(b));
-}
+const PUBLIC_ENV = {
+  NEXT_PUBLIC_CHAIN_ID: process.env.NEXT_PUBLIC_CHAIN_ID,
+  NEXT_PUBLIC_RPC_HTTP: process.env.NEXT_PUBLIC_RPC_HTTP,
+  NEXT_PUBLIC_DONATION_ADDRESS: process.env.NEXT_PUBLIC_DONATION_ADDRESS,
+  NEXT_PUBLIC_TREASURY_ADDRESS: process.env.NEXT_PUBLIC_TREASURY_ADDRESS,
+  NEXT_PUBLIC_GOVERNANCE_ADDRESS: process.env.NEXT_PUBLIC_GOVERNANCE_ADDRESS,
+};
 
 export default function DiagnosticsPage() {
-  const env = getPublicEnv();
+  const [cfg, setCfg] = React.useState<any>(null);
+  const [err, setErr] = React.useState<string>('');
+
+  React.useEffect(() => {
+    fetch('/api/peace/config')
+      .then(r => r.json())
+      .then(setCfg)
+      .catch(e => setErr(String(e)));
+  }, []);
+
   return (
-    <>
-      <h1 style={{fontSize: 28, fontWeight: 700, marginBottom: 12}}>Diagnostics</h1>
-      <div className="card">
-        {env.length === 0 ? <p className="small">No NEXT_PUBLIC_* variables.</p> : (
-          <ul style={{margin:0, paddingLeft:18}}>
-            {env.map(([k, v]) => (<li key={k} style={{margin:'6px 0'}}><code>{k}</code> = <code>{v}</code></li>))}
-          </ul>
-        )}
-      </div>
-      <p style={{marginTop:12}}><a className="btn" href="/api/peace/config" target="_blank" rel="noreferrer">Open /api/peace/config</a></p>
-    </>
+    <main style={{maxWidth:980, margin:'40px auto', padding:'0 20px', color:'#eee'}}>
+      <h1 style={{fontSize:24, fontWeight:700}}>Diagnostics</h1>
+
+      <h3 style={{marginTop:16}}>Build-time public env (NEXT_PUBLIC_*)</h3>
+      <pre style={{background:'#0b0b0b', border:'1px solid #333', padding:12, borderRadius:12}}>
+{JSON.stringify(PUBLIC_ENV, null, 2)}
+      </pre>
+
+      <h3 style={{marginTop:16}}>/api/peace/config</h3>
+      <pre style={{background:'#0b0b0b', border:'1px solid #333', padding:12, borderRadius:12}}>
+{JSON.stringify(cfg ?? { error: err || null }, null, 2)}
+      </pre>
+    </main>
   );
 }

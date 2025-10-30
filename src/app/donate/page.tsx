@@ -1,16 +1,17 @@
-import Address from '@/components/address';
-import { DONATION_ADDRESS } from '@/lib/contracts';
-
-export const revalidate = false;
-
-export default function DonatePage() {
+'use client';
+import React from 'react';
+async function load() { return fetch('/api/peace/donate').then(r=>r.json()); }
+export default function DonatePage(){
+  const [data,setData]=React.useState<any>(null);
+  const [err,setErr]=React.useState<string>('');
+  React.useEffect(()=>{ load().then(setData).catch(e=>setErr(String(e))) },[]);
   return (
-    <>
-      <h1 style={{fontSize: 28, fontWeight: 700, marginBottom: 12}}>Donate</h1>
-      <Address label="Donation Address" value={DONATION_ADDRESS} />
-      <p className="small" style={{marginTop: 12}}>
-        Set <code>NEXT_PUBLIC_DONATION_ADDRESS</code> in Vercel → Project → Settings → Environment Variables.
-      </p>
-    </>
+    <main style={{maxWidth:980, margin:'40px auto', padding:'0 20px', color:'#eee'}}>
+      <h1 style={{fontSize:24,fontWeight:700}}>Donate</h1>
+      <section style={{marginTop:16, padding:16, border:'1px solid #333', borderRadius:12, background:'#0b0b0b'}}>
+        <p>Donation address (env): <b>{data?.address || '(not set)'}</b></p>
+        <pre style={{marginTop:12}}>{JSON.stringify(data ?? { error: err || null }, null, 2)}</pre>
+      </section>
+    </main>
   );
 }

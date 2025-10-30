@@ -1,17 +1,17 @@
-export const revalidate = false;
-
-export default function GovernancePage() {
+'use client';
+import React from 'react';
+async function load() { return fetch('/api/peace/governance').then(r=>r.json()); }
+export default function GovernancePage(){
+  const [data,setData]=React.useState<any>(null);
+  const [err,setErr]=React.useState<string>('');
+  React.useEffect(()=>{ load().then(setData).catch(e=>setErr(String(e))) },[]);
   return (
-    <>
-      <h1 style={{fontSize: 28, fontWeight: 700, marginBottom: 12}}>Governance</h1>
-      <div className="card">
-        <p className="small">Proposals, voting, and results will be added here.</p>
-        <ul style={{marginTop: 8, lineHeight: 1.9}}>
-          <li>Create proposal (coming soon)</li>
-          <li>Active proposals (coming soon)</li>
-          <li>Past results (coming soon)</li>
-        </ul>
-      </div>
-    </>
+    <main style={{maxWidth:980, margin:'40px auto', padding:'0 20px', color:'#eee'}}>
+      <h1 style={{fontSize:24,fontWeight:700}}>Governance</h1>
+      <section style={{marginTop:16, padding:16, border:'1px solid #333', borderRadius:12, background:'#0b0b0b'}}>
+        <p>Governance address (env): <b>{data?.address || '(not set)'}</b></p>
+        <pre style={{marginTop:12}}>{JSON.stringify(data ?? { error: err || null }, null, 2)}</pre>
+      </section>
+    </main>
   );
 }
