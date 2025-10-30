@@ -1,23 +1,40 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
   <defs>
-    <linearGradient id="g4" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#06b6d4"/>
-      <stop offset="100%" stop-color="#60a5fa"/>
+    <linearGradient id="vBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a0a0e"/>
+      <stop offset="1" stop-color="#15151b"/>
     </linearGradient>
-    <radialGradient id="glow4" cx="25%" cy="75%" r="55%">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
-    </radialGradient>
-    <filter id="grain4">
-      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/>
-      <feColorMatrix type="saturate" values="0"/>
-      <feComponentTransfer>
-        <feFuncA type="linear" slope="0.05"/>
-      </feComponentTransfer>
-      <feBlend mode="soft-light"/>
-    </filter>
+    <linearGradient id="vGold" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#F5DFA5"/>
+      <stop offset="0.5" stop-color="#E5C46A"/>
+      <stop offset="1" stop-color="#C99C3A"/>
+    </linearGradient>
   </defs>
-  <rect width="100%" height="100%" fill="url(#g4)"/>
-  <circle cx="420" cy="900" r="520" fill="url(#glow4)"/>
-  <g filter="url(#grain4)"><rect width="100%" height="100%" fill="transparent"/></g>
+
+  <rect width="1920" height="1080" fill="url(#vBg)"/>
+
+  <!-- subtle grid -->
+  <g stroke="#20202a" stroke-width="1" opacity=".3">
+    <path d="M0 40 H1920" />
+    <path d="M0 80 H1920" />
+    <path d="M0 120 H1920" />
+    <path d="M0 160 H1920" />
+    <path d="M0 200 H1920" />
+    <path d="M40 0 V1080" />
+    <path d="M80 0 V1080" />
+    <path d="M120 0 V1080" />
+    <path d="M160 0 V1080" />
+  </g>
+
+  <!-- globe wireframe -->
+  <g transform="translate(960,540)" opacity=".2" stroke="url(#vGold)" fill="none" stroke-width="1.2">
+    <circle r="300"/>
+    <ellipse rx="300" ry="120"/>
+    <ellipse rx="300" ry="200"/>
+    <path d="M0,-300 A300,300 0 0 1 0,300"/>
+    <path d="M-100,-280 A300,300 0 0 1 -100,280"/>
+    <path d="M100,-280 A300,300 0 0 1 100,280"/>
+  </g>
+
+  <text x="50%" y="940" fill="url(#vGold)" font-family="sans-serif" font-size="64" text-anchor="middle" opacity=".8">$世界和平 Verification</text>
 </svg>
