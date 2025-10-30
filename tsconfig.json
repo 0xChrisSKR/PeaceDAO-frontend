@@ -36,8 +36,11 @@
       "@/hooks/*": [
         "./src/hooks/*"
       ],
+      "@/abis/*": [
+        "./src/abis/*"
+      ],
       "@/abi/*": [
-        "./src/abi/*"
+        "./src/abis/*"
       ],
       "@/types/*": [
         "./src/types/*"

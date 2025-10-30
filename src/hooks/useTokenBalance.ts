@@ -1,7 +1,7 @@
 import { useAccount, useChainId, usePublicClient } from "wagmi";
 import { useQuery } from "@tanstack/react-query";
 import type { Address } from "viem";
-import erc20 from "@/abi/erc20.json";
+import { erc20Abi } from "@/abis/ERC20";
 import { DEFAULT_CHAIN } from "@/config/chains";
 
 export function useTokenBalance(token?: Address, options?: { watch?: boolean }) {
@@ -17,7 +17,7 @@ export function useTokenBalance(token?: Address, options?: { watch?: boolean }) 
       if (!client || !address || !token) return 0n;
       return (await client.readContract({
         address: token,
-        abi: erc20,
+        abi: erc20Abi,
         functionName: "balanceOf",
         args: [address]
       })) as bigint;

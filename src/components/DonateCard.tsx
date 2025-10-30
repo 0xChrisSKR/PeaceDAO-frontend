@@ -3,8 +3,9 @@ import React, { useMemo, useState } from "react";
 import { parseEther } from "viem";
 import { getWalletClient } from "../lib/viem";
 import { CONTRACTS } from "../config/contracts";
+import { ENV } from "@/lib/env";
 // 需要你已經有 src/abis/Donation.ts（上一包離線匯出腳本已產生）
-import { DonationABI } from "../abis/Donation";
+import { DonationABI } from "@/abis/Donation";
 
 const explorerByChain: Record<number, string> = {
   1: "https://etherscan.io",
@@ -14,7 +15,7 @@ const explorerByChain: Record<number, string> = {
 };
 
 function getExplorerTx(hash: `0x${string}`) {
-  const id = Number(process.env.NEXT_PUBLIC_CHAIN_ID || 56);
+  const id = ENV.CHAIN_ID;
   const base = explorerByChain[id] || "";
   return base ? `${base}/tx/${hash}` : `#`;
 }
