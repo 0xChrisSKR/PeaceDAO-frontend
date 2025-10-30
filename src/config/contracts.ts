@@ -1,32 +1,21 @@
-import localAddresses from "./addresses.local.json";
+import ADDRS from "./addresses.local";
 
-type AddressKey = "DONATION_ADDRESS" | "TREASURY_ADDRESS" | "GOVERNANCE_ADDRESS";
-type AddressBook = Record<string, Partial<Record<AddressKey, string>>>;
+const CHAIN_ID = Number(process.env.NEXT_PUBLIC_CHAIN_ID || 0) || 0;
 
-const FALLBACKS = localAddresses as AddressBook;
-const rawChainId =
-  process.env.NEXT_PUBLIC_CHAIN_ID ||
-  (typeof window === "undefined" ? process.env.CHAIN_ID : undefined) ||
-  "56";
+type ChainMap = Record<number, { DONATION: string; TREASURY: string; GOVERNANCE: string }>;
 
-const chainFallback = FALLBACKS[String(rawChainId)] || {};
+const fallback = (ADDRS as unknown as ChainMap)[CHAIN_ID] || {
+  DONATION: "",
+  TREASURY: "",
+  GOVERNANCE: "",
+};
 
-const addresses = {
-  DONATION_ADDRESS:
-    process.env.NEXT_PUBLIC_DONATION_ADDRESS ||
-    (typeof window === "undefined" ? process.env.DONATION_ADDRESS : undefined) ||
-    chainFallback.DONATION_ADDRESS ||
-    "",
-  TREASURY_ADDRESS:
-    process.env.NEXT_PUBLIC_TREASURY_ADDRESS ||
-    (typeof window === "undefined" ? process.env.TREASURY_ADDRESS : undefined) ||
-    chainFallback.TREASURY_ADDRESS ||
-    "",
-  GOVERNANCE_ADDRESS:
-    process.env.NEXT_PUBLIC_GOVERNANCE_ADDRESS ||
-    (typeof window === "undefined" ? process.env.GOVERNANCE_ADDRESS : undefined) ||
-    chainFallback.GOVERNANCE_ADDRESS ||
-    "",
-} as const satisfies Record<AddressKey, string>;
+export const CONTRACTS = {
+  CHAIN_ID,
+  RPC_HTTP: process.env.NEXT_PUBLIC_RPC_HTTP || "",
+  DONATION_ADDRESS: process.env.NEXT_PUBLIC_DONATION_ADDRESS || fallback.DONATION || "",
+  TREASURY_ADDRESS: process.env.NEXT_PUBLIC_TREASURY_ADDRESS || fallback.TREASURY || "",
+  GOVERNANCE_ADDRESS: process.env.NEXT_PUBLIC_GOVERNANCE_ADDRESS || fallback.GOVERNANCE || "",
+} as const;
 
-export const CONTRACTS = addresses;
+export default CONTRACTS;

@@ -1,38 +1,44 @@
-'use client';
-import React from 'react';
+export const dynamic = "force-static";
+export const revalidate = 0; // 不快取，方便你看即時 ENV
 
-const PUBLIC_ENV = {
-  NEXT_PUBLIC_CHAIN_ID: process.env.NEXT_PUBLIC_CHAIN_ID,
-  NEXT_PUBLIC_RPC_HTTP: process.env.NEXT_PUBLIC_RPC_HTTP,
-  NEXT_PUBLIC_DONATION_ADDRESS: process.env.NEXT_PUBLIC_DONATION_ADDRESS,
-  NEXT_PUBLIC_TREASURY_ADDRESS: process.env.NEXT_PUBLIC_TREASURY_ADDRESS,
-  NEXT_PUBLIC_GOVERNANCE_ADDRESS: process.env.NEXT_PUBLIC_GOVERNANCE_ADDRESS,
-};
+import CONTRACTS from "@/config/contracts";
 
-export default function DiagnosticsPage() {
-  const [cfg, setCfg] = React.useState<any>(null);
-  const [err, setErr] = React.useState<string>('');
+function redact(v: string | undefined) {
+  if (!v) return "";
+  if (v.length <= 8) return v;
+  return v.slice(0, 4) + "…" + v.slice(-4);
+}
 
-  React.useEffect(() => {
-    fetch('/api/peace/config')
-      .then(r => r.json())
-      .then(setCfg)
-      .catch(e => setErr(String(e)));
-  }, []);
-
+export default function Diagnostics() {
+  const env = {
+    NEXT_PUBLIC_CHAIN_ID: process.env.NEXT_PUBLIC_CHAIN_ID,
+    NEXT_PUBLIC_RPC_HTTP: redact(process.env.NEXT_PUBLIC_RPC_HTTP),
+    NEXT_PUBLIC_DONATION_ADDRESS: process.env.NEXT_PUBLIC_DONATION_ADDRESS,
+    NEXT_PUBLIC_TREASURY_ADDRESS: process.env.NEXT_PUBLIC_TREASURY_ADDRESS,
+    NEXT_PUBLIC_GOVERNANCE_ADDRESS: process.env.NEXT_PUBLIC_GOVERNANCE_ADDRESS,
+  };
   return (
-    <main style={{maxWidth:980, margin:'40px auto', padding:'0 20px', color:'#eee'}}>
-      <h1 style={{fontSize:24, fontWeight:700}}>Diagnostics</h1>
-
-      <h3 style={{marginTop:16}}>Build-time public env (NEXT_PUBLIC_*)</h3>
-      <pre style={{background:'#0b0b0b', border:'1px solid #333', padding:12, borderRadius:12}}>
-{JSON.stringify(PUBLIC_ENV, null, 2)}
+    <div
+      style={{
+        padding: 24,
+        fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas",
+      }}
+    >
+      <h1 style={{ fontSize: 24, marginBottom: 12 }}>Diagnostics</h1>
+      <pre
+        style={{
+          background: "#111",
+          color: "#0f0",
+          padding: 16,
+          borderRadius: 8,
+          overflow: "auto",
+        }}
+      >
+        {JSON.stringify({ env, contracts: CONTRACTS }, null, 2)}
       </pre>
-
-      <h3 style={{marginTop:16}}>/api/peace/config</h3>
-      <pre style={{background:'#0b0b0b', border:'1px solid #333', padding:12, borderRadius:12}}>
-{JSON.stringify(cfg ?? { error: err || null }, null, 2)}
-      </pre>
-    </main>
+      <p style={{ opacity: 0.7, marginTop: 12 }}>
+        This page renders on the server to safely read process.env.
+      </p>
+    </div>
   );
 }
