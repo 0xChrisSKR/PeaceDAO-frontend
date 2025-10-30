@@ -1,9 +1,8 @@
 'use client';
-
-const pick = (k: string) => (process as any).env?.[k] ?? '(undefined)';
-
-export default function Page() {
-  const vars = [
+/* eslint-disable react/no-unescaped-entities */
+const get = (k:string) => (process as any).env?.[k] ?? '&quot;(undefined)&quot;';
+export default function Page(){
+  const keys = [
     'NEXT_PUBLIC_WC_PROJECT_ID',
     'NEXT_PUBLIC_RPC_BSC',
     'NEXT_PUBLIC_PEACE_FUND',
@@ -12,14 +11,13 @@ export default function Page() {
     'NEXT_PUBLIC_TOKEN',
     'NEXT_PUBLIC_TG_PUBLIC',
     'NEXT_PUBLIC_TG_VERIFIED',
-  ].reduce((acc: any, k) => (acc[k] = pick(k), acc), {});
-
+  ];
+  const vars = Object.fromEntries(keys.map(k=>[k,get(k)]));
   return (
-    <main style={{ padding: 24, fontFamily: 'ui-sans-serif,system-ui' }}>
+    <main style={{padding:24,fontFamily:'ui-sans-serif,system-ui'}}>
       <h1>Diagnostics</h1>
-      <p>Check these are not &quot;(undefined)&quot;.</p>
-      <pre>{JSON.stringify(vars, null, 2)}</pre>
-      <p>Config JSON: <a href="/api/peace/config">/api/peace/config</a></p>
+      <pre>{JSON.stringify(vars,null,2)}</pre>
+      <p>Config: <a href="/api/peace/config">/api/peace/config</a></p>
     </main>
   );
 }
