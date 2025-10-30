@@ -1,3 +1,11 @@
+## Production 部署指引（Vercel）
+1) 到 **Project → Deployments**，對最新綠燈的 **Preview** 按 **Promote to Production**
+2) 到 **Settings → Git**，把 **Production Branch** 設為 `main`
+3) 到 **Settings → Domains**，確認 `peace-dao-frontend.vercel.app` 指向**最新的 Production 部署**
+4) **Settings → Build & Output**：Framework=**Next.js**；Install/Build/Output Directory **全部留空**；Development Command **留空**
+
+> 若打開 production 網域看到 **404: NOT_FOUND**（Vercel 文件頁），代表尚未有 Production 部署或網域尚未指到最新 Production。請依上列操作修正。
+
 # PeaceDAO-frontend
 
 Frontend for PeaceDAO (token-verified chat & governance)
