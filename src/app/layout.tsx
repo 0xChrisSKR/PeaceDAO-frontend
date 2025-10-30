@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { cookies } from "next/headers";
+import QueryProvider from "@/providers/QueryProvider";
 import { Web3Providers } from "@/providers/wagmi";
 import { Toast } from "@/components/Toast";
 import { LanguageProvider } from "@/components/LanguageProvider";
@@ -45,20 +46,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang={lang === "zh" ? "zh-CN" : "en"}>
       <body className="min-h-screen bg-gradient-to-b from-white via-sky-50 to-emerald-50 text-slate-900">
-        <Web3Providers>
-          <LanguageProvider initialLocale={lang}>
-            <div className="flex min-h-screen flex-col">
-              <Header />
-              <SiteNav />
-              <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-16 pt-10 sm:px-6 lg:px-8">
-                <NetworkWatcher />
-                <SafeClientProvider>{children}</SafeClientProvider>
-              </main>
-              <SiteFooter />
-            </div>
-            <Toast />
-          </LanguageProvider>
-        </Web3Providers>
+        <QueryProvider>
+          <Web3Providers>
+            <LanguageProvider initialLocale={lang}>
+              <div className="flex min-h-screen flex-col">
+                <Header />
+                <SiteNav />
+                <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-16 pt-10 sm:px-6 lg:px-8">
+                  <NetworkWatcher />
+                  <SafeClientProvider>{children}</SafeClientProvider>
+                </main>
+                <SiteFooter />
+              </div>
+              <Toast />
+            </LanguageProvider>
+          </Web3Providers>
+        </QueryProvider>
       </body>
     </html>
   );
