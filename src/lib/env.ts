@@ -4,14 +4,9 @@
  */
 import { CONTRACTS } from "@/config/contracts";
 
-const chainIdFallback =
-  process.env.NEXT_PUBLIC_CHAIN_ID ||
-  (typeof window === "undefined" ? process.env.CHAIN_ID : undefined) ||
-  "56";
-
 export const ENV = {
-  CHAIN_ID: Number(chainIdFallback),
-  RPC_HTTP: process.env.NEXT_PUBLIC_RPC_HTTP || "",
+  CHAIN_ID: CONTRACTS.CHAIN_ID,
+  RPC_HTTP: CONTRACTS.RPC_HTTP,
   DONATION_ADDRESS: CONTRACTS.DONATION_ADDRESS,
   TREASURY_ADDRESS: CONTRACTS.TREASURY_ADDRESS,
   GOVERNANCE_ADDRESS: CONTRACTS.GOVERNANCE_ADDRESS,
