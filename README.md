@@ -27,18 +27,17 @@ npm run dev
 - PeaceFund (BSC Testnet): `{{PEACEFUND_BSCTEST}}`
 - `donate(string note)` accepts BNB contributions, emits a `Donated` event with the sender, amount, and note, and holds funds without any withdrawal path until a future governance executor is deployed.
 
-## Required owner-provided values
+## Environment Variables
 
 Set these environment variables in `.env.local` (or your hosting provider):
 
-* `NEXT_PUBLIC_WC_PROJECT_ID` (WalletConnect)
-* `NEXT_PUBLIC_PEACE_FUND` (your PeaceFund address; set to `auto` to resolve from configured hints)
-* `NEXT_PUBLIC_PEACE_SWAP_ROUTER` (your Router address)
-* `NEXT_PUBLIC_GOVERNANCE_API` or `NEXT_PUBLIC_PEACEDAO_DEMO_API` (PeaceDAO-demo governance API base URL)
-* `NEXT_PUBLIC_PEACEDAO_CONFIG_PATH` (optional config path for PeaceDAO-demo, defaults to `/config`)
-* `NEXT_PUBLIC_PEACE_FUND_HINTS` (comma-separated URLs or addresses for auto-detection)
-* `NEXT_PUBLIC_GUILD_LINK` (Guild join link)
-* Telegram links (`NEXT_PUBLIC_TG_PUBLIC`, `NEXT_PUBLIC_TG_VERIFIED`) — may change later
+- `NEXT_PUBLIC_WC_PROJECT_ID` = `demo`
+- `NEXT_PUBLIC_RPC_BSC` = `https://bsc-dataseed.binance.org/`
+- `NEXT_PUBLIC_PEACE_FUND` = `0x071B1baf97D85a70A6Ca786E7Fe90b45f50464e5`
+- `NEXT_PUBLIC_PEACEDAO_CONFIG_PATH` = `/config`
+- (Optional) `NEXT_PUBLIC_GOVERNANCE_API` = `https://api.<your-domain>`
+
+Other integration-specific values (swap router, guild links, Telegram communities, etc.) can still be provided as needed, but the above keys are required for the PeaceFund-powered Next.js deployment.
 
 ## Deploy to Vercel
 
