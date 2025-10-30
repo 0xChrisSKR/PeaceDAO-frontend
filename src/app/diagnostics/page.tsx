@@ -1,23 +1,40 @@
-'use client';
-/* eslint-disable react/no-unescaped-entities */
-const get = (k:string) => (process as any).env?.[k] ?? '&quot;(undefined)&quot;';
-export default function Page(){
-  const keys = [
-    'NEXT_PUBLIC_WC_PROJECT_ID',
-    'NEXT_PUBLIC_RPC_BSC',
-    'NEXT_PUBLIC_PEACE_FUND',
-    'NEXT_PUBLIC_PEACEDAO_CONFIG_PATH',
-    'NEXT_PUBLIC_GOVERNANCE_API',
-    'NEXT_PUBLIC_TOKEN',
-    'NEXT_PUBLIC_TG_PUBLIC',
-    'NEXT_PUBLIC_TG_VERIFIED',
-  ];
-  const vars = Object.fromEntries(keys.map(k=>[k,get(k)]));
+/**
+ * Server Component diagnostics page
+ * - 不用 "use client"
+ * - 只顯示 NEXT_PUBLIC_* 變數，避免洩露機密
+ * - 不在客戶端觸碰 process
+ */
+export const dynamic = 'force-static';
+
+function getPublicEnv() {
+  const allowedPrefix = 'NEXT_PUBLIC_';
+  return Object.entries(process.env)
+    .filter(([k]) => k.startsWith(allowedPrefix))
+    .map(([k, v]) => [k, String(v ?? '')])
+    .sort(([a], [b]) => a.localeCompare(b));
+}
+
+export default function DiagnosticsPage() {
+  const env = getPublicEnv();
   return (
-    <main style={{padding:24,fontFamily:'ui-sans-serif,system-ui'}}>
-      <h1>Diagnostics</h1>
-      <pre>{JSON.stringify(vars,null,2)}</pre>
-      <p>Config: <a href="/api/peace/config">/api/peace/config</a></p>
+    <main style={{maxWidth: 840, margin: '40px auto', padding: '0 16px', fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial'}}>
+      <h1 style={{fontSize: 32, fontWeight: 700, marginBottom: 16}}>Diagnostics</h1>
+      <p style={{marginBottom: 8}}>Public environment variables (NEXT_PUBLIC_* only):</p>
+      <div style={{border: '1px solid #ddd', borderRadius: 8, padding: 16}}>
+        {env.length === 0 ? (
+          <p style={{opacity: .7}}>No NEXT_PUBLIC_* variables detected.</p>
+        ) : (
+          <ul>
+            {env.map(([k, v]) => (
+              <li key={k} style={{margin: '6px 0'}}><code>{k}</code> = <code>{v}</code></li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div style={{marginTop: 24}}>
+        <a href="/api/peace/config" style={{textDecoration: 'underline'}}>Open /api/peace/config</a>
+      </div>
     </main>
   );
 }

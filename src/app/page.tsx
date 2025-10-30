@@ -1,13 +1,8 @@
-export default function Page() {
+export default function Home() {
   return (
-    <main style={{padding:'24px',fontFamily:'ui-sans-serif,system-ui',lineHeight:1.6}}>
-      <h1>World Peace DAO</h1>
-      <p>Site is live. Quick links:</p>
-      <ul>
-        <li><a href="/minimal">/minimal</a></li>
-        <li><a href="/diagnostics">/diagnostics</a></li>
-        <li><a href="/api/peace/config">/api/peace/config</a></li>
-      </ul>
+    <main style={{maxWidth: 840, margin: '40px auto', padding: '0 16px', fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial'}}>
+      <h1 style={{fontSize: 40, fontWeight: 800, marginBottom: 16}}>World Peace DAO</h1>
+      <p style={{opacity: .9}}>Site is live.</p>
     </main>
   );
 }
