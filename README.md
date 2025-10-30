@@ -21,8 +21,11 @@ npm run dev
 Set these environment variables in `.env.local` (or your hosting provider):
 
 * `NEXT_PUBLIC_WC_PROJECT_ID` (WalletConnect)
-* `NEXT_PUBLIC_PEACE_FUND` (your PeaceFund address)
+* `NEXT_PUBLIC_PEACE_FUND` (your PeaceFund address; set to `auto` to resolve from configured hints)
 * `NEXT_PUBLIC_PEACE_SWAP_ROUTER` (your Router address)
+* `NEXT_PUBLIC_GOVERNANCE_API` or `NEXT_PUBLIC_PEACEDAO_DEMO_API` (PeaceDAO-demo governance API base URL)
+* `NEXT_PUBLIC_PEACEDAO_CONFIG_PATH` (optional config path for PeaceDAO-demo, defaults to `/config`)
+* `NEXT_PUBLIC_PEACE_FUND_HINTS` (comma-separated URLs or addresses for auto-detection)
 * `NEXT_PUBLIC_GUILD_LINK` (Guild join link)
 * Telegram links (`NEXT_PUBLIC_TG_PUBLIC`, `NEXT_PUBLIC_TG_VERIFIED`) — may change later
 
@@ -33,16 +36,26 @@ Set these environment variables in `.env.local` (or your hosting provider):
    - `NEXT_PUBLIC_WC_PROJECT_ID`
    - `NEXT_PUBLIC_RPC_BSC`
    - `NEXT_PUBLIC_PEACE_FUND`
-   - `NEXT_PUBLIC_TOKEN`
-   - `NEXT_PUBLIC_GUILD_LINK`
-   - `NEXT_PUBLIC_TG_PUBLIC`
-   - `NEXT_PUBLIC_TG_VERIFIED`
-   - `NEXT_PUBLIC_TWITTER`
+    - `NEXT_PUBLIC_GOVERNANCE_API`
+    - `NEXT_PUBLIC_PEACEDAO_CONFIG_PATH`
+    - `NEXT_PUBLIC_PEACE_FUND_HINTS`
+    - `NEXT_PUBLIC_TOKEN`
+    - `NEXT_PUBLIC_GUILD_LINK`
+    - `NEXT_PUBLIC_TG_PUBLIC`
+    - `NEXT_PUBLIC_TG_VERIFIED`
+    - `NEXT_PUBLIC_TWITTER`
+    - Optional server-side overrides: `PEACEDAO_DEMO_API`, `PEACEDAO_DEMO_API_KEY`, `PEACEDAO_DEMO_API_KEY_HEADER`, `PEACE_FUND_HINTS`
 3. Redeploy so the new environment variables are available to the build and runtime.
 4. After the deployment finishes:
    - Open `/api/health` on your deployed domain and confirm the JSON response includes `{"ok":true}`.
    - Connect a wallet via WalletConnect (Binance Web3) to verify the connection flow.
    - Ensure `NEXT_PUBLIC_PEACE_FUND` is set — the Donate page will enable once it is present and the Treasury view will display the contract balance.
+
+## PeaceDAO-demo integration
+
+- The frontend proxies governance reads and reactions through `/api/governance/**`. Configure `NEXT_PUBLIC_GOVERNANCE_API` (or `NEXT_PUBLIC_PEACEDAO_DEMO_API`) to point at the PeaceDAO-demo deployment.
+- PeaceFund detection supports `NEXT_PUBLIC_PEACE_FUND=auto` and will resolve the contract address using `NEXT_PUBLIC_PEACE_FUND_HINTS`, the configured governance API, or any server-side hints defined in `PEACE_FUND_HINTS`.
+- If the remote governance API requires authentication, set `PEACEDAO_DEMO_API_KEY` (and optionally `PEACEDAO_DEMO_API_KEY_HEADER`, defaulting to `x-api-key`) in the hosting provider.
 
 ## Known integration notes
 

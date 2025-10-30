@@ -38,6 +38,9 @@
       ],
       "@/abi/*": [
         "./src/abi/*"
+      ],
+      "@/types/*": [
+        "./src/types/*"
       ]
     },
     "plugins": [

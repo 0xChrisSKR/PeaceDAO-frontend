@@ -8,6 +8,7 @@ import { Section } from "@/components/Section";
 import { Stat } from "@/components/Stat";
 import { useLanguage } from "@/components/LanguageProvider";
 import ConnectButton from "@/components/ConnectButton";
+import { usePeaceFundAddress } from "@/hooks/usePeaceFundAddress";
 
 function shortAddress(address?: string) {
   if (!address) return "";
@@ -16,7 +17,7 @@ function shortAddress(address?: string) {
 
 export default function HomePage() {
   const { dictionary } = useLanguage();
-  const peaceFund = env.peaceFund;
+  const { peaceFund, isLoading: peaceFundLoading } = usePeaceFundAddress();
   const peaceToken = env.peaceToken;
 
   const heroCtas = [
@@ -66,7 +67,11 @@ export default function HomePage() {
               {dictionary.hero.peaceFundLabel}
             </p>
             <p className="font-mono text-base text-slate-900">
-              {peaceFund ? shortAddress(peaceFund) : dictionary.hero.peaceFundMissing}
+              {peaceFund
+                ? shortAddress(peaceFund)
+                : peaceFundLoading
+                ? dictionary.common.loading
+                : dictionary.hero.peaceFundMissing}
             </p>
           </div>
           {peaceFund ? (

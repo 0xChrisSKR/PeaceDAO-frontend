@@ -4,12 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import { parseAbiItem } from "viem";
 import { usePublicClient, useReadContract } from "wagmi";
 import peaceFundAbi from "@/abi/peaceFund.json";
-import env from "@/config/env";
 import { DEFAULT_CHAIN } from "@/config/chains";
 import { Card } from "@/components/Card";
 import { PageTitle } from "@/components/PageTitle";
 import { useLanguage } from "@/components/LanguageProvider";
 import { fromWei } from "@/lib/format";
+import { usePeaceFundAddress } from "@/hooks/usePeaceFundAddress";
 
 interface DonationEvent {
   hash: `0x${string}`;
@@ -23,17 +23,18 @@ const DONATED_EVENT = parseAbiItem("event Donated(address indexed donor,uint256 
 
 export default function TreasuryPage() {
   const { dictionary } = useLanguage();
-  const peaceFund = env.peaceFund;
+  const { peaceFund, isLoading: peaceFundLoading } = usePeaceFundAddress();
   const isConfigured = useMemo(() => peaceFund.startsWith("0x") && peaceFund.length === 42, [peaceFund]);
+  const canQuery = isConfigured && !peaceFundLoading;
 
   const publicClient = usePublicClient({ chainId: DEFAULT_CHAIN.id });
   const { data: balanceData, status } = useReadContract({
-    address: isConfigured ? (peaceFund as `0x${string}`) : undefined,
+    address: canQuery ? (peaceFund as `0x${string}`) : undefined,
     abi: peaceFundAbi,
     functionName: "balance",
     chainId: DEFAULT_CHAIN.id,
     query: {
-      enabled: isConfigured,
+      enabled: canQuery,
       refetchInterval: 15_000
     }
   });
@@ -43,7 +44,12 @@ export default function TreasuryPage() {
   const [eventsError, setEventsError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isConfigured || !publicClient) return;
+    if (!canQuery || !publicClient) {
+      setEvents([]);
+      setEventsError(null);
+      setEventsLoading(Boolean(peaceFundLoading));
+      return;
+    }
     let cancelled = false;
 
     const fetchEvents = async () => {
@@ -100,7 +106,7 @@ export default function TreasuryPage() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [dictionary.treasury.fallback, isConfigured, peaceFund, publicClient]);
+  }, [dictionary.treasury.fallback, canQuery, peaceFund, publicClient, peaceFundLoading]);
 
   const balanceValue = typeof balanceData === "bigint" ? balanceData : 0n;
   const balance = Number(fromWei(balanceValue));
@@ -109,9 +115,11 @@ export default function TreasuryPage() {
     <div className="space-y-8">
       <PageTitle title={dictionary.treasury.title} subtitle={dictionary.treasury.subtitle} />
 
-      {!isConfigured ? (
+      {!canQuery ? (
         <Card className="bg-white/60">
-          <p className="text-sm text-slate-600">{dictionary.donate.missingPeaceFund}</p>
+          <p className="text-sm text-slate-600">
+            {peaceFundLoading ? dictionary.common.loading : dictionary.donate.missingPeaceFund}
+          </p>
         </Card>
       ) : null}
 
@@ -120,7 +128,11 @@ export default function TreasuryPage() {
           <div>
             <p className="text-sm font-semibold text-slate-600">{dictionary.treasury.balanceLabel}</p>
             <p className="mt-2 text-4xl font-semibold text-slate-900">
-              {isConfigured ? `${balance.toLocaleString(undefined, { maximumFractionDigits: 4 })} BNB` : "-"}
+              {canQuery
+                ? `${balance.toLocaleString(undefined, { maximumFractionDigits: 4 })} BNB`
+                : peaceFundLoading
+                ? dictionary.common.loading
+                : "-"}
             </p>
           </div>
           <div className="text-xs text-slate-500">
