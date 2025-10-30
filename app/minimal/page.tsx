@@ -1,11 +1,13 @@
+import Link from "next/link";
+
 export default function Page() {
   return (
-    <main style={{ padding: 24, fontFamily: 'ui-sans-serif,system-ui' }}>
+    <main style={{ padding: "2rem" }}>
       <h1>Minimal OK</h1>
       <ul>
-        <li><a href="/api/health">/api/health</a></li>
-        <li><a href="/api/peace/config">/api/peace/config</a></li>
-        <li><a href="/diagnostics">/diagnostics</a></li>
+        <li><Link href="/api/health" prefetch={false}>/api/health</Link></li>
+        <li><Link href="/api/peace/config" prefetch={false}>/api/peace/config</Link></li>
+        <li><Link href="/diagnostics" prefetch={false}>/diagnostics</Link></li>
       </ul>
     </main>
   );
