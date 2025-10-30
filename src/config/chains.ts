@@ -2,10 +2,12 @@ import { bsc as baseBsc } from "wagmi/chains";
 import { http } from "wagmi";
 import env from "@/config/env";
 
-const rpcUrl = env.rpcBsc || baseBsc.rpcUrls.default.http[0];
+const configuredChainId = Number(env.daoChainId);
+const rpcUrl = env.rpcUrl || env.rpcBsc || baseBsc.rpcUrls.default.http[0];
 
 export const bsc = {
   ...baseBsc,
+  id: Number.isFinite(configuredChainId) && configuredChainId > 0 ? configuredChainId : baseBsc.id,
   rpcUrls: {
     ...baseBsc.rpcUrls,
     default: { http: [rpcUrl] },
