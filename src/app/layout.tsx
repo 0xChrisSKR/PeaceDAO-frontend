@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { cookies } from "next/headers";
 import { Web3Providers } from "@/providers/wagmi";
 import { Toast } from "@/components/Toast";
@@ -10,6 +11,10 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { NetworkWatcher } from "@/components/NetworkWatcher";
 import { DOVE_ICON_DATA_URL } from "@/lib/branding";
 import { resolveLocale } from "@/lib/i18n";
+
+const SafeClientProvider = dynamic(() => import("../providers/SafeClientProvider"), {
+  ssr: false
+});
 
 const title = "World Peace DAO";
 const description = "Mobile-first World Peace DAO DApp for transparent BNB donations.";
@@ -47,7 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <SiteNav />
               <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-16 pt-10 sm:px-6 lg:px-8">
                 <NetworkWatcher />
-                {children}
+                <SafeClientProvider>{children}</SafeClientProvider>
               </main>
               <SiteFooter />
             </div>

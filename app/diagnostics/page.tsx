@@ -15,7 +15,6 @@ export default function Page() {
   return (
     <main style={{ padding: 24, fontFamily: 'ui-sans-serif,system-ui' }}>
       <h1>Diagnostics</h1>
-      <p>這些不能是 (undefined)。</p>
       <pre>{JSON.stringify(vars, null, 2)}</pre>
       <p>Config JSON: <a href="/api/peace/config">/api/peace/config</a></p>
     </main>
