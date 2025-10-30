@@ -1,9 +1,13 @@
-import { NextResponse } from 'next/server';
-export const dynamic = 'force-dynamic';
+import { NextResponse } from "next/server";
+
+import { CONTRACTS } from "@/config/contracts";
+
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   return NextResponse.json({
-    page: 'donate',
-    address: process.env.NEXT_PUBLIC_DONATION_ADDRESS || '',
-    note: 'Replace ABI & wire actions later',
+    page: "donate",
+    address: CONTRACTS.DONATION_ADDRESS,
+    note: "Replace ABI & wire actions later",
   });
 }
