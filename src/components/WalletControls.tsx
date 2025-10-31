@@ -1,47 +1,75 @@
 "use client";
 
 import clsx from "clsx";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { useLanguage } from "@/components/LanguageProvider";
+import { connectWallet } from "@/lib/wallet";
 
 function shorten(address?: string) {
   if (!address) return "";
   return `${address.slice(0, 6)}…${address.slice(-4)}`;
 }
 
+type EthereumProvider = {
+  request: (args: { method: string; params?: unknown[] }) => Promise<any>;
+  on?: (event: string, handler: (...args: any[]) => void) => void;
+  removeListener?: (event: string, handler: (...args: any[]) => void) => void;
+};
+
+function getProvider(): EthereumProvider | undefined {
+  if (typeof window === "undefined") return undefined;
+  return (window as any).ethereum;
+}
+
 export function WalletControls() {
   const { dictionary } = useLanguage();
-  const { address, isConnecting, isConnected } = useAccount();
-  const { connectAsync, connectors, isPending, variables } = useConnect();
-  const { disconnectAsync } = useDisconnect();
-  const [open, setOpen] = useState(false);
+  const [address, setAddress] = useState<string>("");
+  const [isConnecting, setIsConnecting] = useState(false);
 
-  const availableConnectors = useMemo(() => connectors.filter((connector) => connector.id), [connectors]);
+  useEffect(() => {
+    const provider = getProvider();
+    if (!provider) return;
 
-  const handleConnect = async (id: string) => {
-    const connector = availableConnectors.find((item) => item.id === id);
-    if (!connector) return;
+    provider
+      .request({ method: "eth_accounts" })
+      .then((accounts: string[]) => {
+        setAddress(accounts?.[0] ?? "");
+      })
+      .catch(() => undefined);
 
+    const handleAccountsChanged = (accounts: string[]) => {
+      setAddress(accounts?.[0] ?? "");
+    };
+
+    provider.on?.("accountsChanged", handleAccountsChanged);
+    return () => {
+      provider.removeListener?.("accountsChanged", handleAccountsChanged);
+    };
+  }, []);
+
+  const handleConnect = async () => {
+    const provider = getProvider();
+    if (!provider) {
+      toast.error(dictionary.wallet.noConnector);
+      return;
+    }
     try {
-      await connectAsync({ connector });
+      setIsConnecting(true);
+      const acc = await connectWallet();
+      setAddress(acc);
       toast.success(dictionary.wallet.connect);
-      setOpen(false);
     } catch (error: any) {
-      const message = error?.shortMessage ?? error?.message ?? "Failed to connect";
+      const message = error?.message ?? "Failed to connect";
       toast.error(message);
+    } finally {
+      setIsConnecting(false);
     }
   };
 
-  const handleDisconnect = async () => {
-    try {
-      await disconnectAsync();
-      toast.success(dictionary.wallet.disconnect);
-    } catch (error: any) {
-      const message = error?.shortMessage ?? error?.message ?? "Failed to disconnect";
-      toast.error(message);
-    }
+  const handleDisconnect = () => {
+    setAddress("");
+    toast.success(dictionary.wallet.disconnect);
   };
 
   const handleCopy = async () => {
@@ -54,7 +82,7 @@ export function WalletControls() {
     }
   };
 
-  if (isConnected) {
+  if (address) {
     return (
       <div className="flex items-center gap-2">
         <button
@@ -76,43 +104,16 @@ export function WalletControls() {
   }
 
   return (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((value) => !value)}
-        className="inline-flex items-center rounded-full border border-emerald-200 bg-white/80 px-4 py-2 text-sm font-semibold text-emerald-600 shadow-sm transition hover:bg-white"
-      >
-        {isConnecting ? dictionary.wallet.connecting : dictionary.wallet.connect}
-      </button>
-      {open ? (
-        <div className="absolute right-0 z-50 mt-3 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
-          <div className="flex flex-col gap-2">
-            {availableConnectors.map((connector) => {
-              const isCurrent = (variables?.connector as { id?: string } | undefined)?.id === connector.id;
-              return (
-                <button
-                  key={connector.id}
-                  type="button"
-                  onClick={() => handleConnect(connector.id)}
-                  disabled={!connector.ready}
-                  className={clsx(
-                    "rounded-xl border border-slate-200 px-4 py-2 text-left text-sm font-medium text-slate-700 transition hover:border-emerald-400 hover:bg-emerald-50",
-                    (!connector.ready || (isPending && isCurrent)) && "opacity-60"
-                  )}
-                >
-                  {connector.name}
-                  {isPending && isCurrent ? "…" : ""}
-                </button>
-              );
-            })}
-            {availableConnectors.length === 0 ? (
-              <p className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
-                {dictionary.wallet.noConnector}
-              </p>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
-    </div>
+    <button
+      type="button"
+      onClick={handleConnect}
+      className={clsx(
+        "inline-flex items-center rounded-full border border-emerald-200 bg-white/80 px-4 py-2 text-sm font-semibold text-emerald-600 shadow-sm transition hover:bg-white",
+        isConnecting && "opacity-75"
+      )}
+      disabled={isConnecting}
+    >
+      {isConnecting ? dictionary.wallet.connecting : dictionary.wallet.connect}
+    </button>
   );
 }
