@@ -1,16 +1,18 @@
-"use client";
-import { useAccount } from "wagmi";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
+'use client'
+import { useAccount, useConnect, useDisconnect } from 'wagmi'
 
-export default function ConnectButton() {
-  const { open } = useWeb3Modal();
-  const { isConnected, address } = useAccount();
-  const label = isConnected && address
-    ? `${address.slice(0,6)}...${address.slice(-4)}`
-    : "Connect Wallet";
-  return (
-    <button onClick={() => open()} className="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700">
-      {label}
-    </button>
-  );
+export function ConnectButton() {
+  const { address, isConnected } = useAccount()
+  const { connectors, connect, isPending } = useConnect()
+  const { disconnect } = useDisconnect()
+
+  if (!isConnected) {
+    const first = connectors[0]
+    return (
+      <button onClick={() => first && connect({ connector: first })} disabled={!first || isPending}>
+        {isPending ? 'Connecting…' : 'Connect Wallet'}
+      </button>
+    )
+  }
+  return <button onClick={() => disconnect()}>Disconnect {address?.slice(0, 6)}…</button>
 }

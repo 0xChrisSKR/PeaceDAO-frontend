@@ -1,20 +1,16 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import Web3Providers from "@/providers/Web3Providers";
+import type { Metadata } from 'next'
+import type { ReactNode } from 'react'
+import './globals.css'
+import Providers from './providers'
 
-export const metadata: Metadata = {
-  title: "WorldPeace DAO",
-  description: "Decentralized fundraising & governance"
-};
+export const metadata: Metadata = { title: 'PeaceDAO', description: 'token-verified chat & governance' }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="zh-Hant">
-      <body suppressHydrationWarning>
-        <Web3Providers>
-          {children}
-        </Web3Providers>
+    <html lang="en">
+      <body>
+        <Providers>{children}</Providers>
       </body>
     </html>
-  );
+  )
 }
