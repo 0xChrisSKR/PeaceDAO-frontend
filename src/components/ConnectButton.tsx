@@ -1,16 +1,43 @@
 "use client";
-import { useAccount } from "wagmi";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 export default function ConnectButton() {
-  const { open } = useWeb3Modal();
   const { isConnected, address } = useAccount();
-  const label = isConnected && address
-    ? `${address.slice(0,6)}...${address.slice(-4)}`
-    : "Connect Wallet";
+  const { connectors, connect, status, error } = useConnect();
+  const { disconnect } = useDisconnect();
+
+  if (isConnected) {
+    const short = address ? `${address.slice(0, 6)}…${address.slice(-4)}` : "Connected";
+    return (
+      <button
+        onClick={() => disconnect()}
+        className="rounded-lg px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white"
+      >
+        {short} · 斷開
+      </button>
+    );
+  }
+
+  // 優先用第一個連接器（Injected: OKX / MetaMask 等）
+  const primary = connectors[0];
   return (
-    <button onClick={() => open()} className="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700">
-      {label}
-    </button>
+    <div className="flex flex-col gap-2">
+      <button
+        onClick={() => connect({ connector: primary })}
+        disabled={status === "pending"}
+        className="rounded-lg px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white disabled:opacity-60"
+      >
+        {status === "pending" ? "連線中…" : "連接錢包（Injected）"}
+      </button>
+      {connectors.length > 1 && (
+        <button
+          onClick={() => connect({ connector: connectors[1] })}
+          className="rounded-lg px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white"
+        >
+          用 WalletConnect 掃碼
+        </button>
+      )}
+      {error && <span className="text-red-400 text-sm">{String(error.message || error)}</span>}
+    </div>
   );
 }
