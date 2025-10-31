@@ -21,7 +21,8 @@
     "react-hot-toast": "^2.4.1",
     "viem": "2.9.11",
     "wagmi": "1.4.13",
-    "@web3modal/wagmi": "4.0.5"
+    "@reown/appkit": "^1.0.0",
+    "@reown/appkit-wagmi": "^1.0.0"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "^3.0.4",

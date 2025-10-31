@@ -1,49 +1,42 @@
 "use client";
 
-import { ReactNode, useEffect, useRef } from "react";
-import { WagmiProvider, createConfig } from "wagmi";
-import { bsc, bscTestnet } from "wagmi/chains";
-import { http } from "viem";
-import { createWeb3Modal } from "@web3modal/wagmi/react";
+import React from "react";
+import { http, createConfig, WagmiProvider } from "wagmi";
+import { mainnet, sepolia, bsc } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { createAppKit } from "@reown/appkit";
+import { WagmiAdapter } from "@reown/appkit-wagmi";
 
-const PROJECT_ID = process.env.NEXT_PUBLIC_WC_PROJECT_ID ?? "";
-const NETWORK = (process.env.NEXT_PUBLIC_NETWORK ?? "bsc").toLowerCase();
-
-const chains = (NETWORK === "bsctest" || NETWORK === "bsc_test") ? [bscTestnet] : [bsc];
-
-const transports = {
-  [bsc.id]: http(process.env.NEXT_PUBLIC_RPC_BSC),
-  [bscTestnet.id]: http(process.env.NEXT_PUBLIC_RPC_BSC_TEST)
-} as const;
+const WALLETCONNECT_PROJECT_ID = process.env.NEXT_PUBLIC_WC_PROJECT_ID || "demo";
 
 const wagmiConfig = createConfig({
-  chains,
-  transports,
-  multiInjectedProviderDiscovery: true
+  chains: [mainnet, sepolia, bsc],
+  transports: {
+    [mainnet.id]: http(),
+    [sepolia.id]: http(),
+    [bsc.id]: http()
+  }
 });
 
-const queryClient = new QueryClient();
+const adapter = new WagmiAdapter({ wagmiConfig });
 
-export default function Web3Providers({ children }: { children: ReactNode }) {
-  const inited = useRef(false);
-  useEffect(() => {
-    if (inited.current) return;
-    createWeb3Modal({
-      wagmiConfig,
-      projectId: PROJECT_ID,
-      defaultChain: chains[0],
-      enableAnalytics: false,
-      themeMode: "dark"
-    });
-    inited.current = true;
-  }, []);
+createAppKit({
+  adapters: [adapter],
+  projectId: WALLETCONNECT_PROJECT_ID,
+  metadata: {
+    name: "PeaceDAO",
+    description: "PeaceDAO Frontend",
+    url: "https://peace-dao-frontend.vercel.app",
+    icons: ["https://avatars.githubusercontent.com/u/0?v=4"]
+  }
+});
 
+const qc = new QueryClient();
+
+export default function Web3Providers({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
+      <QueryClientProvider client={qc}>{children}</QueryClientProvider>
     </WagmiProvider>
   );
 }
