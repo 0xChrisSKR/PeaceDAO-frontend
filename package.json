@@ -19,9 +19,10 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-hot-toast": "^2.4.1",
-    "viem": "2.9.11",
-    "wagmi": "1.4.13",
-    "@web3modal/wagmi": "4.0.5"
+    "@wagmi/connectors": "^6.1.2",
+    "viem": "^2.39.1",
+    "wagmi": "^2.13.10",
+    "@web3modal/wagmi": "^4.1.7"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "^3.0.4",
