@@ -1,32 +1,53 @@
-// src/providers/web3.tsx
 'use client'
 
-import { ReactNode } from 'react'
-import { WagmiProvider, createConfig, http } from 'wagmi'
-import type { Chain } from 'wagmi/chains'
-import { mainnet, polygon, bsc } from 'wagmi/chains'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import React, { useEffect } from 'react'
+import { WagmiProvider, createConfig } from 'wagmi'
+import { http } from 'viem'
+import { mainnet, bsc, bscTestnet } from 'viem/chains'
+import { createWeb3Modal } from '@web3modal/wagmi/react'
 
-// ← 用 tuple（readonly [Chain, ...Chain[]]）避免你剛剛的 chains 型別錯誤
-const chains = [mainnet, polygon, bsc] as const satisfies readonly [Chain, ...Chain[]]
+const CHAINS = [mainnet, bsc, bscTestnet] as const
 
-const config = createConfig({
-  chains,
+const RPCS: Record<number, string | undefined> = {
+  [mainnet.id]: undefined,
+  [bsc.id]: process.env.NEXT_PUBLIC_BSC_RPC || process.env.NEXT_PUBLIC_RPC_BSC,
+  [bscTestnet.id]:
+    process.env.NEXT_PUBLIC_BSCTEST_RPC || process.env.NEXT_PUBLIC_RPC_BSC_TEST
+}
+
+export const wagmiConfig = createConfig({
+  chains: CHAINS,
   transports: {
-    [mainnet.id]: http(),                // 可換成你的 RPC
-    [polygon.id]: http(),
-    [bsc.id]: http(),                    // 也可放自訂 BSC RPC
+    [mainnet.id]: http(RPCS[mainnet.id]),
+    [bsc.id]: http(RPCS[bsc.id]),
+    [bscTestnet.id]: http(RPCS[bscTestnet.id])
   },
+  ssr: true
 })
 
-const queryClient = new QueryClient()
+function useInitWeb3ModalOnce() {
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const w = window as any
+    if (w.__W3M_INITIALIZED__) return
 
-export function Web3Provider({ children }: { children: ReactNode }) {
-  return (
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
-    </WagmiProvider>
-  )
+    const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID
+    if (!projectId) {
+      console.warn('Missing NEXT_PUBLIC_WC_PROJECT_ID')
+      return
+    }
+
+    createWeb3Modal({
+      wagmiConfig,
+      projectId,
+      enableAnalytics: false,
+      themeMode: 'light'
+    })
+    w.__W3M_INITIALIZED__ = true
+  }, [])
+}
+
+export function Web3Provider({ children }: { children: React.ReactNode }) {
+  useInitWeb3ModalOnce()
+  return <WagmiProvider config={wagmiConfig}>{children}</WagmiProvider>
 }
