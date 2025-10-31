@@ -11,9 +11,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="zh-Hant">
       <body suppressHydrationWarning>
-        <Web3Providers>
-          {children}
-        </Web3Providers>
+        <Web3Providers>{children}</Web3Providers>
       </body>
     </html>
   );
