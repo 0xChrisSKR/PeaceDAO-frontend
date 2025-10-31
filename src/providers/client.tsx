@@ -1,8 +1,8 @@
 'use client';
 
 import { ReactNode } from 'react';
-import Web3Provider from './web3';
+import Web3Providers from './Web3Providers';
 
 export default function Providers({ children }: { children: ReactNode }) {
-  return <Web3Provider>{children}</Web3Provider>;
+  return <Web3Providers>{children}</Web3Providers>;
 }
