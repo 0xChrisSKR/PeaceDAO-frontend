@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import ConnectButton from '@/components/ConnectButton';
+import ConnectWallet from '@/components/ConnectWallet';
 
 export default function Page() {
   return (
@@ -15,7 +15,7 @@ export default function Page() {
             建立以代幣驗證為核心的社群治理：連結錢包，自動分級，解鎖聊天室與提案權限。
           </p>
           <div className="flex gap-3">
-            <ConnectButton />
+            <ConnectWallet />
             <a
               href="/docs"
               className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white ring-1 ring-white/10"
