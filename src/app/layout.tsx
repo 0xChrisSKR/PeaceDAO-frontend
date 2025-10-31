@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Web3Providers from "@/providers/Web3Providers";
+import Web3Providers from "../providers/Web3Providers";
 
 export const metadata: Metadata = {
   title: "WorldPeace DAO",
