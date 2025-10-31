@@ -1,48 +1,59 @@
 "use client";
 
-import { ReactNode, useEffect, useRef } from "react";
-import { WagmiProvider, createConfig } from "wagmi";
-import { bsc, bscTestnet } from "wagmi/chains";
-import { http } from "viem";
-import { createWeb3Modal } from "@web3modal/wagmi/react";
+import React from "react";
+import { http, createConfig } from "wagmi";
+import { WagmiProvider } from "wagmi";
+import { mainnet, sepolia, bsc } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  createAppKit,
+  AppKitProvider,
+  AppKitButton
+} from "@reown/appkit/react";
+import { wagmiAdapter } from "@reown/appkit-wagmi";
 
-const PROJECT_ID = process.env.NEXT_PUBLIC_WC_PROJECT_ID ?? "";
-const NETWORK = (process.env.NEXT_PUBLIC_NETWORK ?? "bsc").toLowerCase();
+// 你可以把專案的 projectId/metadata 換成自己的
+const WALLETCONNECT_PROJECT_ID = process.env.NEXT_PUBLIC_WC_PROJECT_ID || "demo";
 
-const chains = (NETWORK === "bsctest" || NETWORK === "bsc_test") ? [bscTestnet] : [bsc];
-
-const transports = {
-  [bsc.id]: http(process.env.NEXT_PUBLIC_RPC_BSC),
-  [bscTestnet.id]: http(process.env.NEXT_PUBLIC_RPC_BSC_TEST)
-} as const;
-
-const wagmiConfig = createConfig({
+// 建 wagmi 設定（用 http transport；若有 RPC 可替換）
+const chains = [mainnet, sepolia, bsc];
+const config = createConfig({
   chains,
-  transports,
-  multiInjectedProviderDiscovery: true
+  transports: {
+    [mainnet.id]: http(),
+    [sepolia.id]: http(),
+    [bsc.id]: http()
+  }
 });
 
-const queryClient = new QueryClient();
+// 交給 Reown AppKit 產生可用的連線 UI
+const { AppKit } = createAppKit({
+  adapters: [wagmiAdapter({ wagmiConfig: config })],
+  projectId: WALLETCONNECT_PROJECT_ID,
+  metadata: {
+    name: "PeaceDAO",
+    description: "PeaceDAO Frontend",
+    url: "https://peace-dao-frontend.vercel.app",
+    icons: ["https://avatars.githubusercontent.com/u/0?v=4"]
+  },
+  features: {
+    email: false
+  }
+});
 
-export default function Web3Providers({ children }: { children: ReactNode }) {
-  const inited = useRef(false);
-  useEffect(() => {
-    if (inited.current) return;
-    createWeb3Modal({
-      wagmiConfig,
-      projectId: PROJECT_ID,
-      defaultChain: chains[0],
-      enableAnalytics: false,
-      themeMode: "dark"
-    });
-    inited.current = true;
-  }, []);
+const qc = new QueryClient();
 
+export default function Web3Providers({ children }: { children: React.ReactNode }) {
   return (
-    <WagmiProvider config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        {children}
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={qc}>
+        <AppKitProvider>
+          {/* 提供一顆可用的連線按鈕；如果你已有按鈕，可移除此段 */}
+          <div style={{ position: "fixed", top: 12, right: 12, zIndex: 1000 }}>
+            <AppKitButton />
+          </div>
+          {children}
+        </AppKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );
