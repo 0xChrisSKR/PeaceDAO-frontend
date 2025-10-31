@@ -1,9 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  experimental: { instrumentationHook: false },
-  webpack: (config/*, { isServer, webpack }*/) => {
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      "pino-pretty": false,
+      "pino-abstract-transport": false,
+      "sonic-boom": false,
+      "encoding": false
+    };
     return config;
-  },
+  }
 };
-export default nextConfig;
+
+module.exports = nextConfig;
