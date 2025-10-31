@@ -1,15 +1,35 @@
 "use client";
+
+import { useState } from "react";
 import { useAccount } from "wagmi";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
 
 export default function ConnectButton() {
-  const { open } = useWeb3Modal();
   const { isConnected, address } = useAccount();
-  const label = isConnected && address
-    ? `${address.slice(0,6)}...${address.slice(-4)}`
-    : "Connect Wallet";
+  const [fallbackAddress, setFallbackAddress] = useState<string | null>(null);
+  const label = (() => {
+    const activeAddress = isConnected && address ? address : fallbackAddress;
+    if (!activeAddress) return "Connect Wallet";
+    return `${activeAddress.slice(0, 6)}...${activeAddress.slice(-4)}`;
+  })();
+
+  async function connect() {
+    if (typeof window === "undefined") return;
+
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request<string[]>({ method: "eth_requestAccounts" });
+        setFallbackAddress(accounts?.[0] ?? null);
+        return;
+      } catch (error) {
+        console.error("Failed to connect via window.ethereum", error);
+      }
+    }
+
+    alert("Wallet modal is coming soon. Please install MetaMask or compatible wallet.");
+  }
+
   return (
-    <button onClick={() => open()} className="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700">
+    <button onClick={connect} className="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700">
       {label}
     </button>
   );
