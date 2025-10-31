@@ -1,10 +1,8 @@
-// next.config.cjs
 /** @type {import('next').NextConfig} */
 const path = require('path')
 
 const nextConfig = {
   webpack: (config, { isServer }) => {
-    // 把可選相依改成空模組，解 pino-pretty 打包錯誤
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
       'pino-pretty': path.resolve(__dirname, 'src/shims/empty.js'),
@@ -12,7 +10,6 @@ const nextConfig = {
       'sonic-boom': false,
       encoding: false
     }
-
     if (!isServer) {
       config.resolve.fallback = {
         ...(config.resolve.fallback || {}),
@@ -21,6 +18,10 @@ const nextConfig = {
         tls: false
       }
     }
+    // ↓ 把 pino-pretty 的噪音壓掉
+    config.ignoreWarnings = [
+      { module: /pino\/lib\/tools\.js/, message: /pino-pretty/ }
+    ]
     return config
   }
 }
