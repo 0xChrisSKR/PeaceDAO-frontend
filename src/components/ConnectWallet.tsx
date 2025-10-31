@@ -4,18 +4,13 @@ import { useState } from "react";
 import { useAccount } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 
+export {};
+
 declare global {
-  interface BinanceChainProvider {
-    request<T>(args: { method: string; params?: unknown[] }): Promise<T>;
-  }
-
-  interface EthereumProvider {
-    request<T>(args: { method: string; params?: unknown[] }): Promise<T>;
-  }
-
   interface Window {
-    BinanceChain?: BinanceChainProvider;
-    ethereum?: EthereumProvider;
+    /** 必須與既有宣告一致，避免 TS 合併衝突 */
+    ethereum?: any;
+    BinanceChain?: any;
   }
 }
 
