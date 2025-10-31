@@ -2,7 +2,7 @@
 
 import { PropsWithChildren, useMemo, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { WagmiProvider, createConfig, http } from 'wagmi';
+import { WagmiConfig, createConfig, http } from 'wagmi';
 import { mainnet, polygon, arbitrum, base, bsc, optimism, avalanche } from 'wagmi/chains';
 
 import { ENV } from '@/lib/env';
@@ -32,12 +32,13 @@ export default function Providers({ children }: PropsWithChildren) {
       transports: {
         [chain.id]: rpc ? http(rpc) : http(),
       },
+      ssr: true,
     });
   }, [chain, rpc]);
 
   return (
-    <WagmiProvider config={config}>
+    <WagmiConfig config={config}>
       <QueryClientProvider client={qc}>{children}</QueryClientProvider>
-    </WagmiProvider>
+    </WagmiConfig>
   );
 }
