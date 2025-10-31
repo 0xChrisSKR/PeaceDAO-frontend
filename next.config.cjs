@@ -1,17 +1,28 @@
+// next.config.cjs
 /** @type {import('next').NextConfig} */
+const path = require('path')
+
 const nextConfig = {
-  reactStrictMode: true,
-  experimental: { esmExternals: 'loose' },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
+    // 把可選相依改成空模組，解 pino-pretty 打包錯誤
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
-      'pino-pretty': false,
+      'pino-pretty': path.resolve(__dirname, 'src/shims/empty.js'),
       'pino-abstract-transport': false,
       'sonic-boom': false,
-      'encoding': false,
-    };
-    return config;
-  },
-};
+      encoding: false
+    }
 
-module.exports = nextConfig;
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...(config.resolve.fallback || {}),
+        fs: false,
+        net: false,
+        tls: false
+      }
+    }
+    return config
+  }
+}
+
+module.exports = nextConfig
