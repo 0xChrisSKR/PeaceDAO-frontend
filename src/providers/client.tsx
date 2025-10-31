@@ -1,14 +1,8 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { Web3Provider } from '@/providers/web3'
+import { ReactNode } from 'react';
+import Web3Provider from './web3';
 
-export default function ClientProviders({ children }: { children: React.ReactNode }) {
-  const [qc] = useState(() => new QueryClient())
-  return (
-    <QueryClientProvider client={qc}>
-      <Web3Provider>{children}</Web3Provider>
-    </QueryClientProvider>
-  )
+export default function Providers({ children }: { children: ReactNode }) {
+  return <Web3Provider>{children}</Web3Provider>;
 }
