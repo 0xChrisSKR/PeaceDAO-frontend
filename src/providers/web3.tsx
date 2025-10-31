@@ -1,53 +1,52 @@
-'use client'
+'use client';
 
-import React, { useEffect } from 'react'
-import { WagmiProvider, createConfig } from 'wagmi'
-import { http } from 'viem'
-import { mainnet, bsc, bscTestnet } from 'viem/chains'
-import { createWeb3Modal } from '@web3modal/wagmi/react'
+import { ReactNode } from 'react';
+import { WagmiConfig, createConfig, configureChains } from 'wagmi';
+import { bsc, bscTestnet } from 'wagmi/chains';
+import { publicProvider } from 'wagmi/providers/public';
+import { createWeb3Modal } from '@web3modal/wagmi/react';
+import { walletConnect, injected } from 'wagmi/connectors';
+import env from '@/config/env';
 
-const CHAINS = [mainnet, bsc, bscTestnet] as const
+// 依據環境選鏈
+const activeChain = env.NETWORK === 'bsctest' ? bscTestnet : bsc;
 
-const RPCS: Record<number, string | undefined> = {
-  [mainnet.id]: undefined,
-  [bsc.id]: process.env.NEXT_PUBLIC_BSC_RPC || process.env.NEXT_PUBLIC_RPC_BSC,
-  [bscTestnet.id]:
-    process.env.NEXT_PUBLIC_BSCTEST_RPC || process.env.NEXT_PUBLIC_RPC_BSC_TEST
-}
+// 建立 wagmi 基礎設置
+const { chains, publicClient } = configureChains([activeChain], [publicProvider()]);
 
 export const wagmiConfig = createConfig({
-  chains: CHAINS,
-  transports: {
-    [mainnet.id]: http(RPCS[mainnet.id]),
-    [bsc.id]: http(RPCS[bsc.id]),
-    [bscTestnet.id]: http(RPCS[bscTestnet.id])
-  },
-  ssr: true
-})
+  autoConnect: true,
+  connectors: [
+    walletConnect({
+      projectId: env.WC_PROJECT_ID,
+      showQrModal: true,
+    }),
+    injected({ shimDisconnect: true }),
+  ],
+  publicClient,
+});
 
-function useInitWeb3ModalOnce() {
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const w = window as any
-    if (w.__W3M_INITIALIZED__) return
-
-    const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID
-    if (!projectId) {
-      console.warn('Missing NEXT_PUBLIC_WC_PROJECT_ID')
-      return
-    }
-
-    createWeb3Modal({
-      wagmiConfig,
-      projectId,
-      enableAnalytics: false,
-      themeMode: 'light'
-    })
-    w.__W3M_INITIALIZED__ = true
-  }, [])
+// 只在瀏覽器初始化一次 Web3Modal，避免你看到的錯誤
+declare global {
+  interface Window {
+    __W3M_INITIALIZED__?: boolean;
+  }
+}
+if (typeof window !== 'undefined' && !window.__W3M_INITIALIZED__) {
+  createWeb3Modal({
+    wagmiConfig,
+    projectId: env.WC_PROJECT_ID,
+    chains,
+    themeMode: 'dark',
+    themeVariables: {
+      '--w3m-accent': '#f0b90b',     // 幣安金
+      '--w3m-color-mix': '#f0b90b',
+    },
+  });
+  window.__W3M_INITIALIZED__ = true;
 }
 
-export function Web3Provider({ children }: { children: React.ReactNode }) {
-  useInitWeb3ModalOnce()
-  return <WagmiProvider config={wagmiConfig}>{children}</WagmiProvider>
+// 封裝成 Provider
+export default function Web3Provider({ children }: { children: ReactNode }) {
+  return <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>;
 }
