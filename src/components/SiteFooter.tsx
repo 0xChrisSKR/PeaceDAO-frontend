@@ -1,9 +1,7 @@
 "use client";
 
-import env from "@/config/env";
+import { env, WHITEPAPER_URL } from "@/config/env";
 import { useLanguage } from "@/components/LanguageProvider";
-
-const WHITEPAPER_URL = "https://github.com/PeaceDAO/PeaceDAO-frontend/blob/main/docs/WHITEPAPER.md";
 
 export function SiteFooter() {
   const { dictionary } = useLanguage();

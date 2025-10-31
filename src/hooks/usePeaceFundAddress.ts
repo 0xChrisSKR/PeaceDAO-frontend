@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import env from "@/config/env";
+import { env } from "@/config/env";
 import type { PeaceFundResolution } from "@/lib/peaceFund";
 
 interface PeaceFundQueryResult {

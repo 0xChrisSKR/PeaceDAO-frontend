@@ -1,5 +1,5 @@
 import { isAddress } from "viem";
-import env from "@/config/env";
+import { env } from "@/config/env";
 import { DEFAULT_CHAIN } from "@/config/chains";
 import { BNB_LOGO, PEACE_LOGO, USDT_LOGO, WBNB_LOGO } from "@/assets/tokens";
 import { TOKEN_PLACEHOLDER } from "@/assets/placeholders";
