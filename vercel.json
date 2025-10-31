@@ -1,4 +1,6 @@
 {
+  "buildCommand": "npm run build",
+  "installCommand": "npm i --legacy-peer-deps",
   "env": {
     "NEXT_PUBLIC_NETWORK": "bsctest",
     "NEXT_PUBLIC_WC_PROJECT_ID": "prj_QwbJpKLwxGKPUDCU2SDo6RBpOlA4",
