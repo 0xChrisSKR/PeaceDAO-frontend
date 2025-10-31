@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh-Hant">
-      <body>
+      <body suppressHydrationWarning>
         <Web3Providers>
           {children}
         </Web3Providers>
