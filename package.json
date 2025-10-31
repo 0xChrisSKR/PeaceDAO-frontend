@@ -1,45 +1,28 @@
 {
-  "name": "peacedao-frontend",
-  "version": "0.1.0",
+  "name": "peace-dao-frontend",
+  "version": "1.0.0",
   "private": true,
-  "engines": {
-    "node": "22.x"
-  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start -p $PORT"
+    "start": "next start",
+    "postinstall": "echo postinstall skipped"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.32.1",
-    "clsx": "^2.1.0",
     "next": "14.2.3",
-    "next-i18next": "^14.0.0",
-    "pino-pretty": "10.3.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "react-hot-toast": "^2.4.1",
-    "viem": "2.9.11",
-    "wagmi": "1.4.13",
-    "@web3modal/wagmi": "4.0.5"
+
+    "@tanstack/react-query": "5.59.16",
+    "zustand": "4.5.4",
+
+    "wagmi": "2.12.7",
+    "viem": "2.17.8",
+
+    "@reown/appkit": "1.1.1",
+    "@reown/appkit-wagmi": "1.1.1"
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-ethers": "^3.0.4",
-    "@types/node": "20.12.8",
-    "@types/react": "18.2.79",
-    "@types/react-dom": "18.2.25",
-    "autoprefixer": "^10.4.19",
-    "dotenv": "^16.4.5",
-    "ethers": "^6.12.1",
-    "hardhat": "^2.22.5",
-    "eslint": "^8.57.0",
-    "eslint-config-next": "14.2.3",
-    "postcss": "^8.4.38",
-    "tailwindcss": "^3.4.3",
-    "ts-node": "^10.9.2",
     "typescript": "5.4.5"
-  },
-  "overrides": {
-    "@react-native-async-storage/async-storage": "1.23.1"
   }
 }
