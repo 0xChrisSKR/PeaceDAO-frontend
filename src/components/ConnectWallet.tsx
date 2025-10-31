@@ -13,11 +13,23 @@ declare global {
     request<T>(args: { method: string; params?: unknown[] }): Promise<T>;
   }
 
-  interface Window {
-    BinanceChain?: BinanceChainProvider;
-    ethereum?: EthereumProvider;
-  }
+  // NOTE: Avoid redeclaring global Window to prevent TS ambient-merge conflicts
+  // interface Window {
+  //   BinanceChain?: BinanceChainProvider;
+  //   ethereum?: EthereumProvider;
+  // }
 }
+
+type AugmentedWindow = Window & {
+  BinanceChain?: BinanceChainProvider;
+  ethereum?: EthereumProvider;
+};
+
+const getAugmentedWindow = (): AugmentedWindow | undefined =>
+  typeof window === "undefined" ? undefined : (window as AugmentedWindow);
+
+// local-safe getter to avoid global typing collisions
+const getEthereum = (): EthereumProvider | undefined => getAugmentedWindow()?.ethereum;
 
 export default function ConnectWallet() {
   const { address: wagmiAddress, isConnected } = useAccount();
@@ -36,9 +48,11 @@ export default function ConnectWallet() {
       console.error("Web3Modal connection failed, falling back to direct request", error);
     }
 
-    if (window.BinanceChain) {
+    const augmentedWindow = getAugmentedWindow();
+
+    if (augmentedWindow?.BinanceChain) {
       try {
-        const accounts = await window.BinanceChain.request<string[]>({ method: "eth_requestAccounts" });
+        const accounts = await augmentedWindow.BinanceChain.request<string[]>({ method: "eth_requestAccounts" });
         setFallbackAddress(accounts?.[0] ?? null);
         return;
       } catch (err) {
@@ -46,9 +60,11 @@ export default function ConnectWallet() {
       }
     }
 
-    if (window.ethereum) {
+    const ethereum = getEthereum();
+
+    if (ethereum) {
       try {
-        const accounts = await window.ethereum.request<string[]>({ method: "eth_requestAccounts" });
+        const accounts = await ethereum.request<string[]>({ method: "eth_requestAccounts" });
         setFallbackAddress(accounts?.[0] ?? null);
         return;
       } catch (err) {
