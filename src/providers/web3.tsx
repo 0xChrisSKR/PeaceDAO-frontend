@@ -4,49 +4,50 @@ import { ReactNode } from 'react';
 import { WagmiConfig, createConfig, configureChains } from 'wagmi';
 import { bsc, bscTestnet } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
+import { injected, walletConnect } from 'wagmi/connectors';
 import { createWeb3Modal } from '@web3modal/wagmi/react';
-import { walletConnect, injected } from 'wagmi/connectors';
 import env from '@/config/env';
 
-// 依據環境選鏈
-const activeChain = env.NETWORK === 'bsctest' ? bscTestnet : bsc;
+// --- Chains & clients
+const { chains, publicClient } = configureChains(
+  // 先走測試鏈，再備用主網；依你的 env.NETWORK 之後可動態切
+  [bscTestnet, bsc],
+  [publicProvider()]
+);
 
-// 建立 wagmi 基礎設置
-const { chains, publicClient } = configureChains([activeChain], [publicProvider()]);
-
+// --- Wagmi config
 export const wagmiConfig = createConfig({
   autoConnect: true,
   connectors: [
+    injected({ shimDisconnect: true }),
     walletConnect({
       projectId: env.WC_PROJECT_ID,
-      showQrModal: true,
-    }),
-    injected({ shimDisconnect: true }),
+      showQrModal: true
+    })
   ],
-  publicClient,
+  publicClient
 });
 
-// 只在瀏覽器初始化一次 Web3Modal，避免你看到的錯誤
+// --- 確保 Web3Modal 只在瀏覽器初始化一次（解決：Please call createWeb3Modal 之前）
 declare global {
-  interface Window {
-    __W3M_INITIALIZED__?: boolean;
-  }
+  interface Window { __W3M_CREATED__?: boolean }
 }
-if (typeof window !== 'undefined' && !window.__W3M_INITIALIZED__) {
+if (typeof window !== 'undefined' && !window.__W3M_CREATED__) {
   createWeb3Modal({
     wagmiConfig,
     projectId: env.WC_PROJECT_ID,
-    chains,
     themeMode: 'dark',
     themeVariables: {
-      '--w3m-accent': '#f0b90b',     // 幣安金
+      '--w3m-accent': '#f0b90b',
       '--w3m-color-mix': '#f0b90b',
+      '--w3m-font-family': 'system-ui'
     },
+    chains
   });
-  window.__W3M_INITIALIZED__ = true;
+  window.__W3M_CREATED__ = true;
 }
 
-// 封裝成 Provider
+// --- Provider
 export default function Web3Provider({ children }: { children: ReactNode }) {
   return <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>;
 }
