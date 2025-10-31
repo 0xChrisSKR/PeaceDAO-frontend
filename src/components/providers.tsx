@@ -4,6 +4,7 @@ import { PropsWithChildren, useMemo, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider, createConfig, http } from 'wagmi';
 import { mainnet, polygon, arbitrum, base, bsc, optimism, avalanche } from 'wagmi/chains';
+import { injected } from 'wagmi/connectors';
 
 import { ENV } from '@/lib/env';
 
@@ -29,9 +30,11 @@ export default function Providers({ children }: PropsWithChildren) {
   const config = useMemo(() => {
     return createConfig({
       chains: [chain],
+      connectors: [injected()],
       transports: {
         [chain.id]: rpc ? http(rpc) : http(),
       },
+      ssr: true,
     });
   }, [chain, rpc]);
 

@@ -3,9 +3,7 @@
 
 import { createConfig, http } from 'wagmi';
 import { bsc, bscTestnet } from 'wagmi/chains';
-
-// 必填：你的 WalletConnect 專案 ID
-export const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID || '';
+import { injected } from 'wagmi/connectors';
 
 const NETWORK = (process.env.NEXT_PUBLIC_NETWORK || 'bsctest').toLowerCase();
 export const chains = NETWORK === 'bsc' ? [bsc] : [bscTestnet];
@@ -23,6 +21,7 @@ for (const c of chains) {
 
 export const wagmiConfig = createConfig({
   chains,
+  connectors: [injected()],
   transports,
-  ssr: true, // Next.js 推薦
+  ssr: true,
 });
