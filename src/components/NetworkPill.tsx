@@ -1,13 +1,12 @@
 "use client";
 
-import { useChainId, useSwitchChain, useChains } from "wagmi";
+import { useChainId, useSwitchNetwork } from "wagmi";
 import { useMemo } from "react";
 import { bsc, DEFAULT_CHAIN } from "@/config/chains";
 
 export function NetworkPill() {
   const chainId = useChainId();
-  const chains = useChains();
-  const { switchChainAsync, isPending } = useSwitchChain();
+  const { chains, switchNetworkAsync, isLoading } = useSwitchNetwork();
 
   const current = useMemo(
     () => chains.find((chain) => chain.id === chainId) ?? DEFAULT_CHAIN,
@@ -26,9 +25,9 @@ export function NetworkPill() {
   }, [current]);
 
   const handleClick = async () => {
-    if (!nextChain) return;
+    if (!nextChain || !switchNetworkAsync) return;
     try {
-      await switchChainAsync({ chainId: nextChain.id });
+      await switchNetworkAsync(nextChain.id);
     } catch (error) {
       console.error(error);
     }
@@ -38,10 +37,10 @@ export function NetworkPill() {
     <button
       onClick={handleClick}
       type="button"
-      disabled={!nextChain || isPending}
+      disabled={!nextChain || !switchNetworkAsync || isLoading}
       className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
     >
-      {isPending ? "Switching..." : label}
+      {isLoading ? "Switching..." : label}
     </button>
   );
 }
