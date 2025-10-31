@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { useAppKit } from "@reown/appkit/react";
 
 declare global {
   interface BinanceChainProvider {
@@ -21,7 +21,7 @@ declare global {
 
 export default function ConnectWallet() {
   const { address: wagmiAddress, isConnected } = useAccount();
-  const { open } = useWeb3Modal();
+  const { open } = useAppKit();
   const [fallbackAddress, setFallbackAddress] = useState<string | null>(null);
 
   const address = isConnected ? wagmiAddress : fallbackAddress;
@@ -33,7 +33,7 @@ export default function ConnectWallet() {
       await open();
       return;
     } catch (error) {
-      console.error("Web3Modal connection failed, falling back to direct request", error);
+      console.error("AppKit connection failed, falling back to direct request", error);
     }
 
     if (window.BinanceChain) {

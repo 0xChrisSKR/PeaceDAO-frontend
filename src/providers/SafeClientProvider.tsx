@@ -3,7 +3,7 @@ import React from 'react';
 
 function isClient() { return typeof window !== 'undefined'; }
 function hasSafeEnv() {
-  const pid = process.env.NEXT_PUBLIC_WC_PROJECT_ID || '';
+  const pid = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '';
   const rpc = process.env.NEXT_PUBLIC_RPC_BSC || '';
   // 沒有有效的 WalletConnect 專案ID或 RPC，就暫時跳過初始化以避免白屏
   return pid.length >= 8 && rpc.startsWith('http');

@@ -7,7 +7,7 @@ Production UI for World Peace DAO on BSC.
 - `/minimal` → 最小頁（檢查路由/渲染）
 - `/home` → 原首頁（若白屏，需把其依賴改 client-only/lazy-load）
 
-## Environment (Vercel → Project → Settings → Environment Variables)NEXT_PUBLIC_WC_PROJECT_ID=demo
+## Environment (Vercel → Project → Settings → Environment Variables)NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=demo
 NEXT_PUBLIC_RPC_BSC=https://bsc-dataseed.binance.org/
 
 NEXT_PUBLIC_PEACE_FUND=0x071B1baf97D85a70A6Ca786E7Fe90b45f50464e5

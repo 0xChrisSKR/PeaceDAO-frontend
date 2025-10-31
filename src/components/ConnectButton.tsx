@@ -1,9 +1,9 @@
 "use client";
 import { useAccount } from "wagmi";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { useAppKit } from "@reown/appkit/react";
 
 export default function ConnectButton() {
-  const { open } = useWeb3Modal();
+  const { open } = useAppKit();
   const { isConnected, address } = useAccount();
   const label = isConnected && address
     ? `${address.slice(0,6)}...${address.slice(-4)}`

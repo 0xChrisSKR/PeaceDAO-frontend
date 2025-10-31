@@ -2,14 +2,14 @@ export const WHITEPAPER_URL = process.env.NEXT_PUBLIC_WHITEPAPER_URL ?? "/whitep
 
 export const env = {
   NETWORK: process.env.NEXT_PUBLIC_NETWORK ?? "bsc",
-  WC_PROJECT_ID: process.env.NEXT_PUBLIC_WC_PROJECT_ID ?? "",
+  WALLETCONNECT_PROJECT_ID: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "",
   RPC_BSC: process.env.NEXT_PUBLIC_RPC_BSC ?? "",
   RPC_BSC_TEST: process.env.NEXT_PUBLIC_RPC_BSC_TEST ?? "",
   PEACE_FUND: process.env.NEXT_PUBLIC_PEACE_FUND ?? "",
   TOKEN: process.env.NEXT_PUBLIC_TOKEN ?? "WORLDPEACE",
   FOUNDER_BSCTEST: process.env.NEXT_PUBLIC_FOUNDER_BSCTEST ?? "",
   CONFIG_PATH: "/config" as const,
-  wcProjectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID ?? "",
+  walletConnectProjectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "",
   rpcBsc: process.env.NEXT_PUBLIC_RPC_BSC ?? "",
   rpcBscTest: process.env.NEXT_PUBLIC_RPC_BSC_TEST ?? "",
   peaceFund: process.env.NEXT_PUBLIC_PEACE_FUND ?? "",
