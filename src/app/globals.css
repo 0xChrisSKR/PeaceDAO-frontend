@@ -58,3 +58,10 @@ a {
 .prose .opacity-70 {
   opacity: 0.7;
 }
+button {
+  transition: all 0.2s ease;
+}
+button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
