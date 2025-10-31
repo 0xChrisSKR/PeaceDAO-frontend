@@ -14,7 +14,7 @@ export function useTokenBalance(token?: Address, options?: { watch?: boolean }) 
   return useQuery({
     queryKey: ["token-balance", chainId, token, address],
     queryFn: async () => {
-      if (!client || !address || !token) return 0n;
+      if (!client || !address || !token) return BigInt(0);
       return (await client.readContract({
         address: token,
         abi: erc20Abi,

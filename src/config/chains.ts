@@ -2,7 +2,8 @@ import { bsc as baseBsc } from "wagmi/chains";
 import { http } from "viem";
 import { env } from "@/config/env";
 
-const rpcUrl = env.rpcBsc || baseBsc.rpcUrls.default.http[0];
+const defaultRpcList = baseBsc?.rpcUrls?.default?.http ?? [];
+const rpcUrl = env.rpcBsc || defaultRpcList[0] || "https://rpc.ankr.com/bsc";
 
 export const bsc = {
   ...baseBsc,

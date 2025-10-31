@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useAccount, useChainId, useSwitchChain } from "wagmi";
+import { useAccount, useChainId, useSwitchNetwork } from "wagmi";
 import { DEFAULT_CHAIN } from "@/config/chains";
 import { useLanguage } from "@/components/LanguageProvider";
 
@@ -12,13 +12,14 @@ export function NetworkWatcher() {
   const { dictionary } = useLanguage();
   const { isConnected } = useAccount();
   const chainId = useChainId();
-  const { switchChainAsync } = useSwitchChain();
+  const { switchNetworkAsync, isLoading } = useSwitchNetwork();
   const [isSwitching, setSwitching] = useState(false);
 
   const handleSwitch = useCallback(async () => {
+    if (!switchNetworkAsync) return;
     try {
       setSwitching(true);
-      await switchChainAsync({ chainId: DEFAULT_CHAIN.id });
+      await switchNetworkAsync(DEFAULT_CHAIN.id);
       toast.success(`${dictionary.wallet.switch} ${DEFAULT_CHAIN.name}`);
       toast.dismiss(TOAST_ID);
     } catch (error: any) {
@@ -27,7 +28,7 @@ export function NetworkWatcher() {
     } finally {
       setSwitching(false);
     }
-  }, [dictionary.wallet.switch, switchChainAsync]);
+  }, [dictionary.wallet.switch, switchNetworkAsync]);
 
   useEffect(() => {
     if (!isConnected || chainId === DEFAULT_CHAIN.id) {
@@ -42,10 +43,10 @@ export function NetworkWatcher() {
           <button
             type="button"
             onClick={handleSwitch}
-            disabled={isSwitching}
+            disabled={isSwitching || isLoading || !switchNetworkAsync}
             className="inline-flex items-center justify-center rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {isSwitching ? dictionary.common.loading : `${dictionary.wallet.switch} ${DEFAULT_CHAIN.name}`}
+            {isSwitching || isLoading ? dictionary.common.loading : `${dictionary.wallet.switch} ${DEFAULT_CHAIN.name}`}
           </button>
         </div>
       ),
@@ -55,7 +56,7 @@ export function NetworkWatcher() {
     return () => {
       toast.dismiss(TOAST_ID);
     };
-  }, [chainId, dictionary.common.loading, dictionary.wallet.switch, dictionary.wallet.wrongNetwork, handleSwitch, isConnected, isSwitching]);
+  }, [chainId, dictionary.common.loading, dictionary.wallet.switch, dictionary.wallet.wrongNetwork, handleSwitch, isConnected, isLoading, isSwitching, switchNetworkAsync]);
 
   return null;
 }

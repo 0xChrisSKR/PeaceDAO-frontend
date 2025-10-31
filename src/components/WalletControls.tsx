@@ -14,7 +14,7 @@ function shorten(address?: string) {
 export function WalletControls() {
   const { dictionary } = useLanguage();
   const { address, isConnecting, isConnected } = useAccount();
-  const { connectAsync, connectors, isPending, variables } = useConnect();
+  const { connectAsync, connectors, isLoading, pendingConnector } = useConnect();
   const { disconnectAsync } = useDisconnect();
   const [open, setOpen] = useState(false);
 
@@ -88,7 +88,7 @@ export function WalletControls() {
         <div className="absolute right-0 z-50 mt-3 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
           <div className="flex flex-col gap-2">
             {availableConnectors.map((connector) => {
-              const isCurrent = (variables?.connector as { id?: string } | undefined)?.id === connector.id;
+              const isCurrent = pendingConnector?.id === connector.id;
               return (
                 <button
                   key={connector.id}
@@ -97,11 +97,11 @@ export function WalletControls() {
                   disabled={!connector.ready}
                   className={clsx(
                     "rounded-xl border border-slate-200 px-4 py-2 text-left text-sm font-medium text-slate-700 transition hover:border-emerald-400 hover:bg-emerald-50",
-                    (!connector.ready || (isPending && isCurrent)) && "opacity-60"
+                    (!connector.ready || (isLoading && isCurrent)) && "opacity-60"
                   )}
                 >
                   {connector.name}
-                  {isPending && isCurrent ? "…" : ""}
+                  {isLoading && isCurrent ? "…" : ""}
                 </button>
               );
             })}
