@@ -1,15 +1,16 @@
-import Providers from '@/providers/client';
-// ... 其他 import
+import type { Metadata } from 'next';
+import './globals.css';
+import Web3Provider from '@/providers/Web3Provider';
+
+export const metadata: Metadata = { title: 'WorldPeace DAO' };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh-Hant">
       <body>
-        <Providers>
-          {/* 你的 TopBar / Header */}
+        <Web3Provider>
           {children}
-          {/* 你的 TabBar / Footer */}
-        </Providers>
+        </Web3Provider>
       </body>
     </html>
   );
