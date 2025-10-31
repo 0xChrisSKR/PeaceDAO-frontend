@@ -1,130 +1,129 @@
-"use client";
-import type { Route } from "next";
+'use client';
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import env from "@/config/env";
-import { Card } from "@/components/Card";
-import { Section } from "@/components/Section";
-import { Stat } from "@/components/Stat";
-import { useLanguage } from "@/components/LanguageProvider";
-import ConnectButton from "@/components/ConnectButton";
-import { usePeaceFundAddress } from "@/hooks/usePeaceFundAddress";
+import { useWeb3Modal, useWeb3ModalAccount } from "@web3modal/wagmi/react";
 
-function shortAddress(address?: string) {
-  if (!address) return "";
-  return `${address.slice(0, 6)}…${address.slice(-4)}`;
-}
+const tiers = [
+  { min: 1_000_000, label: "提案者 Proposer" },
+  { min: 200_000,   label: "投票者 Voter" },
+  { min: 15_000,    label: "驗證者 Verifier" },
+  { min: 0,         label: "訪客 Guest" },
+];
 
-export default function HomePage() {
-  const { dictionary } = useLanguage();
-  const { peaceFund, isLoading: peaceFundLoading } = usePeaceFundAddress();
-  const peaceToken = env.TOKEN;
+export default function Home() {
+  const { open } = useWeb3Modal();
+  const { address, isConnected } = useWeb3ModalAccount();
+  const [tier, setTier] = useState<string>("—");
+  const [balance, setBalance] = useState<number>(0);
 
-  const heroCtas = [
-    { href: "/donate", label: dictionary.hero.donateCta, color: "bg-amber-500 hover:bg-amber-600" },
-    { href: "/treasury", label: dictionary.hero.treasuryCta, color: "bg-emerald-500 hover:bg-emerald-600" },
-    { href: "/verify", label: dictionary.hero.verifyCta, color: "bg-sky-500 hover:bg-sky-600" }
-  ] satisfies Array<{ href: Route; label: string; color: string }>;
+  // 取得持幣餘額（示範用假資料，日後接合約查詢）
+  useEffect(() => {
+    if (!isConnected) return;
+    // TODO: 實際接 ERC20 balanceOf
+    const simulatedBalance = Math.floor(Math.random() * 2_000_000);
+    setBalance(simulatedBalance);
+    const matched = tiers.find(t => simulatedBalance >= t.min);
+    setTier(matched?.label ?? "Guest");
+  }, [isConnected]);
+
+  const handleConnect = async () => {
+    if (!isConnected) await open();
+  };
 
   return (
-    <div className="space-y-12">
-      <Section className="space-y-6 rounded-3xl bg-zinc-900/70 p-8 ring-1 ring-white/10">
-        <div className="flex justify-end">
-          <ConnectButton />
-        </div>
+    <>
+      {/* 上方橫幅 */}
+      <div
+        style={{
+          background:
+            "linear-gradient(90deg,#111 0%,#1c1c1c 40%,#252525 100%)",
+          color: "#f5f5f5",
+          borderRadius: 16,
+          padding: "20px 18px",
+          marginBottom: 16,
+        }}
+      >
+        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>
+          🌍 WorldPeace DAO
+        </h2>
+        <p style={{ margin: "6px 0 10px", fontSize: 13, color: "#ccc" }}>
+          Decentralized Peace Fundraising & Governance Platform
+        </p>
 
-        <div className="space-y-4">
-          <p className="inline-flex items-center rounded-full bg-zinc-800 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-amber-300">
-            {dictionary.home.badge}
-          </p>
-          <h1 className="text-4xl font-semibold leading-tight text-white sm:text-5xl">
-            {dictionary.hero.title}
-          </h1>
-          <p className="max-w-2xl text-base text-zinc-300 sm:text-lg">{dictionary.hero.subtitle}</p>
-        </div>
-
-        <div className="flex flex-wrap gap-3">
-          {heroCtas.map((cta) => (
-            <Link
-              key={cta.href}
-              href={cta.href}
-              className={`inline-flex items-center rounded-full px-6 py-3 text-sm font-semibold text-black shadow-md transition ${cta.color}`}
-            >
-              {cta.label}
-            </Link>
-          ))}
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Stat label="BSC" value={dictionary.home.statChain} helper={dictionary.home.statChainHelper} />
-          <Stat
-            label={dictionary.home.statToken}
-            value={peaceToken ? shortAddress(peaceToken) : "—"}
-            helper={dictionary.home.statTokenHelper}
-          />
-          <Stat label={dictionary.home.statTelegram} value="@WorldPeace_BNB" helper={dictionary.home.statTelegramHelper} />
-        </div>
-
-        <Card className="flex flex-col gap-3 bg-zinc-800/70 text-sm text-zinc-200 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-amber-300">
-              {dictionary.hero.peaceFundLabel}
-            </p>
-            <p className="font-mono text-base text-white">
-              {peaceFund
-                ? shortAddress(peaceFund)
-                : peaceFundLoading
-                ? dictionary.common.loading
-                : dictionary.hero.peaceFundMissing}
-            </p>
-          </div>
-          {peaceFund ? (
-            <a
-              href={`https://bscscan.com/address/${peaceFund}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center rounded-full border border-amber-300/50 px-4 py-2 text-xs font-semibold text-amber-300 transition hover:bg-amber-300/10"
-            >
-              {dictionary.home.bscScanCta} ↗
-            </a>
-          ) : null}
-        </Card>
-      </Section>
-
-      <Section className="grid gap-6 md:grid-cols-2">
-        <Card className="bg-zinc-800/70 ring-1 ring-white/10">
-          <h2 className="text-xl font-semibold text-white">{dictionary.home.impactTitle}</h2>
-          <p className="mt-2 text-sm text-zinc-300">{dictionary.home.impactBody}</p>
-          <Link
-            href="/treasury"
-            className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-black shadow-md transition hover:bg-emerald-600"
+        {!isConnected ? (
+          <button
+            onClick={handleConnect}
+            style={{
+              background: "#f0b90b",
+              border: "none",
+              borderRadius: 8,
+              padding: "8px 16px",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
           >
-            {dictionary.hero.treasuryCta}
-          </Link>
-        </Card>
-
-        <Card className="bg-zinc-800/70 ring-1 ring-white/10">
-          <h2 className="text-xl font-semibold text-white">{dictionary.home.joinTitle}</h2>
-          <p className="mt-2 text-sm text-zinc-300">{dictionary.home.joinBody}</p>
-          <div className="mt-4 grid gap-2 sm:grid-cols-2">
-            <a
-              href={env.guildLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-full border border-amber-300/50 px-4 py-2 text-sm font-semibold text-amber-300 transition hover:bg-amber-300/10"
-            >
-              {dictionary.home.guildCta} ↗
-            </a>
-            <a
-              href={env.tgPublic}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-full border border-sky-400/50 px-4 py-2 text-sm font-semibold text-sky-300 transition hover:bg-sky-300/10"
-            >
-              {dictionary.home.telegramCta} ↗
-            </a>
+            🔗 連結錢包 / Connect Wallet
+          </button>
+        ) : (
+          <div style={{ fontSize: 13 }}>
+            <div>地址 Address：{address?.slice(0, 6)}…{address?.slice(-4)}</div>
+            <div>餘額 Balance：{balance.toLocaleString()} WPD</div>
+            <div>等級 Tier：{tier}</div>
+            {balance >= 15000 && (
+              <p style={{ marginTop: 6 }}>
+                👉 <a
+                  href="https://t.me/yourchannel"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: "#f0b90b", fontWeight: 600 }}
+                >
+                  加入 TG 驗證群組 (> 15000 WPD)
+                </a>
+              </p>
+            )}
           </div>
-        </Card>
-      </Section>
-    </div>
+        )}
+      </div>
+
+      {/* 功能卡片 */}
+      <div className="card-grid">
+        <div className="card">
+          <h3>1️⃣ 募款提案 Proposals</h3>
+          <p>提出 受贈對象 / 金額 / 理由 （最高 90% 金庫餘額）。</p>
+          <p><Link href="/proposals">進入 →</Link></p>
+        </div>
+
+        <div className="card">
+          <h3>2️⃣ 提案投票 Vote</h3>
+          <p>持幣者投票，票權按持幣量加權，鏈上可驗證。</p>
+          <p><Link href="/vote">進入 →</Link></p>
+        </div>
+
+        <div className="card">
+          <h3>3️⃣ 社群決議 Decisions</h3>
+          <p>顯示最終決議與鏈上交易連結。</p>
+          <p><Link href="/decisions">進入 →</Link></p>
+        </div>
+
+        <div className="card">
+          <h3>4️⃣ 募款金庫 Treasury</h3>
+          <p>安全機制：僅能由決議合約觸發撥款。</p>
+          <p><Link href="/treasury">進入 →</Link></p>
+        </div>
+
+        <div className="card">
+          <h3>5️⃣ Swap （平台造血）</h3>
+          <p>手續費 0.5% → 金庫 50% + 創辦人 50%。</p>
+          <p><Link href="/swap">進入 →</Link></p>
+        </div>
+
+        <div className="card">
+          <h3>📜 白皮書 / 關於 DAO</h3>
+          <p><Link href="/whitepaper">白皮書</Link> | <Link href="/about">關於 DApp</Link></p>
+        </div>
+      </div>
+    </>
   );
 }
