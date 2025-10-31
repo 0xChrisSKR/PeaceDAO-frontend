@@ -4,20 +4,37 @@ import { useState } from "react";
 import { useAccount } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 
-declare global {
-  interface BinanceChainProvider {
-    request<T>(args: { method: string; params?: unknown[] }): Promise<T>;
-  }
-
-  interface EthereumProvider {
-    request<T>(args: { method: string; params?: unknown[] }): Promise<T>;
-  }
-
-  interface Window {
-    BinanceChain?: BinanceChainProvider;
-    ethereum?: EthereumProvider;
-  }
+interface BinanceChainProvider {
+  request<T>(args: { method: string; params?: unknown[] }): Promise<T>;
 }
+
+interface EthereumProvider {
+  request<T>(args: { method: string; params?: unknown[] }): Promise<T>;
+}
+
+// Removed: DO NOT re-declare Window here to avoid TS merge conflicts
+// interface Window {
+
+// Helper to safely get window.ethereum without global typing conflicts
+const getEthereum = (): unknown => {
+  if (typeof window === "undefined") return undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (window as any).ethereum;
+};
+
+const getBinanceChain = (): BinanceChainProvider | undefined => {
+  if (typeof window === "undefined") return undefined;
+  return (window as typeof window & { BinanceChain?: BinanceChainProvider }).BinanceChain;
+};
+
+const isEthereumProvider = (value: unknown): value is EthereumProvider => {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "request" in value &&
+    typeof (value as { request?: unknown }).request === "function"
+  );
+};
 
 export default function ConnectWallet() {
   const { address: wagmiAddress, isConnected } = useAccount();
@@ -36,9 +53,10 @@ export default function ConnectWallet() {
       console.error("Web3Modal connection failed, falling back to direct request", error);
     }
 
-    if (window.BinanceChain) {
+    const binanceChain = getBinanceChain();
+    if (binanceChain) {
       try {
-        const accounts = await window.BinanceChain.request<string[]>({ method: "eth_requestAccounts" });
+        const accounts = await binanceChain.request<string[]>({ method: "eth_requestAccounts" });
         setFallbackAddress(accounts?.[0] ?? null);
         return;
       } catch (err) {
@@ -46,9 +64,10 @@ export default function ConnectWallet() {
       }
     }
 
-    if (window.ethereum) {
+    const ethereum = getEthereum();
+    if (isEthereumProvider(ethereum)) {
       try {
-        const accounts = await window.ethereum.request<string[]>({ method: "eth_requestAccounts" });
+        const accounts = await ethereum.request<string[]>({ method: "eth_requestAccounts" });
         setFallbackAddress(accounts?.[0] ?? null);
         return;
       } catch (err) {
