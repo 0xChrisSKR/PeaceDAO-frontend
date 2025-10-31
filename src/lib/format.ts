@@ -5,8 +5,9 @@ export function toWei(amount: string | number, decimals = 18) {
   return parseUnits(value || "0", decimals);
 }
 
-export function fromWei(value: bigint, decimals = 18) {
-  return formatUnits(value ?? 0n, decimals);
+export function fromWei(value: bigint | null | undefined, decimals = 18) {
+  const safeValue = typeof value === "bigint" ? value : BigInt(0);
+  return formatUnits(safeValue, decimals);
 }
 
 export function parseByDecimals(value: string, decimals: number) {

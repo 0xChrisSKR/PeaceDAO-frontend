@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "22.x"
+    "node": "20.x"
   },
   "scripts": {
     "dev": "next dev",
@@ -19,9 +19,7 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-hot-toast": "^2.4.1",
-    "viem": "2.9.11",
-    "wagmi": "1.4.13",
-    "@web3modal/wagmi": "4.0.5"
+    "viem": "2.9.11"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "^3.0.4",
