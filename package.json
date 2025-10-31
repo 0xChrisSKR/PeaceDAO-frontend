@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "22.x"
+    "node": ">=18.17"
   },
   "scripts": {
     "dev": "next dev",
@@ -40,6 +40,7 @@
     "typescript": "5.4.5"
   },
   "overrides": {
-    "@react-native-async-storage/async-storage": "1.23.1"
+    "@react-native-async-storage/async-storage": "1.23.1",
+    "viem": "^2.39.1"
   }
 }
