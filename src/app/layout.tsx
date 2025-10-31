@@ -1,38 +1,23 @@
-import "./globals.css";
-import type { Metadata } from "next";
-import dynamic from "next/dynamic";
-import { cookies } from "next/headers";
-import { ReactNode } from "react";
-import Header from "@/components/Header";
-import { LanguageProvider } from "@/components/LanguageProvider";
-import { Web3Providers } from "@/providers/wagmi";
-
-const SafeClientProvider = dynamic(() => import("@/providers/SafeClientProvider"), { ssr: false });
+// src/app/layout.tsx
+import './globals.css'
+import type { Metadata } from 'next'
+import { Web3Provider } from '@/providers/web3' // 這行要能對到 src/providers/web3.tsx
 
 export const metadata: Metadata = {
-  title: "World Peace DAO",
-  description: "Token-verified chat & governance on BSC"
-};
+  title: 'PeaceDAO',
+  description: 'Toward transparent fundraising & community governance',
+}
 
-export default function RootLayout({ children }: { children: ReactNode }) {
-  const langCookie = cookies().get("lang")?.value;
-
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang="zh-Hant">
-      <body className="min-h-dvh bg-black text-zinc-100">
-        <div
-          className="fixed inset-0 -z-10 bg-cover bg-center opacity-20"
-          style={{ backgroundImage: "url('/assets/ui/hero-banner.svg')" }}
-        />
-        <SafeClientProvider>
-          <Web3Providers>
-            <LanguageProvider initialLocale={langCookie}>
-              <Header />
-              <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
-            </LanguageProvider>
-          </Web3Providers>
-        </SafeClientProvider>
+    <html lang="en">
+      <body>
+        <Web3Provider>{children}</Web3Provider>
       </body>
     </html>
-  );
+  )
 }
