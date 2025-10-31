@@ -1,4 +1,4 @@
-import env from "@/config/env";
+import { env } from "@/config/env";
 import type { LikeSnapshot, UserLikeState } from "@/types/like";
 
 export interface GovernanceProposalLink {
