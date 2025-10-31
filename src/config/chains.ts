@@ -1,13 +1,17 @@
-import { bsc as baseBsc } from "wagmi/chains";
-import { http } from "viem";
 import { env } from "@/config/env";
 
-const rpcUrl = env.rpcBsc || baseBsc.rpcUrls.default.http[0];
+const rpcUrl = env.rpcBsc || "https://bsc-dataseed.binance.org";
 
 export const bsc = {
-  ...baseBsc,
+  id: 56,
+  name: "BNB Smart Chain",
+  network: "bsc",
+  nativeCurrency: {
+    name: "BNB",
+    symbol: "BNB",
+    decimals: 18
+  },
   rpcUrls: {
-    ...baseBsc.rpcUrls,
     default: { http: [rpcUrl] },
     public: { http: [rpcUrl] }
   }
@@ -17,5 +21,5 @@ export const CHAINS = [bsc] as const;
 export const DEFAULT_CHAIN = bsc;
 
 export const transports = {
-  [bsc.id]: http(rpcUrl)
+  [bsc.id]: rpcUrl
 };

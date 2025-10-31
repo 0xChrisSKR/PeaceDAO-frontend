@@ -1,28 +1,12 @@
-import { useAccount, useChainId, usePublicClient } from "wagmi";
 import { useQuery } from "@tanstack/react-query";
 import type { Address } from "viem";
-import { erc20Abi } from "@/abis/ERC20";
-import { DEFAULT_CHAIN } from "@/config/chains";
 
-export function useTokenBalance(token?: Address, options?: { watch?: boolean }) {
-  const { address } = useAccount();
-  const chainId = useChainId();
-  const effectiveChainId = chainId || DEFAULT_CHAIN.id;
-  const client = usePublicClient({ chainId: effectiveChainId });
-  const watch = options?.watch ?? true;
-
+// 急救版：直接回傳 0n，避免錢包相關相依
+export function useTokenBalance(_token?: Address, _options?: { watch?: boolean }) {
   return useQuery({
-    queryKey: ["token-balance", chainId, token, address],
-    queryFn: async () => {
-      if (!client || !address || !token) return 0n;
-      return (await client.readContract({
-        address: token,
-        abi: erc20Abi,
-        functionName: "balanceOf",
-        args: [address]
-      })) as bigint;
-    },
-    enabled: Boolean(client && address && token),
-    refetchInterval: watch ? 15_000 : false
+    queryKey: ["token-balance", "disabled"],
+    queryFn: async () => 0,
+    enabled: false,
+    initialData: 0
   });
 }

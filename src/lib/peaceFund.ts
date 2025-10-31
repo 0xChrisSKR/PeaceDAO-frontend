@@ -87,7 +87,9 @@ export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {
     if (configUrl) hints.add(configUrl);
   }
 
-  for (const hint of hints) {
+  const hintList = Array.from(hints);
+  for (let index = 0; index < hintList.length; index += 1) {
+    const hint = hintList[index];
     if (!hint) continue;
     if (isAddressLike(hint)) {
       return { address: hint, source: `inline:${hint}` };
