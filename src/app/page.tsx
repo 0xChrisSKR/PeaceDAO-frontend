@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import ConnectButton from '@/components/ConnectButton';
+import ConnectButton from '../components/ConnectButton';
 
 export default function Page() {
   return (

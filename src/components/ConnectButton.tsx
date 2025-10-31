@@ -1,16 +1,33 @@
 "use client";
-import { useAccount } from "wagmi";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 export default function ConnectButton() {
-  const { open } = useWeb3Modal();
   const { isConnected, address } = useAccount();
-  const label = isConnected && address
-    ? `${address.slice(0,6)}...${address.slice(-4)}`
-    : "Connect Wallet";
+  const { connectors, connect, status } = useConnect();
+  const { disconnect } = useDisconnect();
+
+  const short = (a?: `0x${string}`) => (a ? `${a.slice(0, 6)}…${a.slice(-4)}` : "");
+
+  if (isConnected) {
+    return (
+      <button
+        onClick={() => disconnect()}
+        className="rounded-lg px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm"
+      >
+        {short(address)} · 斷開
+      </button>
+    );
+  }
+
+  const primary = connectors[0];
+
   return (
-    <button onClick={() => open()} className="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700">
-      {label}
+    <button
+      onClick={() => primary && connect({ connector: primary })}
+      disabled={status === "pending" || !primary}
+      className="rounded-lg px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white text-sm disabled:opacity-60"
+    >
+      {status === "pending" ? "連線中…" : "連接錢包"}
     </button>
   );
 }
