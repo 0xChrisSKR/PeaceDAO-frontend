@@ -17,7 +17,7 @@ function shortAddress(address?: string) {
 export default function HomePage() {
   const { dictionary } = useLanguage();
   const { peaceFund, isLoading: peaceFundLoading } = usePeaceFundAddress();
-  const peaceToken = env.peaceToken;
+  const peaceToken = env.TOKEN;
 
   const heroCtas = [
     { href: "/donate", label: dictionary.hero.donateCta, color: "bg-amber-500 hover:bg-amber-600" },
