@@ -1,28 +1,4 @@
 {
-  "env": {
-    "NEXT_PUBLIC_NETWORK": "bsctest",
-    "NEXT_PUBLIC_WC_PROJECT_ID": "prj_QwbJpKLwxGKPUDCU2SDo6RBpOlA4",
-
-    "NEXT_PUBLIC_BSC_RPC": "https://bsc-dataseed.binance.org",
-    "NEXT_PUBLIC_BSCTEST_RPC": "https://data-seed-prebsc-1-s1.binance.org:8545",
-    "NEXT_PUBLIC_RPC_BSC": "https://bsc-dataseed.binance.org",
-    "NEXT_PUBLIC_RPC_BSC_TEST": "https://data-seed-prebsc-1-s1.binance.org:8545",
-
-    "NEXT_PUBLIC_TREASURY_ADDRESS_BSC": "0x071B1baf97D85a70A6Ca786E7Fe90b45f50464e5",
-    "NEXT_PUBLIC_PEACE_FUND": "0x071B1baf97D85a70A6Ca786E7Fe90b45f50464e5",
-
-    "NEXT_PUBLIC_TOKEN_ADDRESS_BSC": "",
-    "NEXT_PUBLIC_FOUNDER_ADDRESS_BSC": "",
-    "NEXT_PUBLIC_SWAP_ROUTER_ADDRESS_BSC": "",
-
-    "NEXT_PUBLIC_TREASURY_ADDRESS_BSCTEST": "",
-    "NEXT_PUBLIC_TOKEN_ADDRESS_BSCTEST": "0x4444def5cf226bf50aa4b45e5748b676945bc509",
-    "NEXT_PUBLIC_FOUNDER_ADDRESS_BSCTEST": "0xD05d14e33D34F18731F7658eCA2675E9490A32D3",
-    "NEXT_PUBLIC_SWAP_ROUTER_ADDRESS_BSCTEST": "",
-    "NEXT_PUBLIC_TOKEN": "0x4444def5cf226bf50aa4b45e5748b676945bc509",
-
-    "NEXT_PUBLIC_PEACEDAO_CONFIG_PATH": "/config",
-    "NEXT_PUBLIC_TG_PUBLIC": "https://t.me/WorldPeace_BNB",
-    "NEXT_PUBLIC_TG_VERIFIED": ""
-  }
+  "installCommand": "npm i --legacy-peer-deps",
+  "buildCommand": "npm run build"
 }
