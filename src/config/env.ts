@@ -1,5 +1,5 @@
 // src/config/env.ts
-const env = {
+export const env = {
   NETWORK: process.env.NEXT_PUBLIC_NETWORK ?? "bsctest",
   WC_PROJECT_ID: process.env.NEXT_PUBLIC_WC_PROJECT_ID ?? "",
   RPC_BSC: process.env.NEXT_PUBLIC_RPC_BSC ?? "",
@@ -8,9 +8,6 @@ const env = {
   TOKEN: process.env.NEXT_PUBLIC_TOKEN ?? "",
   FOUNDER_BSCTEST: process.env.NEXT_PUBLIC_FOUNDER_BSCTEST ?? "",
   CONFIG_PATH: "/config",
-
-  // 👇 新增這行，給 page.tsx 用的 peaceToken 變數
-  peaceToken: process.env.NEXT_PUBLIC_TOKEN ?? "",
 } as const;
 
 export type Env = typeof env;
