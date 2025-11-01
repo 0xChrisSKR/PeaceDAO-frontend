@@ -1,23 +1,36 @@
-"use client";
+'use client';
 
-import { env, WHITEPAPER_URL } from "@/config/env";
-import { useLanguage } from "@/components/LanguageProvider";
+import { useI18n } from '../lib/i18n';
 
-export function SiteFooter() {
-  const { dictionary } = useLanguage();
+export default function SiteFooter() {
+  const { t, lang, toggle } = useI18n();
 
   return (
-    <footer className="mt-16 border-t border-white/50 bg-white/70">
-      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-6 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-        <p>{dictionary.footer.rights}</p>
-        <div className="flex flex-wrap items-center gap-4 text-sm font-semibold">
-          <a href={env.twitter} target="_blank" rel="noopener noreferrer" className="text-emerald-600 hover:text-emerald-700">
-            {dictionary.footer.twitter}
-          </a>
-          <a href={WHITEPAPER_URL} target="_blank" rel="noopener noreferrer" className="text-emerald-600 hover:text-emerald-700">
-            {dictionary.footer.docs}
-          </a>
-        </div>
+    <footer
+      className="mt-16 border-t border-white/50 bg-white/10 text-center py-6 text-sm text-white/80 backdrop-blur"
+      style={{ lineHeight: 1.6 }}
+    >
+      <div className="mb-2">
+        🌍 {t('footerMsg', 'Built with ❤️ for global peace and transparency.')}
+      </div>
+      <div>
+        <button
+          onClick={toggle}
+          style={{
+            border: '1px solid rgba(255,255,255,0.3)',
+            background: 'transparent',
+            color: '#fff',
+            borderRadius: 6,
+            padding: '4px 10px',
+            cursor: 'pointer',
+            fontSize: 12
+          }}
+        >
+          {lang === 'zh' ? '切換至 English' : 'Switch to 中文'}
+        </button>
+      </div>
+      <div className="mt-3 opacity-70">
+        © {new Date().getFullYear()} PeaceDAO — All rights reserved.
       </div>
     </footer>
   );
