@@ -1,5 +1,29 @@
-import { env } from "@/config/env";
+import { env } from "@/env";
 import { isAddress } from "viem";
+
+const isServer = typeof window === "undefined";
+
+function parseList(input: string | undefined): string[] {
+  return input
+    ?.split(/[,\n\r\s]+/)
+    .map((value) => value.trim())
+    .filter(Boolean) ?? [];
+}
+
+const peaceFundHints = parseList(
+  process.env.NEXT_PUBLIC_PEACE_FUND_HINTS ?? (isServer ? process.env.PEACE_FUND_HINTS : undefined)
+);
+
+const governanceConfigPath =
+  process.env.NEXT_PUBLIC_PEACEDAO_CONFIG_PATH ??
+  (isServer ? process.env.PEACEDAO_CONFIG_PATH : undefined) ??
+  "/api/peace/config";
+
+const governanceApiBase =
+  env.GOVERNANCE_API_BASE ||
+  process.env.NEXT_PUBLIC_PEACEDAO_DEMO_API ||
+  (isServer ? process.env.PEACEDAO_DEMO_API : undefined) ||
+  "";
 
 export interface PeaceFundResolution {
   address: string;
@@ -68,13 +92,13 @@ function extractPeaceFund(value: unknown): string | null {
 }
 
 export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {
-  const direct = env.peaceFund?.trim();
+  const direct = env.PEACE_FUND?.trim();
   if (direct && direct.toLowerCase() !== "auto" && isAddressLike(direct)) {
     return { address: direct, source: "env:NEXT_PUBLIC_PEACE_FUND" };
   }
 
   const hints = new Set<string>();
-  for (const hint of env.peaceFundHints) {
+  for (const hint of peaceFundHints) {
     hints.add(hint);
   }
 
@@ -82,8 +106,8 @@ export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {
     hints.add(direct);
   }
 
-  if (env.demoApiBase) {
-    const configUrl = buildUrl(env.demoApiBase, env.demoConfigPath);
+  if (governanceApiBase) {
+    const configUrl = buildUrl(governanceApiBase, governanceConfigPath);
     if (configUrl) hints.add(configUrl);
   }
 
@@ -93,7 +117,7 @@ export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {
       return { address: hint, source: `inline:${hint}` };
     }
 
-    const url = buildUrl(env.demoApiBase, hint) ?? hint;
+    const url = buildUrl(governanceApiBase, hint) ?? hint;
     if (!url) continue;
 
     try {
