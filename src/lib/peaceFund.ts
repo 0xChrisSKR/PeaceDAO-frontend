@@ -1,6 +1,25 @@
 import { env } from "@/config/env";
 import { isAddress } from "viem";
 
+// Prefer public env for client, fallback to server env.
+const rawPeaceFund =
+  process.env.NEXT_PUBLIC_PEACE_FUND ||
+  process.env.PEACE_FUND ||
+  "";
+
+// Keep lowercasing for comparisons only; don't use lowercased value for display.
+const peaceFund = rawPeaceFund.trim();
+
+const peaceFundForCompare = peaceFund.toLowerCase();
+
+const rawPeaceFundHints = (env as { peaceFundHints?: string | string[] }).peaceFundHints;
+
+const peaceFundHints = Array.isArray(rawPeaceFundHints)
+  ? rawPeaceFundHints
+  : typeof rawPeaceFundHints === "string" && rawPeaceFundHints
+    ? [rawPeaceFundHints]
+    : [];
+
 export interface PeaceFundResolution {
   address: string;
   source?: string;
@@ -68,17 +87,17 @@ function extractPeaceFund(value: unknown): string | null {
 }
 
 export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {
-  const direct = env.peaceFund?.trim();
-  if (direct && direct.toLowerCase() !== "auto" && isAddressLike(direct)) {
+  const direct = peaceFund;
+  if (direct && peaceFundForCompare !== "auto" && isAddressLike(direct)) {
     return { address: direct, source: "env:NEXT_PUBLIC_PEACE_FUND" };
   }
 
   const hints = new Set<string>();
-  for (const hint of env.peaceFundHints) {
+  for (const hint of peaceFundHints) {
     hints.add(hint);
   }
 
-  if (direct && direct.toLowerCase() !== "auto") {
+  if (direct && peaceFundForCompare !== "auto") {
     hints.add(direct);
   }
 
@@ -111,5 +130,11 @@ export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {
     }
   }
 
-  return { address: isAddressLike(direct) ? direct : "", source: direct ? "env:NEXT_PUBLIC_PEACE_FUND" : undefined };
+  const fallbackAddress =
+    direct && peaceFundForCompare !== "auto" && isAddressLike(direct) ? direct : "";
+
+  return {
+    address: fallbackAddress,
+    source: fallbackAddress ? "env:NEXT_PUBLIC_PEACE_FUND" : undefined
+  };
 }
