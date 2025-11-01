@@ -1,5 +1,5 @@
 // app/config/route.ts
-import { peaceConfig } from '@/lib/peaceConfig';
+import { peaceConfig } from '../../lib/peaceConfig';
 
 export const dynamic = 'force-static';
 export const revalidate = 60;
