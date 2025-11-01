@@ -2,6 +2,8 @@
 // Expose both `env` (default) and named helpers for legacy imports.
 
 export const env = {
+  // 👇 新增 peaceToken，避免 TypeScript 編譯錯誤
+  peaceToken: process.env.NEXT_PUBLIC_PEACE_TOKEN || '',
   PEACE_FUND: process.env.NEXT_PUBLIC_PEACE_FUND ?? '',
   RPC_BSC: process.env.NEXT_PUBLIC_RPC_BSC ?? '',
   RPC_BSC_TEST: process.env.NEXT_PUBLIC_RPC_BSC_TEST ?? '',
