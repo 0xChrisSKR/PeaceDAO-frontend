@@ -67,8 +67,17 @@ function extractPeaceFund(value: unknown): string | null {
   return null;
 }
 
+// ✅ 全面改用 process.env，避免依賴 Env 型別
+// 可選環境變數：
+// - NEXT_PUBLIC_PEACE_FUND  -> 直接指定捐贈合約/地址
+//
+// 若未設定，沿用既有自動解析或 demo 的 fallback。
+function readStr(name: string): string {
+  return (process.env[name] || "").trim();
+}
+
 export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {
-  const direct = env.peaceFund?.trim();
+  const direct = readStr("NEXT_PUBLIC_PEACE_FUND");
   if (direct && direct.toLowerCase() !== "auto" && isAddressLike(direct)) {
     return { address: direct, source: "env:NEXT_PUBLIC_PEACE_FUND" };
   }
