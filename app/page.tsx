@@ -54,7 +54,7 @@ export default function Home() {
             </div>
           </div>
           <div className="hero-art">
-            {/* 如果你放 /public/hero.mp4 會自動顯示影片橫幅；沒有就顯示下面的動畫漸層 */}
+            {/* 有 /public/hero.mp4 就會顯示影片；否則使用動畫漸層 */}
             {/* <video autoPlay muted loop playsInline src="/hero.mp4" style={{width:'100%',height:'100%',objectFit:'cover'}}/> */}
             <div className="pulse"></div>
           </div>
