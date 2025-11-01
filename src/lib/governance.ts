@@ -30,6 +30,15 @@ export interface GovernanceProposalDetail extends GovernanceProposalSummary {
 
 const NUMBER_FALLBACK = 0;
 
+function readEnv(key: string, fallback = ""): string {
+  if (typeof process === "undefined") return fallback.trim();
+  const value = process.env?.[key];
+  if (typeof value === "string" && value.trim()) {
+    return value.trim();
+  }
+  return fallback.trim();
+}
+
 function toNumber(value: unknown): number {
   if (typeof value === "number" && Number.isFinite(value)) return value;
   if (typeof value === "string") {
@@ -53,8 +62,11 @@ function parseDate(value: unknown): string | undefined {
 }
 
 function buildGovernanceUrl(path: string): string | null {
-  const base = env.demoApiBase || env.governanceApi;
-  if (!base) return null;
+  const base =
+    readEnv("NEXT_PUBLIC_GOVERNANCE_API_BASE") ||
+    readEnv("NEXT_PUBLIC_DEMO_API_BASE") ||
+    "/api/demo/governance";
+
   if (path.startsWith("http://") || path.startsWith("https://")) {
     return path;
   }
