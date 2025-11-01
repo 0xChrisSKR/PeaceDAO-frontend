@@ -1,7 +1,7 @@
 // src/lib/governance.ts
-import { env } from "../config/env";
 import type { LikeSnapshot, UserLikeState } from "@/types/like";
 
+/** ---------------- Types ---------------- */
 export interface GovernanceProposalLink { label: string; url: string; }
 export interface GovernanceProposalSummary {
   id: string; title: string; summary?: string; status?: string;
@@ -13,15 +13,19 @@ export interface GovernanceProposalDetail extends GovernanceProposalSummary {
   likeSnapshot: LikeSnapshot; user: UserLikeState;
 }
 
+/** ---------------- Utils ---------------- */
 const NUMBER_FALLBACK = 0;
 function toNumber(v: unknown){ if(typeof v==='number'&&Number.isFinite(v))return v; if(typeof v==='string'){const n=Number(v); if(Number.isFinite(n))return n;} return NUMBER_FALLBACK; }
 function parseDate(v: unknown){ if(typeof v==='number'&&Number.isFinite(v)) return new Date(v).toISOString(); if(typeof v==='string'&&v){ const t=Date.parse(v); if(!Number.isNaN(t)) return new Date(t).toISOString(); } return undefined; }
 
-function buildGovernanceBase(): string { return (process.env.NEXT_PUBLIC_GOVERNANCE_API || "").trim(); }
+/** Base URL from env (optional). Empty string = use relative path */
+function buildGovernanceBase(): string {
+  return (process.env.NEXT_PUBLIC_GOVERNANCE_API || "").trim();
+}
 export function buildGovernanceUrl(path: string): string {
   if(!path) return "";
   if(path.startsWith("http://")||path.startsWith("https://")) return path;
-  const base = buildGovernanceBase();
+  const base = buildGovernanceBase();                 // might be ""
   const normalizedBase = base.replace(/\/$/, "");
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   return `${normalizedBase}${normalizedPath}`;
@@ -31,6 +35,14 @@ export function getPeaceConfigUrl(): string {
   return buildGovernanceUrl(p);
 }
 
+/** Optional API key/header (public-safe). If undefined, we simply don't send it. */
+function getApiAuth() {
+  const key = (process.env.NEXT_PUBLIC_GOVERNANCE_API_KEY || "").trim();
+  const header = (process.env.NEXT_PUBLIC_GOVERNANCE_API_KEY_HEADER || "x-api-key").trim();
+  return { key: key || undefined, header };
+}
+
+/** ---------------- Links normalisers ---------------- */
 function normaliseLink(entry: unknown): GovernanceProposalLink | null {
   if (typeof entry === "string") return { label: entry, url: entry };
   if (!entry || typeof entry !== "object") return null;
@@ -50,6 +62,7 @@ function normaliseLinks(input: unknown): GovernanceProposalLink[] | undefined {
   return links.length ? links : undefined;
 }
 
+/** ---------------- Like / User normalisers ---------------- */
 export function normaliseLikeSnapshot(input: unknown, fallbackId: string): LikeSnapshot {
   const value = (input as Record<string, unknown>) ?? {};
   const base = (value.likeSnapshot as Record<string, unknown>) ?? (value.snapshot as Record<string, unknown>) ?? (value.likes as Record<string, unknown>) ?? value;
@@ -81,7 +94,6 @@ export function normaliseLikeSnapshot(input: unknown, fallbackId: string): LikeS
     lastLikedAt: (typeof parsedLast === "number" && Number.isFinite(parsedLast)) ? parsedLast : undefined
   };
 }
-
 export function normaliseUserState(input: unknown): UserLikeState {
   const v = (input as Record<string, unknown>) ?? {};
   const roles = Array.isArray(v.roles) ? v.roles.map((r)=>String(r).toLowerCase()) : [];
@@ -90,6 +102,7 @@ export function normaliseUserState(input: unknown): UserLikeState {
   return { hasLiked, isVerifier };
 }
 
+/** ---------------- Proposal normalisers ---------------- */
 export function normaliseProposalSummary(input: unknown): GovernanceProposalSummary | null {
   if (!input || typeof input !== "object") return null;
   const v = input as Record<string, unknown>;
@@ -112,7 +125,6 @@ export function normaliseProposalSummary(input: unknown): GovernanceProposalSumm
   const totalBackers = toNumber(v.totalBackers ?? v.backers ?? v.supporters ?? v.supporterCount ?? (v.metrics as Record<string, unknown>)?.backers ?? 0);
   return { id, title, summary, status, createdAt, updatedAt, category, coverImage, totalLikes, totalBackers };
 }
-
 export function normaliseProposalDetail(input: unknown): GovernanceProposalDetail | null {
   const summary = normaliseProposalSummary(input);
   if (!summary) return null;
@@ -129,11 +141,15 @@ export function normaliseProposalDetail(input: unknown): GovernanceProposalDetai
   return { ...summary, content, html, author, links, likeSnapshot, user };
 }
 
+/** ---------------- Fetch helpers (no env typing) ---------------- */
 export async function fetchGovernanceJson<T = unknown>(path: string, init?: RequestInit): Promise<T> {
   const url = buildGovernanceUrl(path);
   if (!url) throw new Error("GOVERNANCE_API_UNCONFIGURED");
+
   const headers = new Headers(init?.headers);
-  if (env.governanceApiKey) headers.set(env.governanceApiKeyHeader || "x-api-key", env.governanceApiKey);
+  const { key, header } = getApiAuth();
+  if (key) headers.set(header, key);
+
   const res = await fetch(url, { ...init, headers, cache: "no-store" });
   if (!res.ok) { const text = await res.text(); throw new Error(text || `Request failed with status ${res.status}`); }
   return res.json() as Promise<T>;
@@ -146,7 +162,10 @@ export async function forwardGovernanceRequest<T = unknown>(
 ): Promise<T> {
   const url = buildGovernanceUrl(path);
   if (!url) throw new Error("GOVERNANCE_API_UNCONFIGURED");
+
   const headers = new Headers(init.headers);
+
+  // forward selected headers from incoming request
   if (requestHeaders) {
     const allowed = ["authorization", "x-api-key"];
     for (const h of allowed) {
@@ -154,8 +173,13 @@ export async function forwardGovernanceRequest<T = unknown>(
       if (v) headers.set(h, v);
     }
   }
-  if (env.governanceApiKey) headers.set(env.governanceApiKeyHeader || "x-api-key", env.governanceApiKey);
+
+  // optional static api key from env
+  const { key, header } = getApiAuth();
+  if (key) headers.set(header, key);
+
   if (init.body && !headers.has("content-type")) headers.set("content-type", "application/json");
+
   const res = await fetch(url, { ...init, headers, cache: "no-store" });
   if (!res.ok) { const text = await res.text(); throw new Error(text || `Request failed with status ${res.status}`); }
   if (res.status === 204) return {} as T;
