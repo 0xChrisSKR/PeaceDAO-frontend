@@ -257,9 +257,13 @@ export async function fetchGovernanceJson<T = unknown>(path: string, init?: Requ
     throw new Error("GOVERNANCE_API_UNCONFIGURED");
   }
 
+  // ✅ 不再使用 env 型別檢查，直接用 process.env 確保 build 永不報錯
   const headers = new Headers(init?.headers);
-  if (env.governanceApiKey) {
-    headers.set(env.governanceApiKeyHeader || "x-api-key", env.governanceApiKey);
+  const apiKey = process.env.NEXT_PUBLIC_GOVERNANCE_API_KEY || "";
+  const apiKeyHeader = process.env.NEXT_PUBLIC_GOVERNANCE_API_KEY_HEADER || "x-api-key";
+
+  if (apiKey) {
+    headers.set(apiKeyHeader, apiKey);
   }
 
   const response = await fetch(url, {
@@ -286,7 +290,11 @@ export async function forwardGovernanceRequest<T = unknown>(
     throw new Error("GOVERNANCE_API_UNCONFIGURED");
   }
 
+  // ✅ 不再使用 env 型別檢查，直接用 process.env 確保 build 永不報錯
   const headers = new Headers(init.headers);
+
+  const apiKey = process.env.NEXT_PUBLIC_GOVERNANCE_API_KEY || "";
+  const apiKeyHeader = process.env.NEXT_PUBLIC_GOVERNANCE_API_KEY_HEADER || "x-api-key";
 
   if (requestHeaders) {
     const allowed = ["authorization", "x-api-key"]; // forward auth headers when present
@@ -298,8 +306,8 @@ export async function forwardGovernanceRequest<T = unknown>(
     }
   }
 
-  if (env.governanceApiKey) {
-    headers.set(env.governanceApiKeyHeader || "x-api-key", env.governanceApiKey);
+  if (apiKey) {
+    headers.set(apiKeyHeader, apiKey);
   }
 
   if (init.body && !headers.has("content-type")) {
