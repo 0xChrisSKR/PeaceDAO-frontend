@@ -1,5 +1,5 @@
 // app/page.tsx
-import { peaceConfig } from '@/lib/peaceConfig';
+import { peaceConfig } from '../lib/peaceConfig';
 
 function Icon({ name }: { name: keyof typeof peaceConfig.community }) {
   const SVG = {
