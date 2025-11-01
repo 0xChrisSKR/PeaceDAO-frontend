@@ -1,5 +1,3 @@
-import type { Abi } from "viem";
-
 export const peaceSwapRouterAbi = [
   {
     type: "function",
@@ -27,6 +25,6 @@ export const peaceSwapRouterAbi = [
     ],
     anonymous: false
   }
-] as const satisfies Abi;
+] as const;
 
 export default peaceSwapRouterAbi;

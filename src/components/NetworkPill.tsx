@@ -1,47 +1,38 @@
 "use client";
 
-import { useChainId, useSwitchChain, useChains } from "wagmi";
-import { useMemo } from "react";
-import { bsc, DEFAULT_CHAIN } from "@/config/chains";
+import { useMemo, useState } from "react";
+
+import { DEFAULT_CHAIN } from "@/config/chains";
+import { useWallet } from "@/hooks/useWallet";
 
 export function NetworkPill() {
-  const chainId = useChainId();
-  const chains = useChains();
-  const { switchChainAsync, isPending } = useSwitchChain();
+  const { chainId, switchToDefaultChain, isConnected } = useWallet();
+  const [isSwitching, setSwitching] = useState(false);
 
-  const current = useMemo(
-    () => chains.find((chain) => chain.id === chainId) ?? DEFAULT_CHAIN,
-    [chains, chainId]
-  );
+  const isOnDefaultChain = useMemo(() => {
+    if (!chainId) return false;
+    return chainId === DEFAULT_CHAIN.id;
+  }, [chainId]);
 
-  const nextChain = useMemo(() => {
-    if (!chains.length) return undefined;
-    if (current.id === chains[0].id && chains[1]) return chains[1];
-    return chains[0];
-  }, [chains, current.id]);
-
-  const label = useMemo(() => {
-    if (current.id === bsc.id) return "BSC Mainnet";
-    return current.name ?? "Unknown";
-  }, [current]);
-
-  const handleClick = async () => {
-    if (!nextChain) return;
+  const handleSwitch = async () => {
     try {
-      await switchChainAsync({ chainId: nextChain.id });
+      setSwitching(true);
+      await switchToDefaultChain();
     } catch (error) {
-      console.error(error);
+      console.error("Failed to switch chain", error);
+    } finally {
+      setSwitching(false);
     }
   };
 
   return (
     <button
-      onClick={handleClick}
+      onClick={handleSwitch}
       type="button"
-      disabled={!nextChain || isPending}
+      disabled={!isConnected || isOnDefaultChain || isSwitching}
       className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
     >
-      {isPending ? "Switching..." : label}
+      {isSwitching ? "Switching..." : isOnDefaultChain ? DEFAULT_CHAIN.name : `Switch to ${DEFAULT_CHAIN.name}`}
     </button>
   );
 }

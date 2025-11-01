@@ -1,9 +1,9 @@
 "use client";
 
-import clsx from "clsx";
-import { useMemo, useState } from "react";
+import { useCallback } from "react";
 import toast from "react-hot-toast";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
+
+import { useWallet } from "@/hooks/useWallet";
 import { useLanguage } from "@/components/LanguageProvider";
 
 function shorten(address?: string) {
@@ -13,36 +13,31 @@ function shorten(address?: string) {
 
 export function WalletControls() {
   const { dictionary } = useLanguage();
-  const { address, isConnecting, isConnected } = useAccount();
-  const { connectAsync, connectors, isPending, variables } = useConnect();
-  const { disconnectAsync } = useDisconnect();
-  const [open, setOpen] = useState(false);
+  const { address, connect, disconnect, isConnecting, isConnected } = useWallet();
 
-  const availableConnectors = useMemo(() => connectors.filter((connector) => connector.id), [connectors]);
-
-  const handleConnect = async (id: string) => {
-    const connector = availableConnectors.find((item) => item.id === id);
-    if (!connector) return;
-
+  const handleConnect = useCallback(async () => {
     try {
-      await connectAsync({ connector });
+      const account = await connect();
+      if (!account) {
+        toast.error("請安裝支援的錢包");
+        return;
+      }
       toast.success(dictionary.wallet.connect);
-      setOpen(false);
     } catch (error: any) {
-      const message = error?.shortMessage ?? error?.message ?? "Failed to connect";
+      const message = error?.message ?? "Failed to connect";
       toast.error(message);
     }
-  };
+  }, [connect, dictionary.wallet.connect]);
 
-  const handleDisconnect = async () => {
+  const handleDisconnect = useCallback(() => {
     try {
-      await disconnectAsync();
+      disconnect();
       toast.success(dictionary.wallet.disconnect);
     } catch (error: any) {
-      const message = error?.shortMessage ?? error?.message ?? "Failed to disconnect";
+      const message = error?.message ?? "Failed to disconnect";
       toast.error(message);
     }
-  };
+  }, [disconnect, dictionary.wallet.disconnect]);
 
   const handleCopy = async () => {
     if (!address) return;
@@ -54,7 +49,7 @@ export function WalletControls() {
     }
   };
 
-  if (isConnected) {
+  if (isConnected && address) {
     return (
       <div className="flex items-center gap-2">
         <button
@@ -76,43 +71,13 @@ export function WalletControls() {
   }
 
   return (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((value) => !value)}
-        className="inline-flex items-center rounded-full border border-emerald-200 bg-white/80 px-4 py-2 text-sm font-semibold text-emerald-600 shadow-sm transition hover:bg-white"
-      >
-        {isConnecting ? dictionary.wallet.connecting : dictionary.wallet.connect}
-      </button>
-      {open ? (
-        <div className="absolute right-0 z-50 mt-3 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
-          <div className="flex flex-col gap-2">
-            {availableConnectors.map((connector) => {
-              const isCurrent = (variables?.connector as { id?: string } | undefined)?.id === connector.id;
-              return (
-                <button
-                  key={connector.id}
-                  type="button"
-                  onClick={() => handleConnect(connector.id)}
-                  disabled={!connector.ready}
-                  className={clsx(
-                    "rounded-xl border border-slate-200 px-4 py-2 text-left text-sm font-medium text-slate-700 transition hover:border-emerald-400 hover:bg-emerald-50",
-                    (!connector.ready || (isPending && isCurrent)) && "opacity-60"
-                  )}
-                >
-                  {connector.name}
-                  {isPending && isCurrent ? "…" : ""}
-                </button>
-              );
-            })}
-            {availableConnectors.length === 0 ? (
-              <p className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
-                {dictionary.wallet.noConnector}
-              </p>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
-    </div>
+    <button
+      type="button"
+      onClick={handleConnect}
+      className="inline-flex items-center rounded-full border border-emerald-200 bg-white/80 px-4 py-2 text-sm font-semibold text-emerald-600 shadow-sm transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-70"
+      disabled={isConnecting}
+    >
+      {isConnecting ? dictionary.wallet.connecting : dictionary.wallet.connect}
+    </button>
   );
 }

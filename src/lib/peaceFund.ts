@@ -1,5 +1,5 @@
 import { env } from "@/config/env";
-import { isAddress } from "viem";
+import { isAddress } from "@/lib/address";
 
 export interface PeaceFundResolution {
   address: string;
