@@ -62,7 +62,8 @@ const BASE_TOKENS: TokenInfo[] = [
 ];
 
 function getPeaceToken(): TokenInfo | null {
-  const { peaceToken } = env;
+  // 安全讀取 peaceToken，若未設定則使用 TOKEN_ADDRESS 或 TOKEN
+  const peaceToken = env.peaceToken || env.TOKEN_ADDRESS || env.TOKEN;
   if (!peaceToken || !isAddress(peaceToken)) {
     return null;
   }
