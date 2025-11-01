@@ -30,6 +30,27 @@ export interface GovernanceProposalDetail extends GovernanceProposalSummary {
 
 const NUMBER_FALLBACK = 0;
 
+// Unified base URL resolver for governance API.
+// Prefer public (client-side) variables, fallback to server-side names for SSR.
+export const GOV_BASE =
+  process.env.NEXT_PUBLIC_GOVERNANCE_API ||
+  process.env.NEXT_PUBLIC_DEMO_API_BASE ||
+  process.env.GOVERNANCE_API ||
+  process.env.DEMO_API_BASE ||
+  "";
+
+export function buildGovernanceUrl(path: string): string | null {
+  const base = GOV_BASE.trim();
+  if (!base) return null;
+
+  // If already absolute, return as-is
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+
+  const cleanBase = base.replace(/\/+$/, "");
+  const cleanPath = path.replace(/^\/+/, "");
+  return `${cleanBase}/${cleanPath}`;
+}
+
 function toNumber(value: unknown): number {
   if (typeof value === "number" && Number.isFinite(value)) return value;
   if (typeof value === "string") {
@@ -50,17 +71,6 @@ function parseDate(value: unknown): string | undefined {
     }
   }
   return undefined;
-}
-
-function buildGovernanceUrl(path: string): string | null {
-  const base = env.demoApiBase || env.governanceApi;
-  if (!base) return null;
-  if (path.startsWith("http://") || path.startsWith("https://")) {
-    return path;
-  }
-  const normalizedBase = base.replace(/\/$/, "");
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-  return `${normalizedBase}${normalizedPath}`;
 }
 
 function normaliseLink(entry: unknown): GovernanceProposalLink | null {
