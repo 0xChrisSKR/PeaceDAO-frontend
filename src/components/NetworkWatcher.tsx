@@ -2,35 +2,34 @@
 
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useAccount, useChainId, useSwitchChain } from "wagmi";
+
 import { DEFAULT_CHAIN } from "@/config/chains";
 import { useLanguage } from "@/components/LanguageProvider";
+import { useWallet } from "@/hooks/useWallet";
 
 const TOAST_ID = "network-mismatch";
 
 export function NetworkWatcher() {
   const { dictionary } = useLanguage();
-  const { isConnected } = useAccount();
-  const chainId = useChainId();
-  const { switchChainAsync } = useSwitchChain();
+  const { isConnected, chainId, switchToDefaultChain } = useWallet();
   const [isSwitching, setSwitching] = useState(false);
 
   const handleSwitch = useCallback(async () => {
     try {
       setSwitching(true);
-      await switchChainAsync({ chainId: DEFAULT_CHAIN.id });
+      await switchToDefaultChain();
       toast.success(`${dictionary.wallet.switch} ${DEFAULT_CHAIN.name}`);
       toast.dismiss(TOAST_ID);
     } catch (error: any) {
-      const message = error?.shortMessage ?? error?.message ?? "Failed to switch";
+      const message = error?.message ?? "Failed to switch";
       toast.error(message);
     } finally {
       setSwitching(false);
     }
-  }, [dictionary.wallet.switch, switchChainAsync]);
+  }, [dictionary.wallet.switch, switchToDefaultChain]);
 
   useEffect(() => {
-    if (!isConnected || chainId === DEFAULT_CHAIN.id) {
+    if (!isConnected || chainId == null || chainId === DEFAULT_CHAIN.id) {
       toast.dismiss(TOAST_ID);
       return;
     }

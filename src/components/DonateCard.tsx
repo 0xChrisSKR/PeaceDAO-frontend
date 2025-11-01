@@ -1,11 +1,10 @@
 "use client";
-import React, { useMemo, useState } from "react";
-import { parseEther } from "viem";
-import { getWalletClient } from "../lib/viem";
+import React, { useState } from "react";
+
 import { CONTRACTS } from "../config/contracts";
 import { ENV } from "@/lib/env";
-// 需要你已經有 src/abis/Donation.ts（上一包離線匯出腳本已產生）
-import { DonationABI } from "@/abis/Donation";
+import { useWallet } from "@/hooks/useWallet";
+import { sendTransaction } from "@/lib/wallet";
 
 const explorerByChain: Record<number, string> = {
   1: "https://etherscan.io",
@@ -25,30 +24,31 @@ export default function DonateCard() {
   const [tx, setTx] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const donation = (CONTRACTS.DONATION_ADDRESS || "") as `0x${string}`;
-
-  const hasDonateFn = useMemo(
-    () => Array.isArray(DonationABI) && (DonationABI as any[]).some((f) => f.type === "function" && f.name === "donate"),
-    []
-  );
+  const { address, connect, isConnecting } = useWallet();
 
   const doDonate = async () => {
-    if (!donation) return alert("Donation address 未設定");
-    setBusy(true); setTx(null);
-    try {
-      const wallet = await getWalletClient();
-      const value = parseEther(amt as `${number}`);
-      let hash: `0x${string}`;
+    if (!donation) {
+      alert("Donation address 未設定");
+      return;
+    }
 
-      if (hasDonateFn) {
-        hash = await (wallet as any).writeContract({
-          address: donation,
-          abi: DonationABI as any,
-          functionName: "donate",
-          value,
-        });
-      } else {
-        hash = await wallet.sendTransaction({ to: donation, value });
+    setBusy(true);
+    setTx(null);
+
+    try {
+      const numericAmount = Number(amt);
+      if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+        throw new Error("請輸入有效的捐款金額");
       }
+
+      let from = address;
+      if (!from) {
+        from = await connect();
+      }
+      if (!from) {
+        throw new Error("請先連接錢包");
+      }
+      const hash = await sendTransaction(donation, amt, from);
       setTx(hash);
     } catch (e: any) {
       console.error(e);
@@ -71,8 +71,8 @@ export default function DonateCard() {
           placeholder="Amount (ETH/BNB)"
           style={{ flex: 1, padding: 8 }}
         />
-        <button onClick={doDonate} disabled={busy || !donation} style={{ padding: "8px 12px" }}>
-          {busy ? "Donating..." : "Donate"}
+        <button onClick={doDonate} disabled={busy || isConnecting || !donation} style={{ padding: "8px 12px" }}>
+          {busy ? "Donating..." : isConnecting ? "Connecting..." : "Donate"}
         </button>
       </div>
       {tx && (

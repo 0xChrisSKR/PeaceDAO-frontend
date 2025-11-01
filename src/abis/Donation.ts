@@ -1,5 +1,3 @@
-import type { Abi } from "viem";
-
 export const DonationABI = [
   {
     type: "function",
@@ -25,6 +23,6 @@ export const DonationABI = [
     ],
     anonymous: false
   }
-] as const satisfies Abi;
+] as const;
 
 export default DonationABI;
