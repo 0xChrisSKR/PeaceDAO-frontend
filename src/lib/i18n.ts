@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 
-// ✅ 新增兩個 export，修正 LanguageProvider.tsx 引用錯誤
 export type Dictionary = Record<string, string>;
 export const DEFAULT_LOCALE = 'zh';
 
@@ -32,7 +31,7 @@ const dict: Record<'zh' | 'en', Dictionary> = {
     goDonate: '前往捐款',
     donateDesc: '錢包直接把原生幣打到和平基金（鏈上）。',
     sending: '送出中…',
-    send: '送出',
+    send: '送出'
   },
   en: {
     heroTitle: 'Make World Peace Real — On-chain Charity.',
@@ -60,7 +59,7 @@ const dict: Record<'zh' | 'en', Dictionary> = {
     goDonate: 'Go to Donate',
     donateDesc: 'Send native token directly to the Peace Fund (on-chain).',
     sending: 'Sending...',
-    send: 'Send',
+    send: 'Send'
   }
 };
 
@@ -68,15 +67,12 @@ export function useI18n() {
   const [lang, setLang] = useState<'zh' | 'en'>(
     (typeof window !== 'undefined' && (localStorage.getItem('lang') as 'zh' | 'en')) || DEFAULT_LOCALE
   );
-
   const t = (k: string, fallback?: string) =>
     (dict[lang] as Dictionary)[k] ?? fallback ?? k;
-
   const toggle = () => {
     const next = lang === 'zh' ? 'en' : 'zh';
     setLang(next);
     if (typeof window !== 'undefined') localStorage.setItem('lang', next);
   };
-
   return { t, lang, toggle };
 }
