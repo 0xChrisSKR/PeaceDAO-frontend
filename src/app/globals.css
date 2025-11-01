@@ -3,65 +3,33 @@
 @tailwind utilities;
 
 html, body {
-  color: rgb(228 228 231 / 1);
   background-color: #000;
+  color: #fff;
+  font-family: 'Inter', 'Noto Sans TC', sans-serif;
 }
 
-a {
-  color: inherit;
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(243,186,47,0.15), transparent 70%),
+              radial-gradient(circle at bottom left, rgba(255,255,255,0.08), transparent 70%);
+  pointer-events: none;
+  z-index: -1;
 }
 
-.prose {
-  color: inherit;
-  font-size: 1rem;
-  line-height: 1.75;
+.btn-gold {
+  @apply px-5 py-2.5 rounded-lg font-semibold bg-gradient-to-r from-yellow-400 to-amber-500 text-black shadow-lg hover:shadow-amber-500/30 transition;
 }
 
-.prose h1,
-.prose h2,
-.prose h3,
-.prose h4 {
-  color: #f4f4f5;
-  font-weight: 600;
-  line-height: 1.2;
+.card {
+  @apply rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-5;
 }
 
-.prose h1 {
-  font-size: 2.25rem;
-  margin-bottom: 1rem;
+.title {
+  @apply text-3xl font-extrabold bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text text-transparent;
 }
 
-.prose h2 {
-  font-size: 1.5rem;
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.prose ul {
-  margin-left: 1.25rem;
-  list-style: disc;
-}
-
-.prose li + li {
-  margin-top: 0.25rem;
-}
-
-.prose hr {
-  margin: 2rem 0;
-  border-color: rgba(250, 204, 21, 0.3);
-}
-
-.prose p {
-  margin-top: 1rem;
-}
-
-.prose .opacity-70 {
-  opacity: 0.7;
-}
-button {
-  transition: all 0.2s ease;
-}
-button:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
+.nav {
+  @apply flex justify-between items-center py-3 px-6 border-b border-white/10 bg-black/60 backdrop-blur-lg fixed top-0 inset-x-0 z-50;
 }
