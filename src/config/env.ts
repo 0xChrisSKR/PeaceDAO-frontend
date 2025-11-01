@@ -1,6 +1,13 @@
 // Centralized public runtime config pulled from NEXT_PUBLIC_*
 // Expose both `env` (default) and named helpers for legacy imports.
 
+export type Network = 'bsc' | 'bsctest';
+
+const _network =
+  (process.env.NEXT_PUBLIC_NETWORK ??
+    process.env.NEXT_PUBLIC_CHAIN ??
+    'bsc') as Network;
+
 export const env = {
   PEACE_FUND: process.env.NEXT_PUBLIC_PEACE_FUND ?? '',
   RPC_BSC: process.env.NEXT_PUBLIC_RPC_BSC ?? '',
@@ -12,12 +19,10 @@ export const env = {
   TG_VERIFIED: process.env.NEXT_PUBLIC_TG_VERIFIED ?? '',
   WC_PROJECT_ID: process.env.NEXT_PUBLIC_WC_PROJECT_ID ?? '',
   WHITEPAPER_URL: process.env.NEXT_PUBLIC_WHITEPAPER_URL ?? '',
+  // social links
   twitter: process.env.NEXT_PUBLIC_TWITTER ?? process.env.NEXT_PUBLIC_TWITTER_URL ?? '',
-  // add network selector
-  NETWORK:
-    process.env.NEXT_PUBLIC_NETWORK ??
-    process.env.NEXT_PUBLIC_CHAIN ??
-    'bsc',
+  // typed network
+  NETWORK: _network,
 };
 
 export type Env = typeof env;
