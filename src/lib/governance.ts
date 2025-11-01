@@ -52,15 +52,16 @@ function parseDate(value: unknown): string | undefined {
   return undefined;
 }
 
-function buildGovernanceUrl(path: string): string | null {
-  const base = env.demoApiBase || env.governanceApi;
-  if (!base) return null;
-  if (path.startsWith("http://") || path.startsWith("https://")) {
-    return path;
+export function buildGovernanceUrl(path: string): string {
+  if (!path) return "/api/demo/governance";
+  const trimmed = path.trim();
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
   }
-  const normalizedBase = base.replace(/\/$/, "");
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-  return `${normalizedBase}${normalizedPath}`;
+  if (trimmed.startsWith("/")) {
+    return trimmed.replace(/\/{2,}/g, "/");
+  }
+  return `/${trimmed}`.replace(/\/{2,}/g, "/");
 }
 
 function normaliseLink(entry: unknown): GovernanceProposalLink | null {
@@ -253,9 +254,6 @@ export function normaliseProposalDetail(input: unknown): GovernanceProposalDetai
 
 export async function fetchGovernanceJson<T = unknown>(path: string, init?: RequestInit): Promise<T> {
   const url = buildGovernanceUrl(path);
-  if (!url) {
-    throw new Error("GOVERNANCE_API_UNCONFIGURED");
-  }
 
   const headers = new Headers(init?.headers);
   if (env.governanceApiKey) {
@@ -282,9 +280,6 @@ export async function forwardGovernanceRequest<T = unknown>(
   requestHeaders?: Headers
 ): Promise<T> {
   const url = buildGovernanceUrl(path);
-  if (!url) {
-    throw new Error("GOVERNANCE_API_UNCONFIGURED");
-  }
 
   const headers = new Headers(init.headers);
 
