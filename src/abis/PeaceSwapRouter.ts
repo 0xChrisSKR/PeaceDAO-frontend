@@ -1,32 +1,4 @@
-import type { Abi } from "viem";
+// Placeholder PeaceSwap router ABI. Update when integration resumes.
+export const PeaceSwapRouterABI = [] as const;
 
-export const peaceSwapRouterAbi = [
-  {
-    type: "function",
-    name: "swapExactTokensForTokensWithFee",
-    stateMutability: "nonpayable",
-    inputs: [
-      { name: "amountIn", type: "uint256" },
-      { name: "amountOutMin", type: "uint256" },
-      { name: "path", type: "address[]" },
-      { name: "to", type: "address" },
-      { name: "deadline", type: "uint256" }
-    ],
-    outputs: [{ name: "amounts", type: "uint256[]" }]
-  },
-  {
-    type: "event",
-    name: "SwapWithFee",
-    inputs: [
-      { name: "sender", type: "address", indexed: true },
-      { name: "tokenIn", type: "address", indexed: true },
-      { name: "tokenOut", type: "address", indexed: true },
-      { name: "amountIn", type: "uint256", indexed: false },
-      { name: "fee", type: "uint256", indexed: false },
-      { name: "amountOut", type: "uint256", indexed: false }
-    ],
-    anonymous: false
-  }
-] as const satisfies Abi;
-
-export default peaceSwapRouterAbi;
+export default PeaceSwapRouterABI;

@@ -2,9 +2,12 @@
 const nextConfig = {
   webpack: (config) => {
     config.resolve = config.resolve || {};
-    config.resolve.alias = config.resolve.alias || {};
-    // 避免瀏覽器端解析 pino-pretty
-    config.resolve.alias['pino-pretty'] = false;
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      '@wagmi/core': false,
+      '@web3modal/wagmi': false,
+      'viem': false
+    };
     return config;
   }
 };
