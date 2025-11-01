@@ -1,6 +1,9 @@
 'use client';
 import { useState } from 'react';
 
+// ✅ 新增這行修正 LanguageProvider 錯誤
+export const DEFAULT_LOCALE = 'zh';
+
 const dict = {
   zh: {
     heroTitle: '讓世界和平成真 — 區塊鏈慈善',
@@ -10,7 +13,7 @@ const dict = {
     treasury: '國庫',
     price: '價格',
     officialLinks: '官方連結',
-    socialAndListings: '社群與上架', // ✅ 補上
+    socialAndListings: '社群與上架',
     linksHint: '官網 / X / TG / Discord / GitHub / GitBook / CMC / CoinGecko',
     verifier: '驗證者',
     fee: '手續費',
@@ -38,7 +41,7 @@ const dict = {
     treasury: 'Treasury',
     price: 'Price',
     officialLinks: 'Official Links',
-    socialAndListings: 'Community & Listings', // ✅ 補上
+    socialAndListings: 'Community & Listings',
     linksHint: 'Website / X / TG / Discord / GitHub / GitBook / CMC / CoinGecko',
     verifier: 'Verifier',
     fee: 'Fee',
@@ -61,12 +64,10 @@ const dict = {
 };
 
 export function useI18n() {
-  // 保留語言偏好
   const [lang, setLang] = useState<'zh'|'en'>(
-    (typeof window !== 'undefined' && (localStorage.getItem('lang') as 'zh'|'en')) || 'zh'
+    (typeof window !== 'undefined' && (localStorage.getItem('lang') as 'zh'|'en')) || DEFAULT_LOCALE
   );
 
-  // ✅ 放寬 key 型別，避免日後新增文案時再卡編譯
   const t = (k: string, fallback?: string) =>
     (dict[lang] as Record<string, string>)[k] ?? fallback ?? k;
 
