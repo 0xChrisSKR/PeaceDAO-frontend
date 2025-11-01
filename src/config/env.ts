@@ -1,28 +1,20 @@
-export const WHITEPAPER_URL = process.env.NEXT_PUBLIC_WHITEPAPER_URL ?? "/whitepaper.pdf";
-
+// Centralized public runtime config pulled from NEXT_PUBLIC_*
+// Expose both `env` (default) and named `ENV` for legacy imports.
 export const env = {
-  NETWORK: process.env.NEXT_PUBLIC_NETWORK ?? "bsc",
-  WC_PROJECT_ID: process.env.NEXT_PUBLIC_WC_PROJECT_ID ?? "",
-  RPC_BSC: process.env.NEXT_PUBLIC_RPC_BSC ?? "",
-  RPC_BSC_TEST: process.env.NEXT_PUBLIC_RPC_BSC_TEST ?? "",
-  PEACE_FUND: process.env.NEXT_PUBLIC_PEACE_FUND ?? "",
-  TOKEN: process.env.NEXT_PUBLIC_TOKEN ?? "WORLDPEACE",
-  FOUNDER_BSCTEST: process.env.NEXT_PUBLIC_FOUNDER_BSCTEST ?? "",
-  CONFIG_PATH: "/config" as const,
-  wcProjectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID ?? "",
-  rpcBsc: process.env.NEXT_PUBLIC_RPC_BSC ?? "",
-  rpcBscTest: process.env.NEXT_PUBLIC_RPC_BSC_TEST ?? "",
-  peaceFund: process.env.NEXT_PUBLIC_PEACE_FUND ?? "",
-  peaceFundHints: (process.env.NEXT_PUBLIC_PEACE_FUND_HINTS ?? "")
-    .split(",")
-    .map((hint) => hint.trim())
-    .filter(Boolean),
-  demoApiBase: process.env.NEXT_PUBLIC_DEMO_API_BASE ?? "",
-  demoConfigPath: process.env.NEXT_PUBLIC_DEMO_CONFIG_PATH ?? "/config.json",
-  governanceApi: process.env.NEXT_PUBLIC_GOVERNANCE_API ?? "",
-  governanceApiKey: process.env.NEXT_PUBLIC_GOVERNANCE_API_KEY ?? "",
-  governanceApiKeyHeader: process.env.NEXT_PUBLIC_GOVERNANCE_API_KEY_HEADER ?? "",
-  peaceSwapRouter: process.env.NEXT_PUBLIC_PEACE_SWAP_ROUTER ?? "",
-  peaceToken: process.env.NEXT_PUBLIC_TOKEN ?? "WORLDPEACE",
-  twitter: process.env.NEXT_PUBLIC_TWITTER ?? "https://x.com/WorldPeace_DAO"
-} as const;
+  PEACE_FUND: process.env.NEXT_PUBLIC_PEACE_FUND ?? '',
+  RPC_BSC: process.env.NEXT_PUBLIC_RPC_BSC ?? '',
+  RPC_BSC_TEST: process.env.NEXT_PUBLIC_RPC_BSC_TEST ?? '',
+  TOKEN: process.env.NEXT_PUBLIC_TOKEN ?? '',
+  TOKEN_ADDRESS: process.env.NEXT_PUBLIC_TOKEN_ADDRESS ?? '',
+  CONFIG_PATH: process.env.NEXT_PUBLIC_PEACEDAO_CONFIG_PATH ?? '/api/peace/config',
+  TG_PUBLIC: process.env.NEXT_PUBLIC_TG_PUBLIC ?? '',
+  TG_VERIFIED: process.env.NEXT_PUBLIC_TG_VERIFIED ?? '',
+  WC_PROJECT_ID: process.env.NEXT_PUBLIC_WC_PROJECT_ID ?? '',
+};
+
+// Type helper
+export type Env = typeof env;
+
+// Export both styles so existing imports keep working
+export default env;
+export const ENV = env;
