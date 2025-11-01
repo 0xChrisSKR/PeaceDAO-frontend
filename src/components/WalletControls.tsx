@@ -1,118 +1,65 @@
-"use client";
+'use client';
 
-import clsx from "clsx";
-import { useMemo, useState } from "react";
-import toast from "react-hot-toast";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { useLanguage } from "@/components/LanguageProvider";
+import { useState } from 'react';
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { toast } from 'react-hot-toast';
+import { useLanguage } from './LanguageProvider';
 
-function shorten(address?: string) {
-  if (!address) return "";
-  return `${address.slice(0, 6)}…${address.slice(-4)}`;
-}
-
-export function WalletControls() {
-  const { dictionary } = useLanguage();
+export default function WalletControls() {
   const { address, isConnecting, isConnected } = useAccount();
-  const { connectAsync, connectors, isPending, variables } = useConnect();
+  const { connectAsync, connectors, isPending } = useConnect();
   const { disconnectAsync } = useDisconnect();
+  const { dictionary } = useLanguage();
+
   const [open, setOpen] = useState(false);
 
-  const availableConnectors = useMemo(() => connectors.filter((connector) => connector.id), [connectors]);
-
-  const handleConnect = async (id: string) => {
-    const connector = availableConnectors.find((item) => item.id === id);
-    if (!connector) return;
-
+  async function handleConnect() {
     try {
+      const connector = connectors[0];
       await connectAsync({ connector });
-      toast.success(dictionary.wallet.connect);
+      toast.success(dictionary?.connect ?? 'Connected');
       setOpen(false);
-    } catch (error: any) {
-      const message = error?.shortMessage ?? error?.message ?? "Failed to connect";
-      toast.error(message);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(dictionary?.error ?? 'Failed to connect');
     }
-  };
+  }
 
-  const handleDisconnect = async () => {
+  async function handleDisconnect() {
     try {
       await disconnectAsync();
-      toast.success(dictionary.wallet.disconnect);
-    } catch (error: any) {
-      const message = error?.shortMessage ?? error?.message ?? "Failed to disconnect";
-      toast.error(message);
+      toast.success(dictionary?.disconnect ?? 'Disconnected');
+    } catch (err: any) {
+      console.error(err);
+      toast.error(dictionary?.error ?? 'Failed to disconnect');
     }
-  };
-
-  const handleCopy = async () => {
-    if (!address) return;
-    try {
-      await navigator.clipboard.writeText(address);
-      toast.success(dictionary.wallet.copied);
-    } catch {
-      toast.error("Unable to copy");
-    }
-  };
-
-  if (isConnected) {
-    return (
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={handleCopy}
-          className="inline-flex items-center gap-2 rounded-full border border-emerald-300 bg-white/80 px-4 py-2 text-sm font-medium text-emerald-700 shadow-sm transition hover:bg-white"
-        >
-          <span>{shorten(address)}</span>
-        </button>
-        <button
-          type="button"
-          onClick={handleDisconnect}
-          className="rounded-full border border-transparent bg-emerald-500 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-600"
-        >
-          {dictionary.wallet.disconnect}
-        </button>
-      </div>
-    );
   }
 
   return (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((value) => !value)}
-        className="inline-flex items-center rounded-full border border-emerald-200 bg-white/80 px-4 py-2 text-sm font-semibold text-emerald-600 shadow-sm transition hover:bg-white"
-      >
-        {isConnecting ? dictionary.wallet.connecting : dictionary.wallet.connect}
-      </button>
-      {open ? (
-        <div className="absolute right-0 z-50 mt-3 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
-          <div className="flex flex-col gap-2">
-            {availableConnectors.map((connector) => {
-              const isCurrent = (variables?.connector as { id?: string } | undefined)?.id === connector.id;
-              return (
-                <button
-                  key={connector.id}
-                  type="button"
-                  onClick={() => handleConnect(connector.id)}
-                  disabled={!connector.ready}
-                  className={clsx(
-                    "rounded-xl border border-slate-200 px-4 py-2 text-left text-sm font-medium text-slate-700 transition hover:border-emerald-400 hover:bg-emerald-50",
-                    (!connector.ready || (isPending && isCurrent)) && "opacity-60"
-                  )}
-                >
-                  {connector.name}
-                  {isPending && isCurrent ? "…" : ""}
-                </button>
-              );
-            })}
-            {availableConnectors.length === 0 ? (
-              <p className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
-                {dictionary.wallet.noConnector}
-              </p>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
+    <div className="flex items-center gap-3 text-white">
+      {isConnected ? (
+        <>
+          <button
+            onClick={handleDisconnect}
+            className="rounded-md bg-red-600 px-3 py-1.5 text-sm hover:bg-red-700 transition-all"
+          >
+            {dictionary?.disconnect ?? 'Disconnect'}
+          </button>
+          <span className="text-xs opacity-75">
+            {address?.slice(0, 6)}...{address?.slice(-4)}
+          </span>
+        </>
+      ) : (
+        <button
+          onClick={handleConnect}
+          disabled={isConnecting || isPending}
+          className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm hover:bg-emerald-700 transition-all disabled:opacity-50"
+        >
+          {isConnecting
+            ? dictionary?.connecting ?? 'Connecting...'
+            : dictionary?.connect ?? 'Connect Wallet'}
+        </button>
+      )}
     </div>
   );
 }
