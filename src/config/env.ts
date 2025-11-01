@@ -26,3 +26,6 @@ export const env = {
   peaceToken: process.env.NEXT_PUBLIC_TOKEN ?? "WORLDPEACE",
   twitter: process.env.NEXT_PUBLIC_TWITTER ?? "https://x.com/WorldPeace_DAO"
 } as const;
+
+// ✅ 保留舊寫法相容用
+export const ENV = env;
