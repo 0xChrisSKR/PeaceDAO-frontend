@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { ENV } from "./env";
+import { env } from "./env";
 
 // 🔹 JSON 檔案位置
 const jsonPath = path.join(process.cwd(), "src/config/addresses.local.json");
@@ -24,7 +24,7 @@ const MAP: Record<string, keyof typeof ADDR> = {
 // 🔹 取對應欄位
 export function resolveAddress(
   key: "DONATION_ADDRESS" | "TREASURY_ADDRESS" | "GOVERNANCE_ADDRESS",
-  net: "bsc" | "bsctest" = ENV.NETWORK
+  net: "bsc" | "bsctest" = env.NETWORK === "bsc" ? "bsc" : "bsctest"
 ) {
   const chainId = MAP[net];
   return ADDR[chainId]?.[key] || "0x0000000000000000000000000000000000000000";

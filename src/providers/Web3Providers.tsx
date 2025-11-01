@@ -1,27 +1,11 @@
 "use client";
 
 import { ReactNode, useEffect, useRef } from "react";
-import { WagmiProvider, createConfig } from "wagmi";
-import { bsc, bscTestnet } from "wagmi/chains";
-import { http } from "viem";
+import { WagmiConfig, type Config } from "wagmi";
 import { createWeb3Modal } from "@web3modal/wagmi/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const PROJECT_ID = process.env.NEXT_PUBLIC_WC_PROJECT_ID ?? "";
-const NETWORK = (process.env.NEXT_PUBLIC_NETWORK ?? "bsc").toLowerCase();
-
-const chains = (NETWORK === "bsctest" || NETWORK === "bsc_test") ? [bscTestnet] : [bsc];
-
-const transports = {
-  [bsc.id]: http(process.env.NEXT_PUBLIC_RPC_BSC),
-  [bscTestnet.id]: http(process.env.NEXT_PUBLIC_RPC_BSC_TEST)
-} as const;
-
-const wagmiConfig = createConfig({
-  chains,
-  transports,
-  multiInjectedProviderDiscovery: true
-});
+import { wagmiConfig, projectId, chains } from "@/lib/wagmi";
 
 const queryClient = new QueryClient();
 
@@ -30,9 +14,9 @@ export default function Web3Providers({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (inited.current) return;
     createWeb3Modal({
-      wagmiConfig,
-      projectId: PROJECT_ID,
-      defaultChain: chains[0],
+      wagmiConfig: wagmiConfig as any,
+      projectId,
+      defaultChain: chains[0] as any,
       enableAnalytics: false,
       themeMode: "dark"
     });
@@ -40,10 +24,10 @@ export default function Web3Providers({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <WagmiProvider config={wagmiConfig}>
+    <WagmiConfig config={wagmiConfig as unknown as Config}>
       <QueryClientProvider client={queryClient}>
         {children}
       </QueryClientProvider>
-    </WagmiProvider>
+    </WagmiConfig>
   );
 }

@@ -1,20 +1,17 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import Web3Providers from "@/providers/Web3Providers";
+import './globals.css'
+import Header from '@/components/Header'
+import Footer from '@/components/Footer'
 
-export const metadata: Metadata = {
-  title: "WorldPeace DAO",
-  description: "Decentralized fundraising & governance"
-};
+export const metadata = { title: 'WorldPeace DAO', description: 'BSC-only governance & donations' }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh-Hant">
-      <body suppressHydrationWarning>
-        <Web3Providers>
-          {children}
-        </Web3Providers>
+      <body>
+        <Header />
+        {children}
+        <Footer />
       </body>
     </html>
-  );
+  )
 }

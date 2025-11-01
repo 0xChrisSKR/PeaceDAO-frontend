@@ -47,7 +47,7 @@ export default function DonateCard() {
           value,
         });
       } else {
-        hash = await wallet.sendTransaction({ to: donation, value });
+        hash = await wallet.sendTransaction({ to: donation, value, chain: wallet.chain });
       }
       setTx(hash);
     } catch (e: any) {

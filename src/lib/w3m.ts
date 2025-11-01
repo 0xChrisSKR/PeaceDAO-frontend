@@ -11,7 +11,7 @@ export function ensureWeb3Modal() {
   if (typeof window === 'undefined') return; // 只在瀏覽器端建立
 
   createWeb3Modal({
-    wagmiConfig,
+    wagmiConfig: wagmiConfig as any,
     projectId,
     enableAnalytics: false,
     themeMode: 'dark',
