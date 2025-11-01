@@ -1,47 +1,21 @@
 "use client";
+import { getEnv } from "@/lib/getEnv";
 
-import { useQuery } from "@tanstack/react-query";
-import { env } from "@/config/env";
-import type { PeaceFundResolution } from "@/lib/peaceFund";
+export type PeaceFundQueryResult = {
+  address: string;
+  mode: "env" | "auto" | "unset";
+};
 
-interface PeaceFundQueryResult {
-  peaceFund: string;
-  source?: string | null;
-  isLoading: boolean;
-  error: Error | null;
-}
-
-async function fetchPeaceFund(): Promise<PeaceFundResolution> {
-  const response = await fetch("/api/peace/config", { cache: "no-store" });
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || "Failed to resolve PeaceFund");
-  }
-  const data = (await response.json()) as PeaceFundResolution & { ok?: boolean };
-  return {
-    address: data.address,
-    source: typeof data.source === "string" ? data.source : undefined
-  };
-}
-
+// 假資料解析：env 設了用 env；=auto 就給一個 demo 位址；都沒設顯示 Unset
 export function usePeaceFundAddress(): PeaceFundQueryResult {
-  const shouldResolve = !env.peaceFund || env.peaceFund.toLowerCase() === "auto";
-
-  const query = useQuery({
-    queryKey: ["peace-fund-address"],
-    queryFn: fetchPeaceFund,
-    staleTime: 5 * 60 * 1000,
-    refetchInterval: shouldResolve ? 5 * 60 * 1000 : false,
-    enabled: shouldResolve
-  });
-
-  const peaceFund = shouldResolve ? query.data?.address ?? "" : env.peaceFund;
-  const source = shouldResolve ? query.data?.source ?? null : "env:NEXT_PUBLIC_PEACE_FUND";
-
-  return {
-    peaceFund,
-    source,
-    isLoading: shouldResolve ? query.isLoading || query.isFetching : false,
-    error: (query.error as Error) ?? null
-  };
+  const envVal = getEnv("PEACE_FUND");
+  if (envVal && envVal !== "auto") {
+    return { address: envVal, mode: "env" };
+  }
+  if (envVal === "auto" || !envVal) {
+    // 模擬自動解析
+    const demo = "0xDEMO-PEACE-FUND-0000000000000000ABCD";
+    return { address: demo, mode: envVal ? "auto" : "unset" };
+  }
+  return { address: "", mode: "unset" };
 }
