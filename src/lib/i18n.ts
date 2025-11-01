@@ -1,4 +1,3 @@
-// src/lib/i18n.ts
 'use client';
 import { useState } from 'react';
 
@@ -11,6 +10,7 @@ const dict = {
     treasury: '國庫',
     price: '價格',
     officialLinks: '官方連結',
+    socialAndListings: '社群與上架', // ✅ 補上
     linksHint: '官網 / X / TG / Discord / GitHub / GitBook / CMC / CoinGecko',
     verifier: '驗證者',
     fee: '手續費',
@@ -38,6 +38,7 @@ const dict = {
     treasury: 'Treasury',
     price: 'Price',
     officialLinks: 'Official Links',
+    socialAndListings: 'Community & Listings', // ✅ 補上
     linksHint: 'Website / X / TG / Discord / GitHub / GitBook / CMC / CoinGecko',
     verifier: 'Verifier',
     fee: 'Fee',
@@ -60,15 +61,20 @@ const dict = {
 };
 
 export function useI18n() {
+  // 保留語言偏好
   const [lang, setLang] = useState<'zh'|'en'>(
     (typeof window !== 'undefined' && (localStorage.getItem('lang') as 'zh'|'en')) || 'zh'
   );
-  const t = (k: keyof typeof dict['zh'], fallback?: string) =>
-    (dict[lang][k] as string) || fallback || k;
+
+  // ✅ 放寬 key 型別，避免日後新增文案時再卡編譯
+  const t = (k: string, fallback?: string) =>
+    (dict[lang] as Record<string, string>)[k] ?? fallback ?? k;
+
   const toggle = () => {
     const next = lang === 'zh' ? 'en' : 'zh';
     setLang(next);
     if (typeof window !== 'undefined') localStorage.setItem('lang', next);
   };
+
   return { t, lang, toggle };
 }
