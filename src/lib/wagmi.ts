@@ -2,13 +2,14 @@
 'use client';
 
 import { createConfig, http } from 'wagmi';
+import type { Chain } from 'viem';
 import { bsc, bscTestnet } from 'wagmi/chains';
 
 // 必填：你的 WalletConnect 專案 ID
 export const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID || '';
 
 const NETWORK = (process.env.NEXT_PUBLIC_NETWORK || 'bsctest').toLowerCase();
-export const chains = NETWORK === 'bsc' ? [bsc] : [bscTestnet];
+export const chains: readonly [Chain, ...Chain[]] = NETWORK === 'bsc' ? [bsc] : [bscTestnet];
 
 // 可選：自訂 RPC（留空就用 wagmi 預設）
 const RPC_BSC = process.env.NEXT_PUBLIC_RPC_BSC || undefined;

@@ -1,4 +1,4 @@
-import { env } from "@/config/env";
+import { getEnv } from "@/lib/getEnv";
 import type { LikeSnapshot, UserLikeState } from "@/types/like";
 
 export interface GovernanceProposalLink {
@@ -53,7 +53,7 @@ function parseDate(value: unknown): string | undefined {
 }
 
 function buildGovernanceUrl(path: string): string | null {
-  const base = env.demoApiBase || env.governanceApi;
+  const base = getEnv("demoApiBase") || getEnv("governanceApi");
   if (!base) return null;
   if (path.startsWith("http://") || path.startsWith("https://")) {
     return path;
@@ -258,8 +258,10 @@ export async function fetchGovernanceJson<T = unknown>(path: string, init?: Requ
   }
 
   const headers = new Headers(init?.headers);
-  if (env.governanceApiKey) {
-    headers.set(env.governanceApiKeyHeader || "x-api-key", env.governanceApiKey);
+  const governanceApiKey = getEnv("governanceApiKey");
+  if (governanceApiKey) {
+    const governanceApiKeyHeader = getEnv("governanceApiKeyHeader") || "x-api-key";
+    headers.set(governanceApiKeyHeader, governanceApiKey);
   }
 
   const response = await fetch(url, {
@@ -298,8 +300,10 @@ export async function forwardGovernanceRequest<T = unknown>(
     }
   }
 
-  if (env.governanceApiKey) {
-    headers.set(env.governanceApiKeyHeader || "x-api-key", env.governanceApiKey);
+  const governanceApiKey = getEnv("governanceApiKey");
+  if (governanceApiKey) {
+    const governanceApiKeyHeader = getEnv("governanceApiKeyHeader") || "x-api-key";
+    headers.set(governanceApiKeyHeader, governanceApiKey);
   }
 
   if (init.body && !headers.has("content-type")) {

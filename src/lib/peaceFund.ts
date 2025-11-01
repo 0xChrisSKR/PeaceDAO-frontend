@@ -1,4 +1,4 @@
-import { env } from "@/config/env";
+import { getEnv, getEnvOr } from "@/lib/getEnv";
 import { isAddress } from "viem";
 
 export interface PeaceFundResolution {
@@ -67,23 +67,43 @@ function extractPeaceFund(value: unknown): string | null {
   return null;
 }
 
+function parsePeaceFundHints(value: string | undefined): string[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) {
+      return parsed
+        .map((entry) => (typeof entry === "string" ? entry : String(entry)))
+        .map((entry) => entry.trim())
+        .filter(Boolean);
+    }
+  } catch {
+    // fall through to comma/newline split
+  }
+  return value
+    .split(/[\s,]+/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
 export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {
-  const direct = env.peaceFund?.trim();
+  const direct = getEnv("peaceFund")?.trim();
   if (direct && direct.toLowerCase() !== "auto" && isAddressLike(direct)) {
-    return { address: direct, source: "env:NEXT_PUBLIC_PEACE_FUND" };
+    return { address: direct, source: "env:peaceFund" };
   }
 
   const hints = new Set<string>();
-  for (const hint of env.peaceFundHints) {
-    hints.add(hint);
-  }
+  const envHints = parsePeaceFundHints(getEnv("peaceFundHints"));
+  for (const hint of envHints) hints.add(hint);
 
   if (direct && direct.toLowerCase() !== "auto") {
     hints.add(direct);
   }
 
-  if (env.demoApiBase) {
-    const configUrl = buildUrl(env.demoApiBase, env.demoConfigPath);
+  const demoApiBase = getEnv("demoApiBase");
+  const demoConfigPath = getEnvOr("demoConfigPath", "/api/peace/config");
+  if (demoApiBase) {
+    const configUrl = buildUrl(demoApiBase, demoConfigPath);
     if (configUrl) hints.add(configUrl);
   }
 
@@ -93,7 +113,7 @@ export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {
       return { address: hint, source: `inline:${hint}` };
     }
 
-    const url = buildUrl(env.demoApiBase, hint) ?? hint;
+    const url = buildUrl(demoApiBase, hint) ?? hint;
     if (!url) continue;
 
     try {
@@ -111,5 +131,5 @@ export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {
     }
   }
 
-  return { address: isAddressLike(direct) ? direct : "", source: direct ? "env:NEXT_PUBLIC_PEACE_FUND" : undefined };
+  return { address: isAddressLike(direct) ? direct : "", source: direct ? "env:peaceFund" : undefined };
 }

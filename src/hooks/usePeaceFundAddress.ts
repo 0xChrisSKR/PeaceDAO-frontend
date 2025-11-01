@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { env } from "@/config/env";
+import { getEnv } from "@/lib/getEnv";
 import type { PeaceFundResolution } from "@/lib/peaceFund";
 
 interface PeaceFundQueryResult {
@@ -25,7 +25,8 @@ async function fetchPeaceFund(): Promise<PeaceFundResolution> {
 }
 
 export function usePeaceFundAddress(): PeaceFundQueryResult {
-  const shouldResolve = !env.peaceFund || env.peaceFund.toLowerCase() === "auto";
+  const peaceFundEnv = getEnv("peaceFund");
+  const shouldResolve = !peaceFundEnv || peaceFundEnv.toLowerCase() === "auto";
 
   const query = useQuery({
     queryKey: ["peace-fund-address"],
@@ -35,8 +36,8 @@ export function usePeaceFundAddress(): PeaceFundQueryResult {
     enabled: shouldResolve
   });
 
-  const peaceFund = shouldResolve ? query.data?.address ?? "" : env.peaceFund;
-  const source = shouldResolve ? query.data?.source ?? null : "env:NEXT_PUBLIC_PEACE_FUND";
+  const peaceFund = shouldResolve ? query.data?.address ?? "" : peaceFundEnv ?? "";
+  const source = shouldResolve ? query.data?.source ?? null : "env:peaceFund";
 
   return {
     peaceFund,
