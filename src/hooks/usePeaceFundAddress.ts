@@ -1,8 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { env } from "@/config/env";
 import type { PeaceFundResolution } from "@/lib/peaceFund";
+import { getEnv } from "@/lib/getEnv";
 
 interface PeaceFundQueryResult {
   peaceFund: string;
@@ -24,8 +24,36 @@ async function fetchPeaceFund(): Promise<PeaceFundResolution> {
   };
 }
 
+interface ConfiguredPeaceFund {
+  value: string;
+  source: string | null;
+}
+
+function resolveConfiguredPeaceFund(): ConfiguredPeaceFund | null {
+  const candidates: Array<ConfiguredPeaceFund | null> = [
+    (() => {
+      const value = getEnv("PEACE_FUND");
+      return value ? { value: value.trim(), source: "env:PEACE_FUND" } : null;
+    })(),
+    (() => {
+      const value = getEnv("DONATE_ADDRESS");
+      return value ? { value: value.trim(), source: "env:DONATE_ADDRESS" } : null;
+    })()
+  ];
+
+  for (const candidate of candidates) {
+    if (candidate && candidate.value) {
+      return candidate;
+    }
+  }
+
+  return null;
+}
+
 export function usePeaceFundAddress(): PeaceFundQueryResult {
-  const shouldResolve = !env.peaceFund || env.peaceFund.toLowerCase() === "auto";
+  const configured = resolveConfiguredPeaceFund();
+  const normalized = configured?.value ?? "";
+  const shouldResolve = !normalized || normalized.toLowerCase() === "auto";
 
   const query = useQuery({
     queryKey: ["peace-fund-address"],
@@ -35,8 +63,8 @@ export function usePeaceFundAddress(): PeaceFundQueryResult {
     enabled: shouldResolve
   });
 
-  const peaceFund = shouldResolve ? query.data?.address ?? "" : env.peaceFund;
-  const source = shouldResolve ? query.data?.source ?? null : "env:NEXT_PUBLIC_PEACE_FUND";
+  const peaceFund = shouldResolve ? query.data?.address ?? "" : normalized;
+  const source = shouldResolve ? query.data?.source ?? null : configured?.source ?? null;
 
   return {
     peaceFund,
