@@ -1,4 +1,5 @@
 import { env } from "@/config/env";
+import { GOV_BASE } from "@/lib/governance";
 import { isAddress } from "viem";
 
 export interface PeaceFundResolution {
@@ -82,8 +83,10 @@ export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {
     hints.add(direct);
   }
 
-  if (env.demoApiBase) {
-    const configUrl = buildUrl(env.demoApiBase, env.demoConfigPath);
+  const apiBase = GOV_BASE.trim() || undefined;
+
+  if (apiBase) {
+    const configUrl = buildUrl(apiBase, env.demoConfigPath);
     if (configUrl) hints.add(configUrl);
   }
 
@@ -93,7 +96,7 @@ export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {
       return { address: hint, source: `inline:${hint}` };
     }
 
-    const url = buildUrl(env.demoApiBase, hint) ?? hint;
+    const url = buildUrl(apiBase, hint) ?? hint;
     if (!url) continue;
 
     try {
