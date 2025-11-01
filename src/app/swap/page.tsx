@@ -1,30 +1,27 @@
-"use client";
-
-import type { CSSProperties } from "react";
+import AppHeader from '@/components/AppHeader'
 
 export default function Swap() {
-  const buttonStyle: CSSProperties = {
-    display: "inline-block",
-    marginRight: 12,
-    padding: "10px 14px",
-    border: "1px solid #ddd",
-    borderRadius: 8,
-    textDecoration: "none"
-  };
-
   return (
-    <main style={{ padding: 24, fontFamily: "system-ui, -apple-system, Segoe UI, Roboto" }}>
-      <h1 style={{ fontSize: 32, fontWeight: 800 }}>Swap</h1>
-      <p>先用聚合器站點完成兌換（BSC）：</p>
-      <div style={{ margin: "12px 0 20px" }}>
-        <a style={buttonStyle} href="https://www.okx.com/web3/dex?networkId=56" target="_blank">
-          OKX DEX（BSC）
-        </a>
-        <a style={buttonStyle} href="https://pancakeswap.finance/swap?chain=bsc" target="_blank">
-          PancakeSwap（BSC）
-        </a>
-      </div>
-      <p style={{ opacity: 0.7 }}>小提示：手機請在錢包 App 的內建瀏覽器開啟以自動注入錢包。</p>
-    </main>
-  );
+    <>
+      <AppHeader />
+      <main className="max-w-6xl mx-auto px-5 pt-28 grid md:grid-cols-2 gap-8">
+        <section className="card">
+          <h2 className="text-2xl font-bold text-yellow-300 mb-4">Swap 交易區</h2>
+          <p className="text-white/70 text-sm mb-6">未來將支援 PancakeSwap 聚合與治理費回饋。</p>
+          <div className="space-y-3">
+            <input placeholder="From (BNB)" className="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2" />
+            <input placeholder="To (代幣)" className="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2" />
+            <button className="btn-gold w-full">Swap</button>
+          </div>
+        </section>
+
+        <section className="card">
+          <h2 className="text-2xl font-bold text-yellow-300 mb-4">市場即時資訊</h2>
+          <div className="h-48 bg-black/40 border border-white/10 rounded-lg flex items-center justify-center text-white/50">
+            [即時深度圖 / K 線區塊]
+          </div>
+        </section>
+      </main>
+    </>
+  )
 }
