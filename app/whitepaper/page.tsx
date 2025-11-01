@@ -1,5 +1,5 @@
 // app/whitepaper/page.tsx
-import { peaceConfig } from '../../lib/peaceConfig';
+import { peaceConfig as cfg } from '../../lib/peaceConfig';
 
 export default function Whitepaper() {
   const links = Object.entries(cfg.community).filter(([, v]) => !!v) as [keyof typeof cfg.community, string][];
@@ -30,11 +30,10 @@ export default function Whitepaper() {
 
         <section className="card" style={{marginBottom:18}}>
           <h2>社群 & 上架連結</h2>
-          <p className="note">（資料源自 <code>/config</code>，亦與前端同步）</p>
+          <p className="note">（資料源自 <code>/config</code>，與前端同步）</p>
           <div style={{display:'flex',flexWrap:'wrap',gap:10, marginTop:10}}>
             {links.map(([k,href])=>(
               <a key={String(k)} className="btn" href={href} target="_blank" rel="noreferrer">
-                {/* 簡化：沿用首頁樣式的按鈕 */}
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
                 <span style={{textTransform:'capitalize',marginLeft:6}}>{String(k)}</span>
               </a>
