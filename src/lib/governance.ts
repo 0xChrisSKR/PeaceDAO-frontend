@@ -1,4 +1,3 @@
-import { env } from "@/config/env";
 import type { LikeSnapshot, UserLikeState } from "@/types/like";
 
 export interface GovernanceProposalLink {
@@ -52,9 +51,20 @@ function parseDate(value: unknown): string | undefined {
   return undefined;
 }
 
-function buildGovernanceUrl(path: string): string | null {
-  const base = env.demoApiBase || env.governanceApi;
-  if (!base) return null;
+// Governance API configuration uses public env vars so builds do not rely on custom Env types.
+function readEnvString(name: string): string {
+  return (process.env[name] || "").trim();
+}
+
+export const governanceApiKeyHeader = "x-api-key";
+
+export function governanceHeaders(): Record<string, string> {
+  const key = readEnvString("NEXT_PUBLIC_GOVERNANCE_API_KEY");
+  return key ? { [governanceApiKeyHeader]: key } : {};
+}
+
+function buildGovernanceUrl(path: string): string {
+  const base = readEnvString("NEXT_PUBLIC_GOVERNANCE_API_BASE") || "/api/demo/governance";
   if (path.startsWith("http://") || path.startsWith("https://")) {
     return path;
   }
@@ -253,13 +263,10 @@ export function normaliseProposalDetail(input: unknown): GovernanceProposalDetai
 
 export async function fetchGovernanceJson<T = unknown>(path: string, init?: RequestInit): Promise<T> {
   const url = buildGovernanceUrl(path);
-  if (!url) {
-    throw new Error("GOVERNANCE_API_UNCONFIGURED");
-  }
 
   const headers = new Headers(init?.headers);
-  if (env.governanceApiKey) {
-    headers.set(env.governanceApiKeyHeader || "x-api-key", env.governanceApiKey);
+  for (const [key, value] of Object.entries(governanceHeaders())) {
+    headers.set(key, value);
   }
 
   const response = await fetch(url, {
@@ -282,9 +289,6 @@ export async function forwardGovernanceRequest<T = unknown>(
   requestHeaders?: Headers
 ): Promise<T> {
   const url = buildGovernanceUrl(path);
-  if (!url) {
-    throw new Error("GOVERNANCE_API_UNCONFIGURED");
-  }
 
   const headers = new Headers(init.headers);
 
@@ -298,8 +302,8 @@ export async function forwardGovernanceRequest<T = unknown>(
     }
   }
 
-  if (env.governanceApiKey) {
-    headers.set(env.governanceApiKeyHeader || "x-api-key", env.governanceApiKey);
+  for (const [key, value] of Object.entries(governanceHeaders())) {
+    headers.set(key, value);
   }
 
   if (init.body && !headers.has("content-type")) {
