@@ -1,4 +1,3 @@
-import { env } from "@/config/env";
 import type { LikeSnapshot, UserLikeState } from "@/types/like";
 
 export interface GovernanceProposalLink {
@@ -52,15 +51,25 @@ function parseDate(value: unknown): string | undefined {
   return undefined;
 }
 
-function buildGovernanceUrl(path: string): string | null {
-  const base = env.demoApiBase || env.governanceApi;
-  if (!base) return null;
-  if (path.startsWith("http://") || path.startsWith("https://")) {
-    return path;
+export function buildGovernanceUrl(path: string): string {
+  if (!path) return "/api/demo/governance";
+  const p = path.trim();
+  if (p.startsWith("http://") || p.startsWith("https://")) return p;
+  if (p.startsWith("/")) return p;
+  return `/${p}`.replace(/\/{2,}/g, "/");
+}
+
+const GOVERNANCE_API_KEY =
+  process.env.NEXT_PUBLIC_GOVERNANCE_API_KEY?.trim() || "";
+const GOVERNANCE_API_KEY_HEADER =
+  process.env.NEXT_PUBLIC_GOVERNANCE_API_KEY_HEADER?.trim() || "x-api-key";
+
+export function buildGovernanceHeaders(init?: HeadersInit): Headers {
+  const headers = new Headers(init);
+  if (GOVERNANCE_API_KEY) {
+    headers.set(GOVERNANCE_API_KEY_HEADER, GOVERNANCE_API_KEY);
   }
-  const normalizedBase = base.replace(/\/$/, "");
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-  return `${normalizedBase}${normalizedPath}`;
+  return headers;
 }
 
 function normaliseLink(entry: unknown): GovernanceProposalLink | null {
@@ -253,14 +262,8 @@ export function normaliseProposalDetail(input: unknown): GovernanceProposalDetai
 
 export async function fetchGovernanceJson<T = unknown>(path: string, init?: RequestInit): Promise<T> {
   const url = buildGovernanceUrl(path);
-  if (!url) {
-    throw new Error("GOVERNANCE_API_UNCONFIGURED");
-  }
 
-  const headers = new Headers(init?.headers);
-  if (env.governanceApiKey) {
-    headers.set(env.governanceApiKeyHeader || "x-api-key", env.governanceApiKey);
-  }
+  const headers = buildGovernanceHeaders(init?.headers);
 
   const response = await fetch(url, {
     ...init,
@@ -282,14 +285,10 @@ export async function forwardGovernanceRequest<T = unknown>(
   requestHeaders?: Headers
 ): Promise<T> {
   const url = buildGovernanceUrl(path);
-  if (!url) {
-    throw new Error("GOVERNANCE_API_UNCONFIGURED");
-  }
-
   const headers = new Headers(init.headers);
 
   if (requestHeaders) {
-    const allowed = ["authorization", "x-api-key"]; // forward auth headers when present
+    const allowed = ["authorization", GOVERNANCE_API_KEY_HEADER.toLowerCase()]; // forward auth headers when present
     for (const header of allowed) {
       const value = requestHeaders.get(header);
       if (value) {
@@ -298,17 +297,15 @@ export async function forwardGovernanceRequest<T = unknown>(
     }
   }
 
-  if (env.governanceApiKey) {
-    headers.set(env.governanceApiKeyHeader || "x-api-key", env.governanceApiKey);
-  }
+  const finalHeaders = buildGovernanceHeaders(headers);
 
-  if (init.body && !headers.has("content-type")) {
-    headers.set("content-type", "application/json");
+  if (init.body && !finalHeaders.has("content-type")) {
+    finalHeaders.set("content-type", "application/json");
   }
 
   const response = await fetch(url, {
     ...init,
-    headers,
+    headers: finalHeaders,
     cache: "no-store"
   });
 
