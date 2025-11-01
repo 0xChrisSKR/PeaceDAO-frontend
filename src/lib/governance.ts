@@ -53,7 +53,7 @@ function parseDate(value: unknown): string | undefined {
 }
 
 function buildGovernanceUrl(path: string): string | null {
-  const base = env.demoApiBase || env.governanceApi;
+  const base = process.env.NEXT_PUBLIC_DEMO_API_BASE || process.env.NEXT_PUBLIC_GOVERNANCE_API || '';
   if (!base) return null;
   if (path.startsWith("http://") || path.startsWith("https://")) {
     return path;
