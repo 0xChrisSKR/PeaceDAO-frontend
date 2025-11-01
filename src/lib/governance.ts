@@ -51,12 +51,26 @@ function parseDate(value: unknown): string | undefined {
   }
   return undefined;
 }
+// ✅ 安全讀取、支援相對路徑，無型別錯誤
+function buildGovernanceBase(): string {
+  // 可選：若你想指定外部來源，填 NEXT_PUBLIC_GOVERNANCE_API
+  const base = (process.env.NEXT_PUBLIC_GOVERNANCE_API || '').trim();
+  return base; // 空字串就走相對路徑
+}
+export function buildGovernanceUrl(path: string): string {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  const base = buildGovernanceBase();
+  const cleaned = path.startsWith('/') ? path : `/${path}`;
+  return `${base}${cleaned}`;
+}
 
-function buildGovernanceUrl(path: string): string | null {
-  const base = process.env.NEXT_PUBLIC_DEMO_API_BASE || process.env.NEXT_PUBLIC_GOVERNANCE_API || '';
-  if (!base) return null;
-  if (path.startsWith("http://") || path.startsWith("https://")) {
-    return path;
+// 取 /config（或你 .env 裡的 NEXT_PUBLIC_PEACEDAO_CONFIG_PATH）
+export function getPeaceConfigUrl(): string {
+  const p = (process.env.NEXT_PUBLIC_PEACEDAO_CONFIG_PATH || '/config').trim();
+  return buildGovernanceUrl(p);
+}
+
   }
   const normalizedBase = base.replace(/\/$/, "");
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
