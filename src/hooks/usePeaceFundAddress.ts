@@ -1,11 +1,10 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { env } from "@/config/env";
 import type { PeaceFundResolution } from "@/lib/peaceFund";
 
 interface PeaceFundQueryResult {
-  peaceFund: string;
+  peaceFund: string | undefined;
   source?: string | null;
   isLoading: boolean;
   error: Error | null;
@@ -25,7 +24,32 @@ async function fetchPeaceFund(): Promise<PeaceFundResolution> {
 }
 
 export function usePeaceFundAddress(): PeaceFundQueryResult {
-  const shouldResolve = !env.peaceFund || env.peaceFund.toLowerCase() === "auto";
+  // Prefer public env for client, fallback to server env.
+  const rawPeaceFund =
+    process.env.NEXT_PUBLIC_PEACE_FUND ||
+    process.env.PEACE_FUND ||
+    "";
+
+  // Keep lowercasing for comparisons only; don't use lowercased value for display.
+  const peaceFund = rawPeaceFund.trim();
+
+  // if you previously did `peaceFund.toLowerCase()` replace usages with:
+  const peaceFundForCompare = peaceFund.toLowerCase();
+
+  if (!peaceFund) {
+    // In CI/build we want to fail early, but in client, just return undefined to avoid crash.
+    if (typeof window === "undefined") {
+      throw new Error("PEACE_FUND/NEXT_PUBLIC_PEACE_FUND is not set");
+    }
+    return {
+      peaceFund: undefined,
+      source: null,
+      isLoading: false,
+      error: new Error("PEACE_FUND/NEXT_PUBLIC_PEACE_FUND is not set")
+    };
+  }
+
+  const shouldResolve = peaceFundForCompare === "auto";
 
   const query = useQuery({
     queryKey: ["peace-fund-address"],
@@ -35,11 +59,11 @@ export function usePeaceFundAddress(): PeaceFundQueryResult {
     enabled: shouldResolve
   });
 
-  const peaceFund = shouldResolve ? query.data?.address ?? "" : env.peaceFund;
+  const resolvedPeaceFund = shouldResolve ? query.data?.address ?? "" : peaceFund;
   const source = shouldResolve ? query.data?.source ?? null : "env:NEXT_PUBLIC_PEACE_FUND";
 
   return {
-    peaceFund,
+    peaceFund: resolvedPeaceFund || undefined,
     source,
     isLoading: shouldResolve ? query.isLoading || query.isFetching : false,
     error: (query.error as Error) ?? null
