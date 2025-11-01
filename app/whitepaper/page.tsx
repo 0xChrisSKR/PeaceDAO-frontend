@@ -1,5 +1,5 @@
 // app/whitepaper/page.tsx
-import { peaceConfig as cfg } from '@/lib/peaceConfig';
+import { peaceConfig } from '../../lib/peaceConfig';
 
 export default function Whitepaper() {
   const links = Object.entries(cfg.community).filter(([, v]) => !!v) as [keyof typeof cfg.community, string][];
