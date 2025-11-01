@@ -1,40 +1,25 @@
-'use client';
+import Hero from '@/components/Hero'
+import ConnectWallet from '@/components/ConnectWallet'
+import AddressBalance from '@/components/AddressBalance'
+import DonateButton from '@/components/DonateButton'
+import FeatureGrid from '@/components/FeatureGrid'
 
-import Image from 'next/image';
-import ConnectButton from '@/components/ConnectButton';
-
-export default function Page() {
+export default function HomePage() {
   return (
-    <main className="mx-auto max-w-7xl px-4 py-10">
-      <section className="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-center rounded-2xl bg-zinc-900/60 ring-1 ring-white/10 p-6 md:p-10">
-        <div className="space-y-4">
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">
-            WorldPeace DAO
-          </h1>
-          <p className="text-zinc-300">
-            建立以代幣驗證為核心的社群治理：連結錢包，自動分級，解鎖聊天室與提案權限。
-          </p>
-          <div className="flex gap-3">
-            <ConnectButton />
-            <a
-              href="/docs"
-              className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white ring-1 ring-white/10"
-            >
-              白皮書 / Docs
-            </a>
-          </div>
+    <main className="mx-auto max-w-6xl px-4 py-8">
+      <Hero />
+      <div className="mt-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <ConnectWallet />
+        <div className="flex gap-4">
+          <AddressBalance />
+          <DonateButton />
         </div>
-
-        <div className="relative h-48 md:h-64 lg:h-80">
-          <Image
-            src="/banner-worldpeace.png"
-            alt="WorldPeace DAO Banner"
-            fill
-            className="object-cover rounded-xl shadow-lg"
-            priority
-          />
-        </div>
-      </section>
+      </div>
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold">功能</h2>
+        <p className="text-white/70">所有收款/捐款僅支援 <b className="text-yellow-300">BNB (BSC)</b>。Swap 將在下一步接 AMM。</p>
+      </div>
+      <FeatureGrid />
     </main>
-  );
+  )
 }

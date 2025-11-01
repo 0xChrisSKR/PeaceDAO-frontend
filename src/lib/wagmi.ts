@@ -1,7 +1,8 @@
 // src/lib/wagmi.ts
 'use client';
 
-import { createConfig, http } from 'wagmi';
+import { createConfig } from '@wagmi/core';
+import { http } from 'viem';
 import { bsc, bscTestnet } from 'wagmi/chains';
 
 // 必填：你的 WalletConnect 專案 ID
@@ -22,7 +23,7 @@ for (const c of chains) {
 }
 
 export const wagmiConfig = createConfig({
-  chains,
-  transports,
+  chains: chains as any,
+  transports: transports as any,
   ssr: true, // Next.js 推薦
 });

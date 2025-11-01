@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useAccount, useChainId, useSwitchChain } from "wagmi";
+import { useAccount, useChainId, useSwitchNetwork } from "wagmi";
 import { DEFAULT_CHAIN } from "@/config/chains";
 import { useLanguage } from "@/components/LanguageProvider";
 
@@ -12,13 +12,17 @@ export function NetworkWatcher() {
   const { dictionary } = useLanguage();
   const { isConnected } = useAccount();
   const chainId = useChainId();
-  const { switchChainAsync } = useSwitchChain();
+  const { switchNetworkAsync } = useSwitchNetwork();
   const [isSwitching, setSwitching] = useState(false);
 
   const handleSwitch = useCallback(async () => {
+    if (!switchNetworkAsync) {
+      toast.error("Switch not supported");
+      return;
+    }
     try {
       setSwitching(true);
-      await switchChainAsync({ chainId: DEFAULT_CHAIN.id });
+      await switchNetworkAsync(DEFAULT_CHAIN.id);
       toast.success(`${dictionary.wallet.switch} ${DEFAULT_CHAIN.name}`);
       toast.dismiss(TOAST_ID);
     } catch (error: any) {
@@ -27,7 +31,7 @@ export function NetworkWatcher() {
     } finally {
       setSwitching(false);
     }
-  }, [dictionary.wallet.switch, switchChainAsync]);
+  }, [dictionary.wallet.switch, switchNetworkAsync]);
 
   useEffect(() => {
     if (!isConnected || chainId === DEFAULT_CHAIN.id) {

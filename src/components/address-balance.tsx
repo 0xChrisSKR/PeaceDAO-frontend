@@ -5,7 +5,7 @@ export default function AddressBalance({ address, label }: { address?: `0x${stri
   const enabled = Boolean(address && /^0x[0-9a-fA-F]{40}$/.test(String(address)));
   const { data, isLoading, isError } = useBalance({
     address: enabled ? (address as `0x${string}`) : undefined,
-    query: { enabled },
+    enabled,
   });
 
   return (

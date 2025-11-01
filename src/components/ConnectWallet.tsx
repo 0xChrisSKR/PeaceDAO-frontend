@@ -1,70 +1,58 @@
-"use client";
-
-import { useState } from "react";
-import { useAccount } from "wagmi";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
-
-declare global {
-  interface BinanceChainProvider {
-    request<T>(args: { method: string; params?: unknown[] }): Promise<T>;
-  }
-
-  interface EthereumProvider {
-    request<T>(args: { method: string; params?: unknown[] }): Promise<T>;
-  }
-
-  interface Window {
-    BinanceChain?: BinanceChainProvider;
-    ethereum?: EthereumProvider;
-  }
-}
+'use client';
+import { useEffect, useState } from 'react';
+import { accounts, chainIdHex, connectBsc } from '@/lib/eth';
+import { shortAddr } from '@/lib/format';
+import { BSC } from '@/lib/chain';
 
 export default function ConnectWallet() {
-  const { address: wagmiAddress, isConnected } = useAccount();
-  const { open } = useWeb3Modal();
-  const [fallbackAddress, setFallbackAddress] = useState<string | null>(null);
+  const [acct, setAcct] = useState<string>('');
+  const [chain, setChain] = useState<string>('');
+  const [err, setErr] = useState<string>('');
 
-  const address = isConnected ? wagmiAddress : fallbackAddress;
+  useEffect(() => {
+    (async () => {
+      try {
+        const [cid, accs] = await Promise.all([chainIdHex(), accounts()]);
+        setChain(cid ?? '');
+        setAcct(accs[0] ?? '');
+      } catch (e: any) {
+        setErr(e?.message || 'init failed');
+      }
+    })();
+  }, []);
 
-  async function connect() {
-    if (typeof window === "undefined") return;
-
+  const onConnect = async () => {
+    setErr('');
     try {
-      await open();
-      return;
-    } catch (error) {
-      console.error("Web3Modal connection failed, falling back to direct request", error);
+      const accs = await connectBsc();
+      setAcct(accs[0] ?? '');
+      const cid = await chainIdHex();
+      setChain(cid ?? '');
+    } catch (e: any) {
+      setErr(e?.message || 'connect failed');
     }
+  };
 
-    if (window.BinanceChain) {
-      try {
-        const accounts = await window.BinanceChain.request<string[]>({ method: "eth_requestAccounts" });
-        setFallbackAddress(accounts?.[0] ?? null);
-        return;
-      } catch (err) {
-        console.error("Failed to connect via BinanceChain", err);
-      }
-    }
-
-    if (window.ethereum) {
-      try {
-        const accounts = await window.ethereum.request<string[]>({ method: "eth_requestAccounts" });
-        setFallbackAddress(accounts?.[0] ?? null);
-        return;
-      } catch (err) {
-        console.error("Failed to connect via window.ethereum", err);
-      }
-    }
-
-    alert("請安裝 Binance Web3 或 Metamask 錢包！");
-  }
+  const onWrong = chain && chain.toLowerCase() !== BSC.chainIdHex;
 
   return (
-    <button
-      onClick={connect}
-      className="rounded-full bg-amber-500 px-5 py-2 font-semibold text-white shadow transition hover:bg-amber-600"
-    >
-      {address ? `已連結: ${address.slice(0, 6)}...${address.slice(-4)}` : "連結錢包"}
-    </button>
+    <div className="flex flex-col gap-2">
+      {acct ? (
+        <div className="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-4 py-2 text-white">
+          <span>已連線</span>
+          <span className="font-mono">{shortAddr(acct)}</span>
+          <span className={`rounded px-2 py-0.5 text-xs ${onWrong ? 'bg-red-500/30' : 'bg-black/20'}`}>
+            chain {chain}
+          </span>
+        </div>
+      ) : (
+        <button onClick={onConnect} className="rounded-md bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-500">
+          連線 BSC 錢包（BNB）
+        </button>
+      )}
+      {onWrong && <p className="text-xs text-red-400">請切換至 BNB Smart Chain (56)。</p>}
+      {err && <p className="text-xs text-red-400">{err}</p>}
+      <p className="text-xs text-white/60">本站<strong className="text-yellow-300">只接受 BNB</strong> 作為捐款及結算資產。</p>
+    </div>
   );
 }
