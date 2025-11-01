@@ -68,7 +68,8 @@ function extractPeaceFund(value: unknown): string | null {
 }
 
 export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {
-  const direct = env.peaceFund?.trim();
+  const direct = process.env.NEXT_PUBLIC_PEACE_FUND?.trim() || "";
+  const configured = env.peaceFund?.trim();
   if (direct && direct.toLowerCase() !== "auto" && isAddressLike(direct)) {
     return { address: direct, source: "env:NEXT_PUBLIC_PEACE_FUND" };
   }
@@ -80,6 +81,10 @@ export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {
 
   if (direct && direct.toLowerCase() !== "auto") {
     hints.add(direct);
+  }
+
+  if (configured && configured.toLowerCase() !== "auto") {
+    hints.add(configured);
   }
 
   if (env.demoApiBase) {
@@ -111,5 +116,5 @@ export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {
     }
   }
 
-  return { address: isAddressLike(direct) ? direct : "", source: direct ? "env:NEXT_PUBLIC_PEACE_FUND" : undefined };
+  return { address: "0x000000000000000000000000000000000000dEaD", source: "demo" };
 }
