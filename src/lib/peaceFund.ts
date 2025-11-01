@@ -68,7 +68,7 @@ function extractPeaceFund(value: unknown): string | null {
 }
 
 export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {
-  const direct = env.peaceFund?.trim();
+  const direct = process.env.NEXT_PUBLIC_PEACE_FUND?.trim();
   if (direct && direct.toLowerCase() !== "auto" && isAddressLike(direct)) {
     return { address: direct, source: "env:NEXT_PUBLIC_PEACE_FUND" };
   }
