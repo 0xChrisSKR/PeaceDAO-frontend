@@ -1,70 +1,67 @@
-"use client";
-
-import { useState } from "react";
-import { useAccount } from "wagmi";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
-
-declare global {
-  interface BinanceChainProvider {
-    request<T>(args: { method: string; params?: unknown[] }): Promise<T>;
-  }
-
-  interface EthereumProvider {
-    request<T>(args: { method: string; params?: unknown[] }): Promise<T>;
-  }
-
-  interface Window {
-    BinanceChain?: BinanceChainProvider;
-    ethereum?: EthereumProvider;
-  }
-}
+'use client';
+import { useEffect, useState } from 'react';
+import { connect, currentAccounts, chainIdHex, getProvider } from '@/lib/eth';
+import { shortAddr } from '@/lib/format';
 
 export default function ConnectWallet() {
-  const { address: wagmiAddress, isConnected } = useAccount();
-  const { open } = useWeb3Modal();
-  const [fallbackAddress, setFallbackAddress] = useState<string | null>(null);
+  const [acct, setAcct] = useState<string>('');
+  const [chain, setChain] = useState<string>('');
+  const [err, setErr] = useState<string>('');
 
-  const address = isConnected ? wagmiAddress : fallbackAddress;
+  useEffect(() => {
+    (async () => {
+      try {
+        const [id, accs] = await Promise.all([chainIdHex(), currentAccounts()]);
+        setChain(id ?? '');
+        setAcct(accs[0] ?? '');
+      } catch (e: any) {
+        setErr(e?.message || 'Wallet init failed');
+      }
+    })();
 
-  async function connect() {
-    if (typeof window === "undefined") return;
+    const p = getProvider();
+    const onAcc = (accs: string[]) => setAcct(accs[0] ?? '');
+    const onChain = (id: string) => setChain(id);
+    if (p?.on) {
+      p.on('accountsChanged', onAcc);
+      p.on('chainChanged', onChain);
+      return () => {
+        p.removeListener?.('accountsChanged', onAcc);
+        p.removeListener?.('chainChanged', onChain);
+      };
+    }
+  }, []);
 
+  const handleConnect = async () => {
+    setErr('');
     try {
-      await open();
-      return;
-    } catch (error) {
-      console.error("Web3Modal connection failed, falling back to direct request", error);
+      const accs = await connect();
+      setAcct(accs[0] ?? '');
+    } catch (e: any) {
+      setErr(e?.message || 'Connect failed');
     }
+  };
 
-    if (window.BinanceChain) {
-      try {
-        const accounts = await window.BinanceChain.request<string[]>({ method: "eth_requestAccounts" });
-        setFallbackAddress(accounts?.[0] ?? null);
-        return;
-      } catch (err) {
-        console.error("Failed to connect via BinanceChain", err);
-      }
-    }
-
-    if (window.ethereum) {
-      try {
-        const accounts = await window.ethereum.request<string[]>({ method: "eth_requestAccounts" });
-        setFallbackAddress(accounts?.[0] ?? null);
-        return;
-      } catch (err) {
-        console.error("Failed to connect via window.ethereum", err);
-      }
-    }
-
-    alert("請安裝 Binance Web3 或 Metamask 錢包！");
-  }
+  const installed = typeof window !== 'undefined' && !!getProvider();
 
   return (
-    <button
-      onClick={connect}
-      className="rounded-full bg-amber-500 px-5 py-2 font-semibold text-white shadow transition hover:bg-amber-600"
-    >
-      {address ? `已連結: ${address.slice(0, 6)}...${address.slice(-4)}` : "連結錢包"}
-    </button>
+    <div className="flex flex-col gap-2">
+      {acct ? (
+        <div className="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-4 py-2 text-white">
+          <span>已連線</span>
+          <span className="font-mono">{shortAddr(acct)}</span>
+          {chain && <span className="rounded bg-black/20 px-2 py-0.5 text-xs">chain {chain}</span>}
+        </div>
+      ) : (
+        <button
+          onClick={handleConnect}
+          className="rounded-md bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-500 active:scale-[.99]"
+        >
+          Connect Wallet
+        </button>
+      )}
+      {!installed && <p className="text-sm text-red-400">No wallet found</p>}
+      {err && <p className="text-sm text-red-400">{err}</p>}
+    </div>
   );
 }
