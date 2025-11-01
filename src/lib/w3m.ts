@@ -1,24 +1,19 @@
 // src/lib/w3m.ts
-'use client';
-
 import { createWeb3Modal } from '@web3modal/wagmi/react';
-import { wagmiConfig, projectId } from './wagmi';
+import { wagmiConfig, activeChain, projectId } from './wagmi';
 
-let created = false;
+let inited = false;
 
+/** 確保只初始化一次；沒有 projectId 也不中斷編譯 */
 export function ensureWeb3Modal() {
-  if (created) return;
-  if (typeof window === 'undefined') return; // 只在瀏覽器端建立
-
+  if (inited) return;
+  const pid = projectId?.trim();
+  if (!pid) { inited = true; return; } // 沒設定就先略過，不阻擋 build
   createWeb3Modal({
     wagmiConfig,
-    projectId,
-    enableAnalytics: false,
-    themeMode: 'dark',
-    themeVariables: {
-      '--w3m-accent': '#f0b90b'
-    }
+    projectId: pid,
+    chains: [activeChain],
+    themeMode: 'dark'
   });
-
-  created = true;
+  inited = true;
 }
