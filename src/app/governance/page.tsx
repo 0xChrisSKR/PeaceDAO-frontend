@@ -1,11 +1,11 @@
 import Nav from "@/components/Nav";
-import SwapMock from "@/components/SwapMock";
-export default function SwapPage(){
+import GovernanceList from "@/components/GovernanceList";
+export default function GovernancePage(){
   return (
     <main style={{maxWidth:1100,margin:"0 auto"}}>
       <Nav />
       <div style={{padding:"18px 16px"}}>
-        <SwapMock/>
+        <GovernanceList/>
       </div>
     </main>
   );
