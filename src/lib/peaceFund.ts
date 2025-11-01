@@ -1,10 +1,12 @@
-import { env } from "@/config/env";
+import { getEnv } from "@/lib/getEnv";
 import { isAddress } from "viem";
 
 export interface PeaceFundResolution {
   address: string;
   source?: string;
 }
+
+const FALLBACK_ADDRESS = "0x000000000000000000000000000000000000dEaD";
 
 function isAddressLike(value: unknown): value is string {
   return typeof value === "string" && value.startsWith("0x") && isAddress(value as `0x${string}`);
@@ -67,33 +69,63 @@ function extractPeaceFund(value: unknown): string | null {
   return null;
 }
 
-export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {
-  const direct = env.peaceFund?.trim();
-  if (direct && direct.toLowerCase() !== "auto" && isAddressLike(direct)) {
-    return { address: direct, source: "env:NEXT_PUBLIC_PEACE_FUND" };
-  }
-
+function parseHints(): string[] {
   const hints = new Set<string>();
-  for (const hint of env.peaceFundHints) {
-    hints.add(hint);
+  const rawHints = getEnv("PEACE_FUND_HINTS");
+  if (rawHints) {
+    for (const entry of rawHints.split(/[\n,]/)) {
+      const trimmed = entry.trim();
+      if (trimmed) hints.add(trimmed);
+    }
   }
 
-  if (direct && direct.toLowerCase() !== "auto") {
-    hints.add(direct);
+  const demoBase = getEnv("DEMO_API_BASE");
+  const demoConfigPath = getEnv("DEMO_CONFIG_PATH") || "/peace/config";
+  const donatePath = getEnv("DEMO_DONATE_PATH") || "/donate";
+
+  const demoConfigUrl = buildUrl(demoBase, demoConfigPath);
+  if (demoConfigUrl) hints.add(demoConfigUrl);
+  const donateUrl = buildUrl(demoBase, donatePath);
+  if (donateUrl) hints.add(donateUrl);
+
+  const governanceApi = getEnv("GOVERNANCE_API");
+  if (governanceApi) {
+    const donateFromGovernance = buildUrl(governanceApi, "/donate");
+    if (donateFromGovernance) hints.add(donateFromGovernance);
   }
 
-  if (env.demoApiBase) {
-    const configUrl = buildUrl(env.demoApiBase, env.demoConfigPath);
-    if (configUrl) hints.add(configUrl);
-  }
-
+  const result: string[] = [];
   for (const hint of hints) {
-    if (!hint) continue;
-    if (isAddressLike(hint)) {
-      return { address: hint, source: `inline:${hint}` };
+    if (hint) {
+      result.push(hint);
+    }
+  }
+  return result;
+}
+
+export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {
+  const envCandidates: Array<{ value: string | undefined; source: string }> = [
+    { value: getEnv("PEACE_FUND"), source: "env:PEACE_FUND" },
+    { value: getEnv("DONATE_ADDRESS"), source: "env:DONATE_ADDRESS" }
+  ];
+
+  for (const candidate of envCandidates) {
+    const value = candidate.value?.trim();
+    if (!value || value.toLowerCase() === "auto") continue;
+    if (isAddressLike(value)) {
+      return { address: value, source: candidate.source };
+    }
+  }
+
+  for (const hint of parseHints()) {
+    const normalized = String(hint).trim();
+    if (!normalized) continue;
+
+    if (isAddressLike(normalized)) {
+      return { address: normalized, source: `inline:${normalized}` };
     }
 
-    const url = buildUrl(env.demoApiBase, hint) ?? hint;
+    const url = /^https?:\/\//i.test(normalized) ? normalized : undefined;
     if (!url) continue;
 
     try {
@@ -111,5 +143,5 @@ export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {
     }
   }
 
-  return { address: isAddressLike(direct) ? direct : "", source: direct ? "env:NEXT_PUBLIC_PEACE_FUND" : undefined };
+  return { address: FALLBACK_ADDRESS, source: undefined };
 }
