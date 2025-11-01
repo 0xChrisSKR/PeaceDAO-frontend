@@ -12,13 +12,16 @@ export const env = {
   TG_VERIFIED: process.env.NEXT_PUBLIC_TG_VERIFIED ?? '',
   WC_PROJECT_ID: process.env.NEXT_PUBLIC_WC_PROJECT_ID ?? '',
   WHITEPAPER_URL: process.env.NEXT_PUBLIC_WHITEPAPER_URL ?? '',
+  // social links
+  twitter: process.env.NEXT_PUBLIC_TWITTER ?? process.env.NEXT_PUBLIC_TWITTER_URL ?? '',
 };
 
 export type Env = typeof env;
 
-// Default export (object style)
+// Default export
 export default env;
 
-// Legacy named exports (structural aliases)
+// Legacy named exports / aliases
 export const ENV = env;
 export const WHITEPAPER_URL = env.WHITEPAPER_URL;
+export const TWITTER_URL = env.twitter;
