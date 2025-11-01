@@ -1,4 +1,5 @@
-import { env } from "@/config/env";
+// 相對路徑，避免 @ 別名沒設好
+import { env } from "../config/env";
 import type { LikeSnapshot, UserLikeState } from "@/types/like";
 
 export interface GovernanceProposalLink {
@@ -51,32 +52,28 @@ function parseDate(value: unknown): string | undefined {
   }
   return undefined;
 }
-// ✅ 安全讀取、支援相對路徑，無型別錯誤
+
+/** ===== Governance base/url helpers (no TS env typing issues) ===== */
 function buildGovernanceBase(): string {
-  // 可選：若你想指定外部來源，填 NEXT_PUBLIC_GOVERNANCE_API
-  const base = (process.env.NEXT_PUBLIC_GOVERNANCE_API || '').trim();
-  return base; // 空字串就走相對路徑
+  // 若未設定則回傳空字串，代表用相對路徑
+  return (process.env.NEXT_PUBLIC_GOVERNANCE_API || "").trim();
 }
+
 export function buildGovernanceUrl(path: string): string {
-  if (!path) return '';
-  if (path.startsWith('http://') || path.startsWith('https://')) return path;
-  const base = buildGovernanceBase();
-  const cleaned = path.startsWith('/') ? path : `/${path}`;
-  return `${base}${cleaned}`;
-}
-
-// 取 /config（或你 .env 裡的 NEXT_PUBLIC_PEACEDAO_CONFIG_PATH）
-export function getPeaceConfigUrl(): string {
-  const p = (process.env.NEXT_PUBLIC_PEACEDAO_CONFIG_PATH || '/config').trim();
-  return buildGovernanceUrl(p);
-}
-
-  }
+  if (!path) return "";
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  const base = buildGovernanceBase(); // 可能是 ""（相對路徑）
   const normalizedBase = base.replace(/\/$/, "");
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   return `${normalizedBase}${normalizedPath}`;
 }
 
+export function getPeaceConfigUrl(): string {
+  const p = (process.env.NEXT_PUBLIC_PEACEDAO_CONFIG_PATH || "/config").trim();
+  return buildGovernanceUrl(p);
+}
+
+/** ===== Links normalisers ===== */
 function normaliseLink(entry: unknown): GovernanceProposalLink | null {
   if (typeof entry === "string") {
     return { label: entry, url: entry };
@@ -90,7 +87,8 @@ function normaliseLink(entry: unknown): GovernanceProposalLink | null {
     return null;
   }
   const labelCandidate = record.label ?? record.title ?? record.name;
-  const label = typeof labelCandidate === "string" && labelCandidate ? labelCandidate : urlCandidate;
+  const label =
+    typeof labelCandidate === "string" && labelCandidate ? labelCandidate : urlCandidate;
   return { label, url: urlCandidate };
 }
 
@@ -114,22 +112,26 @@ function normaliseLinks(input: unknown): GovernanceProposalLink[] | undefined {
   return links.length ? links : undefined;
 }
 
+/** ===== Like / User normalisers ===== */
 export function normaliseLikeSnapshot(input: unknown, fallbackId: string): LikeSnapshot {
   const value = (input as Record<string, unknown>) ?? {};
-  const base = (value.likeSnapshot as Record<string, unknown>) ??
+  const base =
+    (value.likeSnapshot as Record<string, unknown>) ??
     (value.snapshot as Record<string, unknown>) ??
     (value.likes as Record<string, unknown>) ??
     value;
 
-  const totalLikes = toNumber(base.totalLikes ?? base.likes ?? base.count ?? base.total ?? 0);
-  const totalBackers = toNumber(base.totalBackers ?? base.backers ?? base.supporters ?? base.totalSupporters ?? 0);
+  const totalLikes = toNumber(
+    base.totalLikes ?? base.likes ?? base.count ?? base.total ?? 0
+  );
+  const totalBackers = toNumber(
+    base.totalBackers ?? base.backers ?? base.supporters ?? base.totalSupporters ?? 0
+  );
 
   const txHashes: string[] = [];
   if (Array.isArray(base.txHashes)) {
     for (const hash of base.txHashes) {
-      if (typeof hash === "string" && hash.startsWith("0x")) {
-        txHashes.push(hash);
-      }
+      if (typeof hash === "string" && hash.startsWith("0x")) txHashes.push(hash);
     }
   } else if (Array.isArray(base.transactions)) {
     for (const tx of base.transactions) {
@@ -138,40 +140,44 @@ export function normaliseLikeSnapshot(input: unknown, fallbackId: string): LikeS
       } else if (tx && typeof tx === "object") {
         const record = tx as Record<string, unknown>;
         const hash = record.hash ?? record.txHash ?? record.transactionHash;
-        if (typeof hash === "string" && hash.startsWith("0x")) {
-          txHashes.push(hash);
-        }
+        if (typeof hash === "string" && hash.startsWith("0x")) txHashes.push(hash);
       }
     }
   }
 
   const proofUrlCandidate =
-    base.verifiedProofUrl ??
-    base.proofUrl ??
-    base.verificationUrl ??
-    base.verification_link;
-  const verifiedProofUrl = typeof proofUrlCandidate === "string" ? proofUrlCandidate : undefined;
+    base.verifiedProofUrl ?? base.proofUrl ?? base.verificationUrl ?? base.verification_link;
+  const verifiedProofUrl =
+    typeof proofUrlCandidate === "string" ? proofUrlCandidate : undefined;
 
-  const lastLikeCandidate = base.lastLikedAt ?? base.updatedAt ?? base.timestamp ?? base.lastLiked ?? base.lastUpdated;
-  const parsedLastLike = typeof lastLikeCandidate === "number"
-    ? lastLikeCandidate
-    : typeof lastLikeCandidate === "string"
-    ? Date.parse(lastLikeCandidate)
-    : undefined;
+  const lastLikeCandidate =
+    base.lastLikedAt ?? base.updatedAt ?? base.timestamp ?? base.lastLiked ?? base.lastUpdated;
+  const parsedLastLike =
+    typeof lastLikeCandidate === "number"
+      ? lastLikeCandidate
+      : typeof lastLikeCandidate === "string"
+      ? Date.parse(lastLikeCandidate)
+      : undefined;
 
   return {
-    proposalId: typeof base.proposalId === "string" && base.proposalId ? base.proposalId : fallbackId,
+    proposalId:
+      typeof base.proposalId === "string" && base.proposalId ? base.proposalId : fallbackId,
     totalLikes,
     totalBackers,
     txHashes: txHashes.length ? txHashes : undefined,
     verifiedProofUrl,
-    lastLikedAt: typeof parsedLastLike === "number" && Number.isFinite(parsedLastLike) ? parsedLastLike : undefined
+    lastLikedAt:
+      typeof parsedLastLike === "number" && Number.isFinite(parsedLastLike)
+        ? parsedLastLike
+        : undefined,
   };
 }
 
 export function normaliseUserState(input: unknown): UserLikeState {
   const value = (input as Record<string, unknown>) ?? {};
-  const roles = Array.isArray(value.roles) ? value.roles.map((role) => String(role).toLowerCase()) : [];
+  const roles = Array.isArray(value.roles)
+    ? value.roles.map((role) => String(role).toLowerCase())
+    : [];
   const hasLiked = Boolean(
     value.hasLiked ??
       value.liked ??
@@ -180,32 +186,36 @@ export function normaliseUserState(input: unknown): UserLikeState {
       value.hasSupported
   );
   const isVerifier = Boolean(
-    value.isVerifier ??
-      value.verifier ??
-      value.canVerify ??
-      roles.some((role) => role.includes("verify"))
+    value.isVerifier ?? value.verifier ?? value.canVerify ?? roles.some((r) => r.includes("verify"))
   );
   return { hasLiked, isVerifier };
 }
 
+/** ===== Proposal normalisers ===== */
 export function normaliseProposalSummary(input: unknown): GovernanceProposalSummary | null {
   if (!input || typeof input !== "object") return null;
   const value = input as Record<string, unknown>;
+
   const idCandidate = value.id ?? value.proposalId ?? value.slug ?? value.uuid ?? value.identifier;
-  if (typeof idCandidate !== "string" && typeof idCandidate !== "number") {
-    return null;
-  }
+  if (typeof idCandidate !== "string" && typeof idCandidate !== "number") return null;
   const id = String(idCandidate);
+
   const titleCandidate = value.title ?? value.name ?? value.headline ?? `Proposal ${id}`;
   const title = typeof titleCandidate === "string" ? titleCandidate : `Proposal ${id}`;
+
   const summaryCandidate = value.summary ?? value.excerpt ?? value.description ?? value.body;
   const summary = typeof summaryCandidate === "string" ? summaryCandidate : undefined;
+
   const statusCandidate = value.status ?? value.state ?? value.phase ?? value.stage;
   const status = typeof statusCandidate === "string" ? statusCandidate.toLowerCase() : undefined;
-  const categoryCandidate = value.category ?? value.tag ?? (Array.isArray(value.tags) ? value.tags[0] : undefined);
+
+  const categoryCandidate =
+    value.category ?? value.tag ?? (Array.isArray(value.tags) ? value.tags[0] : undefined);
   const category = typeof categoryCandidate === "string" ? categoryCandidate : undefined;
+
   const coverCandidate = value.coverImage ?? value.image ?? value.thumbnail;
   const coverImage = typeof coverCandidate === "string" ? coverCandidate : undefined;
+
   const createdAt = parseDate(value.createdAt ?? value.created_at ?? value.publishedAt ?? value.startTime);
   const updatedAt = parseDate(value.updatedAt ?? value.updated_at ?? value.lastUpdated ?? value.modifiedAt);
 
@@ -235,7 +245,7 @@ export function normaliseProposalSummary(input: unknown): GovernanceProposalSumm
     category,
     coverImage,
     totalLikes,
-    totalBackers
+    totalBackers,
   };
 }
 
@@ -246,11 +256,17 @@ export function normaliseProposalDetail(input: unknown): GovernanceProposalDetai
   const value = (input as Record<string, unknown>) ?? {};
   const contentCandidate = value.content ?? value.body ?? value.description ?? value.markdown;
   const content = typeof contentCandidate === "string" ? contentCandidate : undefined;
+
   const htmlCandidate = value.html ?? value.bodyHtml ?? value.renderedHtml;
   const html = typeof htmlCandidate === "string" ? htmlCandidate : undefined;
+
   const authorCandidate = value.author ?? value.owner ?? value.creator;
   const author = typeof authorCandidate === "string" ? authorCandidate : undefined;
-  const likeSnapshot = normaliseLikeSnapshot(value.likeSnapshot ?? value.likes ?? value.snapshot, summary.id);
+
+  const likeSnapshot = normaliseLikeSnapshot(
+    value.likeSnapshot ?? value.likes ?? value.snapshot,
+    summary.id
+  );
   const user = normaliseUserState(value.viewer ?? value.user ?? value.currentUser ?? value.account);
   const links = normaliseLinks(value.links ?? value.resources ?? value.attachments);
 
@@ -261,32 +277,29 @@ export function normaliseProposalDetail(input: unknown): GovernanceProposalDetai
     author,
     links,
     likeSnapshot,
-    user
+    user,
   };
 }
 
-export async function fetchGovernanceJson<T = unknown>(path: string, init?: RequestInit): Promise<T> {
+/** ===== Fetch helpers ===== */
+export async function fetchGovernanceJson<T = unknown>(
+  path: string,
+  init?: RequestInit
+): Promise<T> {
   const url = buildGovernanceUrl(path);
-  if (!url) {
-    throw new Error("GOVERNANCE_API_UNCONFIGURED");
-  }
+  if (!url) throw new Error("GOVERNANCE_API_UNCONFIGURED");
 
   const headers = new Headers(init?.headers);
   if (env.governanceApiKey) {
     headers.set(env.governanceApiKeyHeader || "x-api-key", env.governanceApiKey);
   }
 
-  const response = await fetch(url, {
-    ...init,
-    headers,
-    cache: "no-store"
-  });
+  const response = await fetch(url, { ...init, headers, cache: "no-store" });
 
   if (!response.ok) {
     const text = await response.text();
     throw new Error(text || `Request failed with status ${response.status}`);
   }
-
   return response.json() as Promise<T>;
 }
 
@@ -296,44 +309,33 @@ export async function forwardGovernanceRequest<T = unknown>(
   requestHeaders?: Headers
 ): Promise<T> {
   const url = buildGovernanceUrl(path);
-  if (!url) {
-    throw new Error("GOVERNANCE_API_UNCONFIGURED");
-  }
+  if (!url) throw new Error("GOVERNANCE_API_UNCONFIGURED");
 
   const headers = new Headers(init.headers);
 
   if (requestHeaders) {
-    const allowed = ["authorization", "x-api-key"]; // forward auth headers when present
-    for (const header of allowed) {
-      const value = requestHeaders.get(header);
-      if (value) {
-        headers.set(header, value);
-      }
+    const allowed = ["authorization", "x-api-key"];
+    for (const h of allowed) {
+      const v = requestHeaders.get(h);
+      if (v) headers.set(h, v);
     }
   }
 
   if (env.governanceApiKey) {
     headers.set(env.governanceApiKeyHeader || "x-api-key", env.governanceApiKey);
   }
-
   if (init.body && !headers.has("content-type")) {
     headers.set("content-type", "application/json");
   }
 
-  const response = await fetch(url, {
-    ...init,
-    headers,
-    cache: "no-store"
-  });
+  const response = await fetch(url, { ...init, headers, cache: "no-store" });
 
   if (!response.ok) {
     const text = await response.text();
     throw new Error(text || `Request failed with status ${response.status}`);
   }
-
   if (response.status === 204) {
     return {} as T;
   }
-
   return response.json() as Promise<T>;
 }
