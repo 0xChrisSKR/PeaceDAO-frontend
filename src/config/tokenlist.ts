@@ -1,10 +1,11 @@
 import { isAddress } from "viem";
 import { env } from "@/config/env";
-import { DEFAULT_CHAIN } from "@/config/chains";
 import { BNB_LOGO, PEACE_LOGO, USDT_LOGO, WBNB_LOGO } from "@/assets/tokens";
 import { TOKEN_PLACEHOLDER } from "@/assets/placeholders";
 
 type Address = `0x${string}`;
+
+const DEFAULT_CHAIN_ID = env.NETWORK.toLowerCase().includes("test") ? 97 : 56;
 
 export interface TokenInfo {
   chainId: number;
@@ -35,7 +36,7 @@ export interface TokenList {
 
 const BASE_TOKENS: TokenInfo[] = [
   {
-    chainId: DEFAULT_CHAIN.id,
+    chainId: DEFAULT_CHAIN_ID,
     address: "0x0000000000000000000000000000000000000000" as Address,
     name: "BNB",
     symbol: "BNB",
@@ -44,7 +45,7 @@ const BASE_TOKENS: TokenInfo[] = [
     tags: ["native"]
   },
   {
-    chainId: DEFAULT_CHAIN.id,
+    chainId: DEFAULT_CHAIN_ID,
     address: "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c" as Address,
     name: "Wrapped BNB",
     symbol: "WBNB",
@@ -52,7 +53,7 @@ const BASE_TOKENS: TokenInfo[] = [
     logoURI: WBNB_LOGO
   },
   {
-    chainId: DEFAULT_CHAIN.id,
+    chainId: DEFAULT_CHAIN_ID,
     address: "0x55d398326f99059ff775485246999027b3197955" as Address,
     name: "Tether USD",
     symbol: "USDT",
@@ -67,7 +68,7 @@ function getPeaceToken(): TokenInfo | null {
     return null;
   }
   return {
-    chainId: DEFAULT_CHAIN.id,
+    chainId: DEFAULT_CHAIN_ID,
     address: peaceToken as Address,
     name: "Peace Token",
     symbol: "PEACE",
