@@ -1,5 +1,3 @@
-import type { Abi } from "viem";
-
 export const erc20Abi = [
   {
     type: "function",
@@ -42,6 +40,6 @@ export const erc20Abi = [
     ],
     outputs: [{ type: "bool" }]
   }
-] as const satisfies Abi;
+] as const;
 
 export default erc20Abi;

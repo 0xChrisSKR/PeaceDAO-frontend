@@ -124,6 +124,7 @@ export interface Dictionary {
     wrongNetwork: string;
     switch: string;
     noConnector: string;
+    unavailable: string;
   };
   proposalLikes: {
     like: string;
@@ -277,7 +278,8 @@ const dictionaries: Record<Locale, Dictionary> = {
       copied: "Address copied",
       wrongNetwork: "You are connected to the wrong network.",
       switch: "Switch to",
-      noConnector: "Install a Web3 wallet or configure WalletConnect."
+      noConnector: "Install a Web3 wallet or configure WalletConnect.",
+      unavailable: "Wallet connectivity is currently disabled."
     },
     proposalLikes: {
       like: "Like proposal",
@@ -426,7 +428,8 @@ const dictionaries: Record<Locale, Dictionary> = {
       copied: "地址已复制",
       wrongNetwork: "当前连接的网络不正确。",
       switch: "切换到",
-      noConnector: "请安装 Web3 钱包或配置 WalletConnect。"
+      noConnector: "请安装 Web3 钱包或配置 WalletConnect。",
+      unavailable: "目前暂停钱包连接功能。"
     },
     proposalLikes: {
       like: "按讚支持",

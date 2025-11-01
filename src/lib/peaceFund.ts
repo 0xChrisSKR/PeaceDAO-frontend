@@ -1,13 +1,9 @@
 import { env } from "@/config/env";
-import { isAddress } from "viem";
 
-export interface PeaceFundResolution {
-  address: string;
-  source?: string;
-}
+const ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/;
 
 function isAddressLike(value: unknown): value is string {
-  return typeof value === "string" && value.startsWith("0x") && isAddress(value as `0x${string}`);
+  return typeof value === "string" && ADDRESS_REGEX.test(value);
 }
 
 function buildUrl(base: string | undefined, path: string): string | undefined {
@@ -65,6 +61,11 @@ function extractPeaceFund(value: unknown): string | null {
   }
 
   return null;
+}
+
+export interface PeaceFundResolution {
+  address: string;
+  source?: string;
 }
 
 export async function resolvePeaceFundAddress(): Promise<PeaceFundResolution> {

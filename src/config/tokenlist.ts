@@ -1,8 +1,12 @@
-import { isAddress } from "viem";
 import { env } from "@/config/env";
 import { DEFAULT_CHAIN } from "@/config/chains";
 import { BNB_LOGO, PEACE_LOGO, USDT_LOGO, WBNB_LOGO } from "@/assets/tokens";
 import { TOKEN_PLACEHOLDER } from "@/assets/placeholders";
+
+const ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/;
+function isAddress(value: string | undefined | null): value is `0x${string}` {
+  return Boolean(value && ADDRESS_REGEX.test(value));
+}
 
 type Address = `0x${string}`;
 
@@ -62,8 +66,8 @@ const BASE_TOKENS: TokenInfo[] = [
 ];
 
 function getPeaceToken(): TokenInfo | null {
-  const { peaceToken } = env;
-  if (!peaceToken || !isAddress(peaceToken)) {
+  const peaceToken = env.peaceToken;
+  if (!isAddress(peaceToken)) {
     return null;
   }
   return {
