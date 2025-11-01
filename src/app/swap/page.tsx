@@ -1,30 +1,56 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import TopNav from "@/components/TopNav";
+import { useState } from "react";
 
-export default function Swap() {
-  const buttonStyle: CSSProperties = {
-    display: "inline-block",
-    marginRight: 12,
-    padding: "10px 14px",
-    border: "1px solid #ddd",
-    borderRadius: 8,
-    textDecoration: "none"
-  };
-
+export default function Page() {
+  const [from, setFrom] = useState("USDT");
+  const [to, setTo] = useState("BTC");
   return (
-    <main style={{ padding: 24, fontFamily: "system-ui, -apple-system, Segoe UI, Roboto" }}>
-      <h1 style={{ fontSize: 32, fontWeight: 800 }}>Swap</h1>
-      <p>先用聚合器站點完成兌換（BSC）：</p>
-      <div style={{ margin: "12px 0 20px" }}>
-        <a style={buttonStyle} href="https://www.okx.com/web3/dex?networkId=56" target="_blank">
-          OKX DEX（BSC）
-        </a>
-        <a style={buttonStyle} href="https://pancakeswap.finance/swap?chain=bsc" target="_blank">
-          PancakeSwap（BSC）
-        </a>
+    <main className="min-h-screen text-white">
+      <TopNav />
+      <div className="max-w-md mx-auto px-4 py-8 space-y-4">
+        <h1 className="text-2xl font-semibold">Swap (Demo)</h1>
+        <div className="rounded-lg border border-neutral-800 p-4 bg-neutral-900/50 space-y-3">
+          <div>
+            <div className="text-xs text-neutral-400 mb-1">From</div>
+            <select
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+              className="w-full px-3 py-2 rounded bg-neutral-900 border border-neutral-800 text-sm"
+            >
+              <option>USDT</option>
+              <option>ETH</option>
+              <option>SOL</option>
+            </select>
+            <input
+              placeholder="Amount"
+              className="mt-2 w-full px-3 py-2 rounded bg-neutral-900 border border-neutral-800 text-sm"
+            />
+          </div>
+          <div>
+            <div className="text-xs text-neutral-400 mb-1">To</div>
+            <select
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              className="w-full px-3 py-2 rounded bg-neutral-900 border border-neutral-800 text-sm"
+            >
+              <option>BTC</option>
+              <option>USDT</option>
+              <option>SOL</option>
+            </select>
+            <input
+              placeholder="Estimated"
+              className="mt-2 w-full px-3 py-2 rounded bg-neutral-900 border border-neutral-800 text-sm"
+              disabled
+            />
+          </div>
+          <div className="text-xs text-neutral-400">Fee (mock): 0.10%</div>
+          <button disabled className="w-full px-3 py-2 rounded bg-neutral-700 text-neutral-300">
+            Swap (disabled in demo)
+          </button>
+        </div>
       </div>
-      <p style={{ opacity: 0.7 }}>小提示：手機請在錢包 App 的內建瀏覽器開啟以自動注入錢包。</p>
     </main>
   );
 }
