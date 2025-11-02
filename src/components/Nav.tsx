@@ -7,7 +7,11 @@ import { useI18n } from '@/lib/i18n';
 import WalletControls from '@/components/WalletControls';
 import { useEffect, useState } from 'react';
 
-export default function Nav() {
+interface NavProps {
+  active?: string; // ✅ 新增這行，允許外部傳 active props
+}
+
+export default function Nav({ active }: NavProps) {
   const pathname = usePathname();
   const { t } = useI18n();
   const [scrolled, setScrolled] = useState(false);
@@ -19,10 +23,10 @@ export default function Nav() {
   }, []);
 
   const links = [
-    { href: '/', label: t('nav.home', 'Home') },
-    { href: '/donate', label: t('nav.donate', 'Donate') },
-    { href: '/treasury', label: t('nav.treasury', 'Treasury') },
-    { href: '/whitepaper', label: t('nav.whitepaper', 'Whitepaper') },
+    { href: '/', label: t('nav.home', 'Home'), key: 'home' },
+    { href: '/donate', label: t('nav.donate', 'Donate'), key: 'donate' },
+    { href: '/treasury', label: t('nav.treasury', 'Treasury'), key: 'treasury' },
+    { href: '/whitepaper', label: t('nav.whitepaper', 'Whitepaper'), key: 'whitepaper' },
   ];
 
   return (
@@ -33,25 +37,30 @@ export default function Nav() {
     >
       <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-2">
-          {/* ✅ 這裡改用字串路徑，對應 public/logo.svg；就算檔案缺也不會卡 build */}
           <Image src="/logo.svg" alt="PeaceDAO" width={36} height={36} priority />
           <span className="text-white font-semibold text-lg">PeaceDAO</span>
         </Link>
 
         <div className="hidden md:flex gap-8">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`transition ${
-                pathname === link.href
-                  ? 'text-white font-semibold'
-                  : 'text-white/70 hover:text-white'
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {links.map((link) => {
+            const isActive =
+              active === link.key ||
+              pathname === link.href ||
+              pathname.startsWith(link.href + '/');
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`transition ${
+                  isActive
+                    ? 'text-white font-semibold'
+                    : 'text-white/70 hover:text-white'
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
 
         <div className="flex items-center gap-4">
