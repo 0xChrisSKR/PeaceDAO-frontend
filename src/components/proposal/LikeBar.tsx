@@ -1,162 +1,92 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { useLanguage } from "@/components/LanguageProvider";
-import type { LikeBarProps } from "@/types/like";
+import { useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { useI18n } from '../../lib/i18n';
+
+type Props = {
+  /** 初始是否已按讚（可不傳） */
+  initialLiked?: boolean;
+  /** 初始讚數（可不傳） */
+  initialCount?: number;
+  /**
+   * 可選：切換時呼叫的外部動作（例如打 API）
+   * 若丟出錯誤會自動還原 optimistic 狀態並顯示錯誤訊息
+   */
+  onToggle?: (liked: boolean) => Promise<void> | void;
+  /** 可選：自訂 className */
+  className?: string;
+};
 
 export default function LikeBar({
-  proposalId,
-  snapshot,
-  user,
-  onLikeToggle,
-  onSubmitVerification,
-  disabled = false,
-  loading = false
-}: LikeBarProps) {
-  const { dictionary } = useLanguage();
-  const [optimisticLiked, setOptimisticLiked] = useState(user.hasLiked);
+  initialLiked = false,
+  initialCount = 0,
+  onToggle,
+  className,
+}: Props) {
+  const { t } = useI18n();
+  const [liked, setLiked] = useState<boolean>(initialLiked);
+  const [count, setCount] = useState<number>(initialCount);
   const [submitting, setSubmitting] = useState(false);
-  const [showVerify, setShowVerify] = useState(false);
-  const [proofUrl, setProofUrl] = useState("");
-  const [note, setNote] = useState("");
 
-  useEffect(() => {
-    setOptimisticLiked(user.hasLiked);
-  }, [user.hasLiked]);
+  async function handleToggle() {
+    if (submitting) return;
+    setSubmitting(true);
 
-  const totalLikes = snapshot.totalLikes + (optimisticLiked && !user.hasLiked ? 1 : 0) + (!optimisticLiked && user.hasLiked ? -1 : 0);
-  const supporters = snapshot.totalBackers ?? 0;
-  const likeDisabled = disabled || loading || submitting;
+    const next = !liked;
 
-  async function handleLike() {
-    if (likeDisabled) return;
-    const nextValue = !optimisticLiked;
-    setOptimisticLiked(nextValue);
+    // optimistic UI
+    setLiked(next);
+    setCount((c) => c + (next ? 1 : -1));
+
     try {
-      setSubmitting(true);
-      await onLikeToggle?.(nextValue);
+      if (onToggle) {
+        await onToggle(next);
+      }
+      // 成功提示（可自行調整或移除）
+      toast.success(
+        next
+          ? t('proposalLikes.on', 'Liked')
+          : t('proposalLikes.off', 'Unliked')
+      );
     } catch (error) {
       console.error(error);
-      setOptimisticLiked(user.hasLiked);
-      toast.error(dictionary.proposalLikes.toggleError);
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  async function handleSubmitVerification() {
-    if (!proofUrl) {
-      toast.error(dictionary.proposalLikes.proofRequired);
-      return;
-    }
-    if (submitting || disabled) return;
-    try {
-      setSubmitting(true);
-      await onSubmitVerification?.({ proofUrl, note });
-      setShowVerify(false);
-      setProofUrl("");
-      setNote("");
-    } catch (error) {
-      console.error(error);
-      toast.error(dictionary.proposalLikes.submitError);
+      // 還原 optimistic
+      setLiked(!next);
+      setCount((c) => c + (next ? -1 : 1));
+      // ✅ 使用 t()，不再存取 dictionary.proposalLikes.toggleError
+      toast.error(
+        t('proposalLikes.toggleError', 'Failed to update like')
+      );
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <div className="w-full rounded-xl border border-slate-200 bg-white/60 p-4 backdrop-blur dark:border-neutral-700 dark:bg-neutral-900/60">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold transition ${
-              optimisticLiked
-                ? "border-rose-600 bg-rose-600 text-white shadow"
-                : "border-neutral-300 bg-white text-neutral-800 shadow-sm hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700"
-            }`}
-            onClick={handleLike}
-            disabled={likeDisabled}
-            aria-pressed={optimisticLiked}
-          >
-            <span aria-hidden>❤️</span>
-            <span>{optimisticLiked ? dictionary.proposalLikes.liked : dictionary.proposalLikes.like}</span>
-          </button>
-
-          <div className="text-sm text-neutral-700 dark:text-neutral-300">
-            <span className="font-semibold">{totalLikes}</span> {dictionary.proposalLikes.likesLabel}
-            {" · "}
-            <span className="font-semibold">{supporters}</span> {dictionary.proposalLikes.supportersLabel}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {snapshot.txHashes?.length ? (
-            <a
-              href={`https://bscscan.com/tx/${snapshot.txHashes[0]}`}
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs underline text-neutral-600 transition hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100"
-            >
-              {dictionary.proposalLikes.viewTx}
-            </a>
-          ) : null}
-
-          {user.isVerifier ? (
-            <button
-              type="button"
-              onClick={() => setShowVerify((x) => !x)}
-              disabled={disabled}
-              className="text-xs px-3 py-2 rounded-lg border border-neutral-300 text-neutral-700 transition hover:bg-neutral-50 disabled:opacity-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
-            >
-              {showVerify ? dictionary.proposalLikes.closeVerify : dictionary.proposalLikes.openVerify}
-            </button>
-          ) : null}
-        </div>
-      </div>
-
-      {loading ? (
-        <p className="mt-3 text-xs text-neutral-500">{dictionary.common.loading}</p>
-      ) : null}
-
-      {showVerify && user.isVerifier ? (
-        <div className="mt-4 grid gap-2">
-          <input
-            type="url"
-            className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-800 focus:border-emerald-400 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
-            placeholder={dictionary.proposalLikes.proofPlaceholder}
-            value={proofUrl}
-            onChange={(event) => setProofUrl(event.target.value)}
-            disabled={submitting}
-          />
-          <textarea
-            className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-800 focus:border-emerald-400 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
-            placeholder={dictionary.proposalLikes.notePlaceholder}
-            rows={3}
-            value={note}
-            onChange={(event) => setNote(event.target.value)}
-            disabled={submitting}
-          />
-          <button
-            type="button"
-            className="self-start rounded-lg border border-emerald-600 bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-50"
-            onClick={handleSubmitVerification}
-            disabled={submitting}
-          >
-            {dictionary.proposalLikes.submit}
-          </button>
-        </div>
-      ) : null}
-
-      {snapshot.verifiedProofUrl ? (
-        <div className="mt-3 text-xs text-neutral-600 dark:text-neutral-300">
-          ✅ {dictionary.proposalLikes.verifiedLabel}:{" "}
-          <a className="underline" href={snapshot.verifiedProofUrl} target="_blank" rel="noreferrer">
-            {dictionary.proposalLikes.viewTx}
-          </a>
-        </div>
-      ) : null}
+    <div className={className}>
+      <button
+        onClick={handleToggle}
+        disabled={submitting}
+        className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm transition-all ${
+          liked
+            ? 'bg-rose-600 text-white hover:bg-rose-700'
+            : 'bg-white/10 text-white hover:bg-white/20'
+        } disabled:opacity-60`}
+        aria-pressed={liked}
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill={liked ? 'currentColor' : 'none'}
+          stroke="currentColor"
+          strokeWidth="1.7"
+        >
+          <path d="M12 21s-6.716-4.484-9.428-7.2C.86 12.086.5 10.177 1.37 8.77 2.33 7.215 4.61 6.5 6.2 7.34c1.02.55 1.8 1.54 1.8 1.54s.78-.99 1.8-1.54c1.59-.84 3.87-.126 4.83 1.43.87 1.41.51 3.316-1.2 5.03C18.716 16.516 12 21 12 21z" />
+        </svg>
+        <span>{count}</span>
+      </button>
     </div>
   );
 }
