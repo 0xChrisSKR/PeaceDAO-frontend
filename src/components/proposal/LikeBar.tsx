@@ -13,7 +13,7 @@ interface LikeBarProps {
 
 export default function LikeBar({ proposalId, initialLiked, initialCount }: LikeBarProps) {
   const { isConnected, address } = useAccount();
-  const { t, dictionary } = useI18n();
+  const { t } = useI18n(); // ✅ 不再解構 dictionary
 
   const [liked, setLiked] = useState(initialLiked);
   const [count, setCount] = useState(initialCount);
@@ -21,12 +21,9 @@ export default function LikeBar({ proposalId, initialLiked, initialCount }: Like
 
   async function handleToggleLike() {
     if (!isConnected || !address) {
-      toast.error(
-        t('proposalLikes.needWallet', dictionary?.['proposalLikes.needWallet'] ?? '請先連接錢包')
-      );
+      toast.error(t('proposalLikes.needWallet', '請先連接錢包'));
       return;
     }
-
     if (submitting) return;
 
     setSubmitting(true);
@@ -35,24 +32,11 @@ export default function LikeBar({ proposalId, initialLiked, initialCount }: Like
     setCount((prev) => prev + (optimisticLiked ? 1 : -1));
 
     try {
-      // 模擬 async 請求，之後替換成真實 API
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      toast.success(
-        t(
-          'proposalLikes.toggleSuccess',
-          dictionary?.['proposalLikes.toggleSuccess'] ?? '操作成功'
-        )
-      );
-    } catch (error) {
-      console.error(error);
-      toast.error(
-        t(
-          'proposalLikes.toggleError',
-          dictionary?.['proposalLikes.toggleError'] ?? '操作失敗，請稍後再試'
-        )
-      );
-
+      // TODO: 換成實際 API
+      await new Promise((r) => setTimeout(r, 600));
+      toast.success(t('proposalLikes.toggleSuccess', '操作成功'));
+    } catch (e) {
+      toast.error(t('proposalLikes.toggleError', '操作失敗，請稍後再試'));
       // rollback
       setLiked(!optimisticLiked);
       setCount((prev) => prev - (optimisticLiked ? 1 : -1));
