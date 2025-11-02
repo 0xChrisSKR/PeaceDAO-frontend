@@ -1,29 +1,63 @@
 'use client';
 
-import { useEffect } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
-import { useAccount } from 'wagmi';
-import SiteNav from '../SiteNav';
-import WalletControls from '../WalletControls';
-import { ensureWeb3Modal } from '../../lib/w3m';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useI18n } from '@/lib/i18n';
+import WalletControls from '@/components/WalletControls'; // ✅ 修正路徑
+import Logo from '@/public/logo.svg'; // ✅ 你的 logo 圖檔
+import { useEffect, useState } from 'react';
 
 export default function Nav() {
-  const { isConnected } = useAccount();
+  const pathname = usePathname();
+  const { t } = useI18n();
+  const [scrolled, setScrolled] = useState(false);
 
-  useEffect(() => { ensureWeb3Modal(); }, []);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const links = [
+    { href: '/', label: t('nav.home', 'Home') },
+    { href: '/donate', label: t('nav.donate', 'Donate') },
+    { href: '/treasury', label: t('nav.treasury', 'Treasury') },
+    { href: '/whitepaper', label: t('nav.whitepaper', 'Whitepaper') },
+  ];
 
   return (
-    <header className="w-full">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+    <nav
+      className={`fixed top-0 left-0 w-full z-40 transition-all ${
+        scrolled ? 'bg-black/80 backdrop-blur-md' : 'bg-transparent'
+      }`}
+    >
+      <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-2">
-          <Image src="/logo.svg" alt="World Peace" width={28} height={28} />
-          <span className="text-white/90 font-semibold">世界和平</span>
+          <Image src={Logo} alt="PeaceDAO" width={36} height={36} />
+          <span className="text-white font-semibold text-lg">PeaceDAO</span>
         </Link>
-        <div className="hidden md:block"><SiteNav /></div>
-        <div className="flex items-center gap-3"><WalletControls /></div>
+
+        <div className="hidden md:flex gap-8">
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`transition ${
+                pathname === link.href
+                  ? 'text-white font-semibold'
+                  : 'text-white/70 hover:text-white'
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-4">
+          <WalletControls /> {/* ✅ 修正錢包連結元件 */}
+        </div>
       </div>
-      <div className="md:hidden px-4"><SiteNav /></div>
-    </header>
+    </nav>
   );
 }
