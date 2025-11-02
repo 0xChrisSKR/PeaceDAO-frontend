@@ -4,8 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@/lib/i18n';
-import WalletControls from '@/components/WalletControls'; // ✅ 修正路徑
-import Logo from '@/public/logo.svg'; // ✅ 你的 logo 圖檔
+import WalletControls from '@/components/WalletControls';
 import { useEffect, useState } from 'react';
 
 export default function Nav() {
@@ -34,7 +33,8 @@ export default function Nav() {
     >
       <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-2">
-          <Image src={Logo} alt="PeaceDAO" width={36} height={36} />
+          {/* ✅ 這裡改用字串路徑，對應 public/logo.svg；就算檔案缺也不會卡 build */}
+          <Image src="/logo.svg" alt="PeaceDAO" width={36} height={36} priority />
           <span className="text-white font-semibold text-lg">PeaceDAO</span>
         </Link>
 
@@ -55,7 +55,7 @@ export default function Nav() {
         </div>
 
         <div className="flex items-center gap-4">
-          <WalletControls /> {/* ✅ 修正錢包連結元件 */}
+          <WalletControls />
         </div>
       </div>
     </nav>
