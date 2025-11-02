@@ -1,7 +1,13 @@
-let inited = false;
+import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react';
+import { mainnet, bsc, polygon } from 'wagmi/chains';
+
+const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || '';
+
+const chains = [mainnet, bsc, polygon];
+export const config = defaultWagmiConfig({ chains, projectId });
+
 export function ensureWeb3Modal() {
-  if (typeof window === 'undefined') return;
-  if (inited) return;
-  inited = true;
-  // 放你的 Web3Modal / Reown AppKit 初始化也可；目前保持 no-op 保證可編譯
+  if (typeof window !== 'undefined') {
+    createWeb3Modal({ wagmiConfig: config, projectId });
+  }
 }
