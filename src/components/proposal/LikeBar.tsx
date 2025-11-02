@@ -2,65 +2,79 @@
 
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { useI18n } from '../../lib/i18n';
+import { useAccount } from 'wagmi';
+import { useI18n } from '@/lib/i18n';
 
-type Props = {
-  initialLiked?: boolean;
-  initialCount?: number;
-  onToggle?: (liked: boolean) => Promise<void> | void;
-  className?: string;
-};
+interface LikeBarProps {
+  proposalId: string;
+  initialLiked: boolean;
+  initialCount: number;
+}
 
-export default function LikeBar({
-  initialLiked = false,
-  initialCount = 0,
-  onToggle,
-  className,
-}: Props) {
-  const { t } = useI18n();
-  const [liked, setLiked] = useState<boolean>(initialLiked);
-  const [count, setCount] = useState<number>(initialCount);
+export default function LikeBar({ proposalId, initialLiked, initialCount }: LikeBarProps) {
+  const { isConnected, address } = useAccount();
+  const { t, dictionary } = useI18n();
+
+  const [liked, setLiked] = useState(initialLiked);
+  const [count, setCount] = useState(initialCount);
   const [submitting, setSubmitting] = useState(false);
 
-  async function handleToggle() {
+  async function handleToggleLike() {
+    if (!isConnected || !address) {
+      toast.error(
+        t('proposalLikes.needWallet', dictionary?.['proposalLikes.needWallet'] ?? '請先連接錢包')
+      );
+      return;
+    }
+
     if (submitting) return;
+
     setSubmitting(true);
-
-    const next = !liked;
-
-    // optimistic UI
-    setLiked(next);
-    setCount((c) => c + (next ? 1 : -1));
+    const optimisticLiked = !liked;
+    setLiked(optimisticLiked);
+    setCount((prev) => prev + (optimisticLiked ? 1 : -1));
 
     try {
-      if (onToggle) await onToggle(next);
-      toast.success(next ? t('proposalLikes.on', 'Liked') : t('proposalLikes.off', 'Unliked'));
+      // 模擬 async 請求，之後替換成真實 API
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      toast.success(
+        t(
+          'proposalLikes.toggleSuccess',
+          dictionary?.['proposalLikes.toggleSuccess'] ?? '操作成功'
+        )
+      );
     } catch (error) {
       console.error(error);
-      // 還原
-      setLiked(!next);
-      setCount((c) => c + (next ? -1 : 1));
-      toast.error(t('proposalLikes.toggleError', 'Failed to update like'));
+      toast.error(
+        t(
+          'proposalLikes.toggleError',
+          dictionary?.['proposalLikes.toggleError'] ?? '操作失敗，請稍後再試'
+        )
+      );
+
+      // rollback
+      setLiked(!optimisticLiked);
+      setCount((prev) => prev - (optimisticLiked ? 1 : -1));
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <div className={className}>
+    <div className="flex items-center gap-3 mt-3">
       <button
-        onClick={handleToggle}
+        onClick={handleToggleLike}
         disabled={submitting}
-        className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm transition-all ${
-          liked ? 'bg-rose-600 text-white hover:bg-rose-700' : 'bg-white/10 text-white hover:bg-white/20'
-        } disabled:opacity-60`}
-        aria-pressed={liked}
+        className={`px-4 py-2 rounded-md text-sm font-medium border transition-colors ${
+          liked
+            ? 'bg-pink-600 text-white border-pink-500 hover:bg-pink-700'
+            : 'bg-transparent text-white/70 border-white/40 hover:text-white hover:border-white/60'
+        }`}
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill={liked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.7">
-          <path d="M12 21s-6.716-4.484-9.428-7.2C.86 12.086.5 10.177 1.37 8.77 2.33 7.215 4.61 6.5 6.2 7.34c1.02.55 1.8 1.54 1.8 1.54s.78-.99 1.8-1.54c1.59-.84 3.87-.126 4.83 1.43.87 1.41.51 3.316-1.2 5.03C18.716 16.516 12 21 12 21z" />
-        </svg>
-        <span>{count}</span>
+        ❤️ {liked ? t('proposalLikes.liked', '已按讚') : t('proposalLikes.like', '按讚')}
       </button>
+      <span className="text-white/60 text-sm">{count}</span>
     </div>
   );
 }
