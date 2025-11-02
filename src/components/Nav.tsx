@@ -8,11 +8,12 @@ import WalletControls from '@/components/WalletControls';
 import { useEffect, useState } from 'react';
 
 interface NavProps {
-  active?: string; // ✅ 新增這行，允許外部傳 active props
+  active?: string;
 }
 
 export default function Nav({ active }: NavProps) {
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+  const pathname = rawPathname ?? '/'; // ✅ 防呆：絕不為 null
   const { t } = useI18n();
   const [scrolled, setScrolled] = useState(false);
 
@@ -52,9 +53,7 @@ export default function Nav({ active }: NavProps) {
                 key={link.href}
                 href={link.href}
                 className={`transition ${
-                  isActive
-                    ? 'text-white font-semibold'
-                    : 'text-white/70 hover:text-white'
+                  isActive ? 'text-white font-semibold' : 'text-white/70 hover:text-white'
                 }`}
               >
                 {link.label}
